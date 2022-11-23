@@ -13,6 +13,7 @@ function searchRouteDetail(
   pathname: string,
   routes: RouteObject[],
 ): RouteObject | null {
+  console.log('routes', routes)
   for (const route of routes) {
     console.log('route', route)
     if (route.path === pathname) {
@@ -20,7 +21,10 @@ function searchRouteDetail(
       return route
     }
     if (route.children) {
-      return searchRouteDetail(pathname, route.children)
+      const res = searchRouteDetail(pathname, route.children)
+      if (res) {
+        return res
+      }
     }
   }
   return null
@@ -39,6 +43,7 @@ function guard(
   const { pathname } = location
   // 找到对应的路由信息，判断有没有权限控制
   const routeDetail = searchRouteDetail(pathname, routes)
+  console.log('routeDetail', routeDetail)
   //没有找到路由，跳转404
   if (!routeDetail) {
     navigate('/404')
@@ -46,6 +51,7 @@ function guard(
   }
 
   const token = getItem('token')
+  console.log('token', token)
   //如果路径需要权限验证
   if (!token) {
     if (pathname === '/') {
@@ -59,7 +65,7 @@ function guard(
     navigate('/')
     return false
   }
-  return false
+  return true
 }
 
 /**
