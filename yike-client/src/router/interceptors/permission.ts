@@ -1,12 +1,10 @@
 import NProgress from 'nprogress'
 import '@/components/NProgress/nprogress.less'
 import { notification } from 'antd'
-import router from './router'
 
 NProgress.configure({ showSpinner: false })
 
 const allowList = ['login', 'register', 'registerResult']
-export const loginRoutePath = '/auth/login'
 const defaultRoutePath = '/dashboard/my-dashboard'
 
 router.beforeEach((to, from, next) => {

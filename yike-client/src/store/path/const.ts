@@ -1,1 +1,1 @@
-export const loginRoutePath = '/auth/login'
+export const loginRoutePath = '/login'

@@ -1,17 +1,23 @@
 import React, { ChangeEvent, useState, useEffect } from 'react'
-import Input from '@/components/InputBox'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { login } from '@/api/system/auth'
 import { sendCodeCaptcha } from '@/api/system/common'
 import { setItem } from '@/utils/storage'
-import { useNavigate } from 'react-router-dom'
+import { setToken } from '@/features/user/userSlice'
+import { selectLogState, setLogState } from '@/features/system/systemSlice'
+import Input from '@/components/InputBox'
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const [user, setUser] = useState({
     username: 'test1',
     password: '123456',
     code: '',
   })
+
   const handleUserChange = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     const nextUser = {
       ...user,
@@ -34,13 +40,20 @@ const Register: React.FC = () => {
     })
     if (data.errorCode === 0 && data.msg === 'ok') {
       setItem('token', data.data as any)
-      navigate('/common/main')
+      dispatch(setToken(data.data))
+      dispatch(setLogState(true))
     }
   }
 
+  const logState = useSelector(selectLogState)
+
   useEffect(() => {
-    handleCode()
-  }, [])
+    if (logState) {
+      navigate('/')
+    } else {
+      handleCode()
+    }
+  }, [logState])
 
   return (
     <>
@@ -77,4 +90,4 @@ const Register: React.FC = () => {
   )
 }
 
-export default Register
+export default Login

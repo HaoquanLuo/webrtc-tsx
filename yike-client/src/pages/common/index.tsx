@@ -1,6 +1,7 @@
 import React from 'react'
-import '@/App.css'
 import { Outlet } from 'react-router-dom'
+
+import '@/App.css'
 
 const CommonPage: React.FC = () => {
   return (

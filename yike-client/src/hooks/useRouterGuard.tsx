@@ -1,29 +1,23 @@
-import {
-  Location,
-  NavigateFunction,
-  RouteObject,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
-import { getItem } from '@/utils/storage'
-import { useState, useEffect } from 'react'
+import { Location, NavigateFunction, RouteObject } from 'react-router-dom'
+import { getToken } from '@/utils/helpers/getToken'
 
 //递归查询对应的路由
 function searchRouteDetail(
   pathname: string,
   routes: RouteObject[],
 ): RouteObject | null {
-  console.log('routes', routes)
+  // 遍历每个路由映射
   for (const route of routes) {
-    console.log('route', route)
+    // 若匹配则返回该路由
     if (route.path === pathname) {
-      console.log('found route')
       return route
     }
+    // 有嵌套路由则递归遍历
     if (route.children) {
-      const res = searchRouteDetail(pathname, route.children)
-      if (res) {
-        return res
+      const resultRoute = searchRouteDetail(pathname, route.children)
+      // 找到路由（不为空）才返回
+      if (resultRoute) {
+        return resultRoute
       }
     }
   }
@@ -35,37 +29,39 @@ function searchRouteDetail(
  * @param location
  * @param routes
  */
-function guard(
+export function guard(
   location: Location, //类型在react-router-dom中导入
   navigate: NavigateFunction,
   routes: RouteObject[],
 ) {
   const { pathname } = location
+  console.log('location', location)
+  const token = getToken()
   // 找到对应的路由信息，判断有没有权限控制
   const routeDetail = searchRouteDetail(pathname, routes)
-  console.log('routeDetail', routeDetail)
+  // console.log('routeDetail', routeDetail)
   //没有找到路由，跳转404
   if (!routeDetail) {
-    navigate('/404')
+    // navigate('/404')
     return false
   }
-
-  const token = getItem('token')
-  console.log('token', token)
   //如果路径需要权限验证
   if (!token) {
-    if (pathname === '/') {
-      return true
-    }
-    const inAuth = new RegExp(/\/auth(.*)/, 'gim')
+    const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
     // 如果匹配路径 '/auth'
     if (pathname.match(inAuth)) {
+      return false
+    }
+    if (pathname === '/' || pathname === '/login' || pathname === '/register') {
       return true
     }
-    navigate('/')
     return false
+  } else {
+    if (pathname === '/login') {
+      navigate('/auth')
+    }
+    return true
   }
-  return true
 }
 
 /**
@@ -73,13 +69,23 @@ function guard(
  * @param routes
  * @returns
  */
-export const RouterGuard = (routes: RouteObject[]) => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [isPassed, setIsPassed] = useState(false)
-  useEffect(() => {
-    setIsPassed(guard(location, navigate, routes))
-  }, [location, navigate, routes])
+// export const useRouterGuard = (routes: RouteObject[]) => {
+//   // debugger
+//   const location = useLocation()
+//   const navigate = useNavigate()
+//   const [isPassed, setIsPassed] = useState(false)
 
-  return isPassed
-}
+//   useEffect(() => {
+//     let flag = false
+//     if (!flag) {
+//       setIsPassed(guard(location, navigate, routes))
+//     }
+//     return () => {
+//       flag = true
+//     }
+//   }, [location, navigate, routes])
+
+//   const RouterView = useRoutes(routes)
+//   const res = isPassed ? RouterView : null
+//   return res
+// }

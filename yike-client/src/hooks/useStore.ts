@@ -1,3 +1,3 @@
-import { store } from '@/store/user'
+import { store } from '@/store'
 
 export const useStore = () => store.getState()

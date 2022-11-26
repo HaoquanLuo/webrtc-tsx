@@ -3,7 +3,7 @@ import { notification } from 'antd'
 import { useStore } from '@/hooks/useStore'
 import { ACCESS_TOKEN } from '@/store/user/const'
 import { loginRoutePath } from '@/store/path/const'
-import userSlice from '@/features/user/userSlice'
+import { removeToken } from '@/features/user/userSlice'
 
 // redux
 const userState = useStore().user
@@ -49,7 +49,7 @@ const errorHandler = (error: AxiosError) => {
         }, 1500)
       }
       if (token) {
-        userSlice.actions.deleteToken()
+        removeToken()
       }
       reload()
     }

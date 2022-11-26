@@ -1,9 +1,13 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import md5 from 'md5'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import Input from '@/components/InputBox'
 import { getEmailCaptcha, register } from '@/api/system/auth'
+import { selectLogState } from '@/features/system/systemSlice'
 
 const Register: React.FC = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState({
     username: 'test1',
     password: '123456',
@@ -31,6 +35,13 @@ const Register: React.FC = () => {
       email: user.email,
     })
   }
+
+  const logState = useSelector(selectLogState)
+  useEffect(() => {
+    if (logState) {
+      navigate('/')
+    }
+  }, [logState])
   return (
     <>
       <h2>Sign Up</h2>
