@@ -21,14 +21,14 @@ router.post(
     // if (code.length < 6) {
     //   code += 0
     // }
+
+    /**
+     * @todo 为了方便将邮件验证码改为123456，上线前要改回去
+     */
     const code = (123456).toFixed()
     // 在会话中添加验证码字段code
     ctx.session!.code = code
-    console.log(
-      'register send code:',
-      ctx.session!.code,
-      typeof ctx.session!.code,
-    )
+    console.log('邮件验证码:', ctx.session!.code, typeof ctx.session!.code)
     // 发送邮件
     // await sendEmail({
     //   to: email,
