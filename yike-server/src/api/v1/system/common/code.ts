@@ -19,7 +19,7 @@ router.get('/code', async (ctx: Models.Ctx) => {
     ignoreChars: '0o1i', // 过滤掉某些字符， 如 0o1i
     noise: 1, //干扰线条数目
     width: 100, //宽度
-    // heigth:40,//高度
+    // height:40,//高度
     color: true, //验证码字符是否有颜色，默认是没有，但是如果设置了背景颜色，那么默认就是有字符颜色
     background: '#cc9966', //背景大小
   })
