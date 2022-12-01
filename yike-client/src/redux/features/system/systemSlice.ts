@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { getToken } from '@/utils/helpers/getToken'
-import { StoreProps } from '@/typings/store'
+import { StoreProps } from '@/common/typings/store'
+import { getToken } from '@/common/utils/helpers/getToken'
 
 export interface SystemState {
   logState: boolean

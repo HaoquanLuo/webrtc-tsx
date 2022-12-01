@@ -1,23 +1,22 @@
 import React from 'react'
 
-const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
+const ShadowBox: React.FC<{ children: React.ReactElement }> = (props) => {
   const { children } = props
   return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          background: '#999666',
-          width: '100%',
-          height: '2rem',
-        }}
-      >
-        Header
-      </div>
+    <div shadow-xl rd-2 m-3 p-2 b-2 flex-1>
       {children}
-    </>
+    </div>
+  )
+}
+
+const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
+  const { children } = props
+
+  return (
+    <div flex-1 flex>
+      <div bg-yellow w-60 h-full></div>
+      <ShadowBox>{children}</ShadowBox>
+    </div>
   )
 }
 

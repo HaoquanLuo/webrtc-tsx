@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { removeItem } from '@/utils/storage'
-import { getToken } from '@/utils/helpers/getToken'
-import { StoreProps } from '@/typings/store'
+import { getToken } from '@/common/utils/helpers/getToken'
+import { StoreProps } from '@/common/typings/store'
+import { removeItem } from '@/common/utils/storage'
 
 export interface UserState {
   token: string

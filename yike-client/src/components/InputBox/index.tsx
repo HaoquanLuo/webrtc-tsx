@@ -1,4 +1,4 @@
-import { generateUID } from '@/utils/helpers/generateUid'
+import { generateUID } from '@/common/utils/helpers/generateUid'
 import React, { ChangeEvent } from 'react'
 
 interface Input {

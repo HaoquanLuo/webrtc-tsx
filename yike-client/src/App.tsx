@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import UserLayout from './layout/UserLayout'
+import SystemLayout from './layout/SystemLayout'
 import { finalRoutes } from './router'
 import LoadingPage from './pages/exception/Loading'
 
@@ -11,12 +11,12 @@ function App() {
 
   useEffect(() => {}, [])
   return (
-    <div className="app">
-      <UserLayout>
-        <React.Suspense fallback={<LoadingPage />}>
+    <div className="app" shadow-inset shadow-xl rd-2>
+      <React.Suspense fallback={<LoadingPage />}>
+        <SystemLayout>
           <RouterProvider router={router} />
-        </React.Suspense>
-      </UserLayout>
+        </SystemLayout>
+      </React.Suspense>
     </div>
   )
 }

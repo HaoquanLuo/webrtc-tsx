@@ -3,10 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { login } from '@/api/system/auth'
 import { sendCodeCaptcha } from '@/api/system/common'
-import { setItem } from '@/utils/storage'
-import { setToken } from '@/features/user/userSlice'
-import { selectLogState, setLogState } from '@/features/system/systemSlice'
 import Input from '@/components/InputBox'
+import { setItem } from '@/common/utils/storage'
+import {
+  setLogState,
+  selectLogState,
+} from '@/redux/features/system/systemSlice'
+import { setToken } from '@/redux/features/user/userSlice'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()

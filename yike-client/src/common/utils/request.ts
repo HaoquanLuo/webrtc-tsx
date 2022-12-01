@@ -1,12 +1,12 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { notification } from 'antd'
-import { useStore } from '@/hooks/useStore'
-import { ACCESS_TOKEN } from '@/store/user/const'
-import { loginRoutePath } from '@/store/path/const'
-import { removeToken } from '@/features/user/userSlice'
+import { loginRoutePath } from '@/common/constants/routes'
+import { ACCESS_TOKEN } from '@/common/constants/user'
+import { removeToken } from '@/redux/features/user/userSlice'
+import { getStore } from './getStore'
 
 // redux
-const userState = useStore().user
+const userState = getStore().user
 
 // axios 基础配置
 axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASE_URL

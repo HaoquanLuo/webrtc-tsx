@@ -1,6 +1,7 @@
-import { getToken } from '@/utils/helpers/getToken'
+import { getToken } from '@/common/utils/helpers/getToken'
+import UserLayout from '@/layout/UserLayout'
 import { lazy, useEffect } from 'react'
-import { Link, redirect, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 // 快速导入工具函数
 export const lazyLoad = (moduleName: string) => {
@@ -17,6 +18,7 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
 ) => {
   const { children } = props
   const { pathname } = useLocation()
+  const navigate = useNavigate()
 
   const token = getToken()
   const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
@@ -24,9 +26,13 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
   useEffect(() => {
     // 未登录且在 `/auth` 路径中
     if (!token && pathname.match(inAuth)?.[0]) {
-      redirect('/login')
+      navigate('/login', {
+        replace: true,
+      })
     }
   }, [pathname])
+
+  const userView = <UserLayout>{children}</UserLayout>
 
   const guidelines = (
     <>
@@ -41,5 +47,5 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
     </>
   )
 
-  return token ? children : guidelines
+  return token ? userView : guidelines
 }

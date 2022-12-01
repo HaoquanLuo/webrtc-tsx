@@ -3,7 +3,7 @@ import { RouteGuard, lazyLoad } from '@/core/RouteGuard'
 import { constantRoutesMap } from './modules/common'
 import { authRoutesMap } from './modules/auth'
 import CommonPage from '@/pages/common'
-import { ExceptionPaths } from './constants'
+import { ExceptionPaths } from '@/common/constants/components'
 
 export const finalRoutes: RouteObject[] = [
   {

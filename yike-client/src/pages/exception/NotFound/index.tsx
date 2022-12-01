@@ -1,5 +1,4 @@
-import { selectLogState } from '@/features/system/systemSlice'
-import { store } from '@/store'
+import { selectLogState } from '@/redux/features/system/systemSlice'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'

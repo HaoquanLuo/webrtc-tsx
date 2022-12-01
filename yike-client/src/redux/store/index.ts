@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from '@/features/user/userSlice'
-import systemReducer from '@/features/system/systemSlice'
+import userReducer from '../features/user/userSlice'
+import systemReducer from '../features/system/systemSlice'
 
 export const store = configureStore({
   reducer: {

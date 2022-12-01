@@ -1,6 +1,6 @@
 import { RouteObject } from 'react-router-dom'
 import { lazyLoad } from '@/core/RouteGuard'
-import { AuthPaths, ExceptionPaths } from '@/router/constants'
+import { AuthPaths, ExceptionPaths } from '@/common/constants/components'
 
 /**
  * 权限路由

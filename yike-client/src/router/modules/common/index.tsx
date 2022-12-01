@@ -1,6 +1,6 @@
 import { RouteObject } from 'react-router-dom'
 import { lazyLoad } from '@/core/RouteGuard'
-import { CommonPaths } from '@/router/constants'
+import { CommonPaths } from '@/common/constants/components'
 
 /**
  * 基础路由

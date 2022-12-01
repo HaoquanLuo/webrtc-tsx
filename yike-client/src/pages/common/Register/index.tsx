@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Input from '@/components/InputBox'
 import { getEmailCaptcha, register } from '@/api/system/auth'
-import { selectLogState } from '@/features/system/systemSlice'
+import { selectLogState } from '@/redux/features/system/systemSlice'
 
 const Register: React.FC = () => {
   const navigate = useNavigate()

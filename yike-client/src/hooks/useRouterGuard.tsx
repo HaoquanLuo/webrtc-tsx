@@ -1,5 +1,13 @@
-import { Location, NavigateFunction, RouteObject } from 'react-router-dom'
-import { getToken } from '@/utils/helpers/getToken'
+import { getToken } from '@/common/utils/helpers/getToken'
+import { useState, useEffect } from 'react'
+import {
+  Location,
+  NavigateFunction,
+  RouteObject,
+  useLocation,
+  useNavigate,
+  useRoutes,
+} from 'react-router-dom'
 
 //递归查询对应的路由
 function searchRouteDetail(
@@ -69,23 +77,23 @@ export function guard(
  * @param routes
  * @returns
  */
-// export const useRouterGuard = (routes: RouteObject[]) => {
-//   // debugger
-//   const location = useLocation()
-//   const navigate = useNavigate()
-//   const [isPassed, setIsPassed] = useState(false)
+export const useRouterGuard = (routes: RouteObject[]) => {
+  // debugger
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [isPassed, setIsPassed] = useState(false)
 
-//   useEffect(() => {
-//     let flag = false
-//     if (!flag) {
-//       setIsPassed(guard(location, navigate, routes))
-//     }
-//     return () => {
-//       flag = true
-//     }
-//   }, [location, navigate, routes])
+  useEffect(() => {
+    let flag = false
+    if (!flag) {
+      setIsPassed(guard(location, navigate, routes))
+    }
+    return () => {
+      flag = true
+    }
+  }, [location, navigate, routes])
 
-//   const RouterView = useRoutes(routes)
-//   const res = isPassed ? RouterView : null
-//   return res
-// }
+  const RouterView = useRoutes(routes)
+  const res = isPassed ? RouterView : null
+  return res
+}

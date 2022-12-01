@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request from '@/common/utils/request'
 import { AxiosResponse } from 'axios'
 
 const Auth = '/system/auth'
