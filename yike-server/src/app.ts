@@ -1,17 +1,27 @@
 import Koa from 'koa'
-import http from 'http'
+import { createServer } from 'http'
 import initCore from './core/Init'
 import Config from './config/Config'
+import { Server } from 'socket.io'
+import { SIO } from './common/typings/socket'
 // 创建koa实例
 const app = new Koa()
 // 创建服务器
-const server: http.Server = new http.Server(app.callback())
-
+const httpServer = createServer(app.callback())
+// 创建io实例
+export const sio = new Server<
+  SIO.ClientToServerEvents,
+  SIO.ServerToClientEvents,
+  SIO.InterServiceEvents,
+  SIO.SocketData
+>(httpServer, {
+  cors: {
+    origin: '*',
+  },
+})
 // 执行初始化
-initCore(app, server)
+initCore(app, httpServer, sio)
 // 监听端口
-app.listen(Config.HTTP_PORT, () => {
-  console.log('run success')
-  console.log(`app started at port ${Config.HTTP_PORT}...`)
-  console.log(process.env.NODE_ENV)
+httpServer.listen(Config.HTTP_PORT, () => {
+  console.log(`ENV: ${process.env.NODE_ENV}, PORT: ${Config.HTTP_PORT}.`)
 })

@@ -6,7 +6,12 @@ export class HttpException extends Error {
   public data: any
   public isBuffer = false
   public responseType: string | undefined
-  constructor(data?: unknown, msg = '服务器异常，请联系管理员', errorCode = 10000, code = 400) {
+  constructor(
+    data?: unknown,
+    msg = '服务器异常，请联系管理员',
+    errorCode = 10000,
+    code = 400,
+  ) {
     super()
     this.message = msg
     this.errorCode = errorCode
@@ -23,13 +28,19 @@ export class ParameterException extends HttpException {
     this.errorCode = errorCode || 10000
   }
 }
-
 // http请求成功
 export class Success extends HttpException {
   public data
   public responseType
   public session
-  constructor(data?: any, msg = 'ok', code = 200, errorCode = 0, responseType?: string, session?: string) {
+  constructor(
+    data?: any,
+    msg = 'ok',
+    code = 200,
+    errorCode = 0,
+    responseType?: string,
+    session?: string,
+  ) {
     super()
     this.code = code //200查询成功，201操作成功
     this.message = msg
@@ -74,7 +85,7 @@ export class AuthFailed extends HttpException {
     this.errorCode = errorCode || 10002
   }
 }
-// Forbbiden
+// Forbidden
 export class Forbbiden extends HttpException {
   constructor(msg: string, errorCode?: number) {
     super()
@@ -83,7 +94,6 @@ export class Forbbiden extends HttpException {
     this.errorCode = errorCode || 100006
   }
 }
-
 // 查询失败
 export class QueryFailed extends HttpException {
   constructor(msg?: string, errorCode?: number) {
@@ -93,7 +103,6 @@ export class QueryFailed extends HttpException {
     this.errorCode = errorCode || 100006
   }
 }
-
 // 数据库出错
 export class DataBaseFailed extends HttpException {
   constructor(msg?: string, errorCode?: number) {

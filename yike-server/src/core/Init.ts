@@ -1,24 +1,38 @@
-import Koa from 'koa'
-import http from 'http'
-import koaBodyParser from 'koa-bodyparser'
 import path from 'path'
-import { getAllFilesExport } from '../common/utils/utils'
+import Koa from 'koa'
+import io from 'socket.io'
+import http from 'http'
+import koaCors from '@koa/cors'
+import koaBodyParser from 'koa-bodyparser'
 import Router from 'koa-router'
+import session from 'koa-session'
 import Config from '../config/Config'
 import catchError from '../middlewares/catchError'
-import session from 'koa-session'
+import { getAllFilesExport } from '../common/utils/utils'
 import { updateRedisRole } from '../server/auth'
+
 class Init {
-  public static app: Koa<Koa.DefaultState, Koa.DefaultContext>
+  public static app: Koa
   public static server: http.Server
-  public static initCore(app: Koa<Koa.DefaultState, Koa.DefaultContext>, server: http.Server) {
+  public static io: io.Server
+  public static initCore(
+    app: Koa<Koa.DefaultState, Koa.DefaultContext>,
+    server: http.Server,
+    io: io.Server,
+  ) {
     Init.app = app
     Init.server = server
+    Init.io = io
     Init.loadBodyParser()
     Init.initCatchError()
     Init.loadSession()
     Init.initLoadRouters()
+    Init.loadCors()
     Init.updateRedisRole()
+  }
+
+  public static loadCors() {
+    Init.app.use(koaCors())
   }
 
   // 解析body参数
@@ -53,8 +67,8 @@ class Init {
           rolling: false, //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
           renew: false, //(boolean) renew session when session is nearly expired,
         },
-        Init.app
-      )
+        Init.app,
+      ),
     )
   }
 
