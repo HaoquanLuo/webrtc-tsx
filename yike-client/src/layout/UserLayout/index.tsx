@@ -3,8 +3,10 @@ import React from 'react'
 const ShadowBox: React.FC<{ children: React.ReactElement }> = (props) => {
   const { children } = props
   return (
-    <div shadow-xl rd-2 m-3 p-2 b-2 flex-1>
-      {children}
+    <div p-3 drop-shadow-xl w-full h-full flex>
+      <div shadow-xl rd-2 b-op-50 w-full h-full>
+        {children}
+      </div>
     </div>
   )
 }
@@ -13,8 +15,8 @@ const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
   const { children } = props
 
   return (
-    <div flex-1 flex>
-      <div bg-yellow w-60 h-full></div>
+    <div id="user-layout" flex-1 flex>
+      <div bg-yellow min-w="60!" h-a shrink-0></div>
       <ShadowBox>{children}</ShadowBox>
     </div>
   )

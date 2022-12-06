@@ -1,6 +1,8 @@
 import { getToken } from '@/common/utils/helpers/getToken'
 import UserLayout from '@/layout/UserLayout'
-import { lazy, useEffect } from 'react'
+import { setCurrentPath } from '@/redux/features/system/systemSlice'
+import { lazy, useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 // 快速导入工具函数
@@ -12,6 +14,9 @@ export const lazyLoad = (moduleName: string) => {
   return <Module />
 }
 
+export const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
+export const inIndex = new RegExp(/^\/$/)
+
 // 路由鉴权组件
 export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
   props,
@@ -19,17 +24,21 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
   const { children } = props
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const token = getToken()
-  const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
 
   useEffect(() => {
     // 未登录且在 `/auth` 路径中
-    if (!token && pathname.match(inAuth)?.[0]) {
+    if (!token && inAuth.test(pathname)) {
       navigate('/login', {
         replace: true,
       })
     }
+  }, [pathname])
+
+  useEffect(() => {
+    dispatch(setCurrentPath(pathname))
   }, [pathname])
 
   const userView = <UserLayout>{children}</UserLayout>

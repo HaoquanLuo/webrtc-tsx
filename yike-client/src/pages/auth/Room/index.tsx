@@ -1,47 +1,40 @@
-import React, { useEffect } from 'react'
+import { useLoadLocalStream } from '@/hooks/useLoadStream'
+import React, { useEffect, useState } from 'react'
 
 const Room: React.FC = () => {
-  async function getUserMediaStream() {
-    try {
-      const constraints = {
-        audio: true,
-        video: true,
-      }
-      return await navigator.mediaDevices.getUserMedia(constraints)
-    } catch (err: any) {
-      throw new Error(err)
-    }
+  const [roomUsers, setRoomUsers] = useState(1)
+  useLoadLocalStream('videos-container')
+
+  const addFakeCamera = () => {
+    const container = document.getElementById('videos-container')!
+    const camera = document.createElement('div')
+    camera.style.width = '100%'
+    camera.style.height = '100%'
+    camera.style.position = 'relative'
+    camera.style.borderRadius = '8px'
+    camera.style.color = 'yellow'
+    camera.innerHTML =
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi placeat, quasi dolores cum quo magnam officiis nam fugiat fuga quia deleniti provident, assumenda doloribus quibusdam laborum perferendis ducimus enim porro.      Exercitationem assumenda earum natus sint provident et amet similique! Explicabo voluptatem ab, odit distinctio dolores molestiae. Eligendi ullam corporis necessitatibus laboriosam, eveniet accusamus recusandae doloremque iusto non magni voluptatibus officia?'
+
+    container.appendChild(camera)
   }
 
   useEffect(() => {
-    const myVideo: HTMLVideoElement = document.querySelector('#my-video')!
-    getUserMediaStream().then((res) => {
-      try {
-        myVideo.srcObject = res
-      } catch (error) {
-        console.log(error)
+    setTimeout(() => {
+      setRoomUsers(3)
+      for (let i = 0; i < 2; i++) {
+        addFakeCamera()
       }
-    })
+    }, 3000)
   }, [])
 
   return (
-    <>
-      <h2>Room</h2>
-      <div id="video-container" w-a h-a grid gap-2>
-        <div w-fit h-fit b-2 rd-2>
-          <video id="my-video" controls />
-        </div>
-        {/* <div w-a h-a b-2 rd-2>
-          2
-        </div>
-        <div w-a h-a b-2 rd-2>
-          3
-        </div>
-        <div w-a h-a b-2 rd-2>
-          4
-        </div> */}
-      </div>
-    </>
+    <div
+      id="videos-container"
+      className={`relative p-3 w-full h-full gap-3 grid ${
+        roomUsers <= 4 ? 'grid-rows-2 grid-cols-2' : 'grid-rows-3 grid-cols-3'
+      }`}
+    ></div>
   )
 }
 
