@@ -7,7 +7,7 @@ import { SIO } from './common/typings/socket'
 // 创建koa实例
 const app = new Koa()
 // 创建服务器
-const httpServer = createServer(app.callback())
+export const httpServer = createServer(app.callback())
 // 创建io实例
 export const sio = new Server<
   SIO.ClientToServerEvents,
@@ -18,6 +18,12 @@ export const sio = new Server<
   cors: {
     origin: '*',
   },
+})
+sio.on('connection', (socket) => {
+  console.log(`client connection: ${socket.id}`)
+  socket.on('hello', (...args) => {
+    console.log(`hello args:${args}`)
+  })
 })
 // 执行初始化
 initCore(app, httpServer, sio)
