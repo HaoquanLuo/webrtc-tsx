@@ -1,3 +1,4 @@
+import { StreamStatus } from '@/common/typings/stream'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -26,8 +27,6 @@ export function stopBothVideoAndAudio(stream: MediaStream) {
     }
   })
 }
-
-type StreamStatus = 'loading' | 'complete'
 
 /**
  * @description 进入房间后加载本地媒体流
