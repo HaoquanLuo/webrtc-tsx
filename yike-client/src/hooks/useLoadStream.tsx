@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * @description 获取本地媒体流
  */
-export async function getUserMediaStream() {
+async function getUserMediaStream() {
   try {
     const constraints = {
       audio: true,
@@ -19,9 +19,9 @@ export async function getUserMediaStream() {
 /**
  * @description 退出房间时清除媒体流（在 useEffect 返回的函数中清除）
  */
-export function stopBothVideoAndAudio(stream: MediaStream) {
+function stopBothVideoAndAudio(stream: MediaStream) {
+  console.log('run cleanup')
   stream.getTracks().forEach((track) => {
-    console.log('track: ', track)
     if (track.readyState === 'live') {
       track.stop()
     }
@@ -34,33 +34,33 @@ export function stopBothVideoAndAudio(stream: MediaStream) {
  */
 export const useLocalStream = () => {
   const streamRef = useRef<MediaStream | null>(null)
-  const [status, setStatus] = useState<StreamStatus>('loading')
-  // let socketId: string = useSocket()
-  // console.log('socketId', socketId)
+  const [streamStatus, setStreamStatus] = useState<StreamStatus>('loading')
+
+  async function getLocalStream() {
+    try {
+      // 加载本地媒体流
+      const localStream = await getUserMediaStream()
+      streamRef.current = localStream
+      setStreamStatus('complete')
+    } catch (error) {
+      console.log(`Local MediaStream not available: ${error}`)
+    }
+  }
 
   useEffect(() => {
-    const getLocalStream = async () => {
-      try {
-        // 加载本地媒体流
-        const localStream = await getUserMediaStream()
-        streamRef.current = localStream
-        setStatus('complete')
-      } catch (error) {
-        console.log(`Local MediaStream not available`)
-      }
-    }
     getLocalStream()
+
     return () => {
-      console.log('run cleanup')
-      setStatus('loading')
       if (streamRef.current) {
         stopBothVideoAndAudio(streamRef.current)
+        streamRef.current = null
+        setStreamStatus('loading')
       }
     }
   }, [])
 
   return {
     localStream: streamRef.current,
-    status,
+    status: streamStatus,
   }
 }

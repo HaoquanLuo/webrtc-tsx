@@ -12,7 +12,7 @@ const VideoBox: React.FC<Props> = (props) => {
     if (!videoRef.current) {
       return
     }
-    console.log('srcObject', srcObject)
+
     videoRef.current.srcObject = srcObject
     videoRef.current.addEventListener('click', () => {
       if (videoRef.current!.classList.contains('screen-full')) {

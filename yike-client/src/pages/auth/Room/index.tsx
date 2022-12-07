@@ -1,21 +1,20 @@
+import React, { useEffect, useState } from 'react'
+import LoadingBox from '@/components/LoadingBox'
 import VideoBox from '@/components/VideoBox'
 import { useLocalStream } from '@/hooks/useLoadStream'
-import React, { useState } from 'react'
+import { useSocket } from '@/hooks/useSocket'
 
 const Room: React.FC = () => {
   const [roomUsers, setRoomUsers] = useState(1)
 
-  const addFakeCamera = () => {
-    const container = document.getElementById('videos-container')!
-    const camera = document.createElement('div')
-    camera.style.width = '100%'
-    camera.style.height = '100%'
-    camera.style.position = 'relative'
-    camera.style.borderRadius = '8px'
-    camera.style.color = 'yellow'
-    camera.innerHTML = 'Fake Camera Here'
-
-    container.appendChild(camera)
+  const FakeCamera = () => {
+    return (
+      <div grid place-items-center>
+        <div w-full h-full relative rd-2 text-yellow>
+          Fake Camera
+        </div>
+      </div>
+    )
   }
 
   const LocalCamera = () => {
@@ -23,13 +22,21 @@ const Room: React.FC = () => {
 
     return (
       <div grid place-items-center>
-        {status === 'loading' && (
-          <div text-center animate-spin i-mdi-loading text-9xl></div>
-        )}
+        {status === 'loading' && <LoadingBox />}
         {status === 'complete' && <VideoBox srcObject={localStream!} />}
       </div>
     )
   }
+
+  // useEffect(() => {
+  //   let timer = setTimeout(() => {
+  //     setRoomUsers(3)
+  //   }, 1000)
+
+  //   return () => {
+  //     clearTimeout(timer)
+  //   }
+  // }, [])
 
   return (
     <div
