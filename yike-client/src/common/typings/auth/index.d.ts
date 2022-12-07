@@ -11,6 +11,7 @@ export interface AuthRouteObject {
 }
 
 type LoaderType = () => any | (() => Promise<any>)
+
 export type RoutesItems = {
   path: string
   element: React.ReactElement
