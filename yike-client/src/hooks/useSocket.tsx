@@ -1,56 +1,31 @@
 import { SIO } from '@/common/typings/socket'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { Socket, io } from 'socket.io-client'
 
-// export const useSocket = () => {
-//   const socketRef = useRef<Socket<
-//     SIO.ServerToClientEvents,
-//     SIO.ClientToServerEvents
-//   > | null>(null)
-//   const [connectStatus, setConnectStatus] = useState(false)
+/**
+ * @description 创建 Socket 对象
+ */
+export const useSocket = () => {
+  const socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents> = io(
+    'http://127.0.0.1:9000',
+  )
 
-//   const socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents> = io(
-//     'http://localhost:9000',
-//   )
+  useEffect(() => {
+    // 建立 socket 连接
+    socket.connect()
+    socket.on('connect', () => {
+      console.log('connected to server', socket.id)
+      socket.emit('hello', `hello from ${socket.id}`)
+    })
+    return () => {
+      console.log('run cleanup')
+      // 断开 socket 连接
+      socket.disconnect()
+      socket.on('disconnect', () => {
+        console.log('disconnected from server')
+      })
+    }
+  }, [])
 
-//   useEffect(() => {
-//     socket.on('connect', () => {
-//       socketRef.current = socket
-//       setConnectStatus(true)
-//       console.log('connected to server', socketRef.current.connected)
-//     })
-//     socket.emit('hello', 'ni hao!')
-
-//     return () => {
-//       socket.on('disconnect', () => {
-//         console.log('disconnected from server', socketRef.current?.connected)
-//       })
-//       setConnectStatus(false)
-//     }
-//   }, [])
-
-//   return {
-//     socket: socketRef.current,
-//     connectStatus,
-//   }
-// }
-
-export function useSocket() {
-  const socketRef = useRef<
-    Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
-  >(io('http://127.0.0.1:9000'))
-
-  socketRef.current.on('connect', () => {
-    console.log('connected to server', socketRef.current.connected)
-  })
-
-  socketRef.current.emit('hello', 'world')
-
-  socketRef.current.on('disconnect', () => {
-    console.log('disconnected from server', socketRef.current.connected)
-  })
-
-  return {
-    socket: socketRef.current,
-  }
+  return { socket }
 }

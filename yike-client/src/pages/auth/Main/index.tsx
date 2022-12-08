@@ -1,11 +1,7 @@
-import { useSocket } from '@/hooks/useSocket'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
 const Main: React.FC = () => {
-  const { socket } = useSocket()
-  socket.emit('hello', 'world')
-
   return (
     <>
       <h2>Auth Main</h2>

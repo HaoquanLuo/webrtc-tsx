@@ -6,6 +6,11 @@ import { useSocket } from '@/hooks/useSocket'
 
 const Room: React.FC = () => {
   const [roomUsers, setRoomUsers] = useState(1)
+  const { socket } = useSocket()
+
+  useEffect(() => {
+    socket.emit('hello', 'world')
+  }, [])
 
   const FakeCamera = () => {
     return (
@@ -18,25 +23,15 @@ const Room: React.FC = () => {
   }
 
   const LocalCamera = () => {
-    const { localStream, status } = useLocalStream()
+    const { localStream, streamStatus } = useLocalStream()
 
     return (
       <div grid place-items-center>
-        {status === 'loading' && <LoadingBox />}
-        {status === 'complete' && <VideoBox srcObject={localStream!} />}
+        {streamStatus === 'loading' && <LoadingBox />}
+        {streamStatus === 'complete' && <VideoBox srcObject={localStream!} />}
       </div>
     )
   }
-
-  // useEffect(() => {
-  //   let timer = setTimeout(() => {
-  //     setRoomUsers(3)
-  //   }, 1000)
-
-  //   return () => {
-  //     clearTimeout(timer)
-  //   }
-  // }, [])
 
   return (
     <div

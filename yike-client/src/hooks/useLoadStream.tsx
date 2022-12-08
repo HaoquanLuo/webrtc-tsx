@@ -20,7 +20,6 @@ async function getUserMediaStream() {
  * @description 退出房间时清除媒体流（在 useEffect 返回的函数中清除）
  */
 function stopBothVideoAndAudio(stream: MediaStream) {
-  console.log('run cleanup')
   stream.getTracks().forEach((track) => {
     if (track.readyState === 'live') {
       track.stop()
@@ -61,6 +60,6 @@ export const useLocalStream = () => {
 
   return {
     localStream: streamRef.current,
-    status: streamStatus,
+    streamStatus,
   }
 }
