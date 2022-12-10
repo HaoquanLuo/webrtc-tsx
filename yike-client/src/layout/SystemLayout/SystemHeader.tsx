@@ -7,7 +7,7 @@ import {
   selectCurrentPath,
   removeLogState,
 } from '@/redux/features/system/systemSlice'
-import { removeToken } from '@/redux/features/user/userSlice'
+import { removeToken, removeUserInfo } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 
@@ -21,6 +21,7 @@ const SystemHeader: React.FC = () => {
     if (data.errorCode === 0 && data.msg === 'ok') {
       dispatch(removeToken())
       dispatch(removeLogState())
+      dispatch(removeUserInfo())
       location.assign('/')
     }
   }

@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import LoadingBox from '@/components/LoadingBox'
 import VideoBox from '@/components/VideoBox'
 import { useLocalStream } from '@/hooks/useLoadStream'
-import { useSocket } from '@/hooks/useSocket'
 
 const Room: React.FC = () => {
   const [roomUsers, setRoomUsers] = useState(1)
-  const { socket } = useSocket()
-
-  useEffect(() => {
-    socket.emit('hello', 'world')
-  }, [])
 
   const FakeCamera = () => {
     return (

@@ -9,7 +9,7 @@ import {
   setLogState,
   selectLogState,
 } from '@/redux/features/system/systemSlice'
-import { setToken } from '@/redux/features/user/userSlice'
+import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
@@ -36,15 +36,32 @@ const Login: React.FC = () => {
     }
   }
   const handleSubmit = async () => {
-    const { data } = await login({
+    const { data } = (await login({
       userName: user.username,
       password: user.password,
       code: user.code,
-    })
+    })) as {
+      data: {
+        data: string
+        errorCode: number
+        msg: string
+      }
+    }
+
     if (data.errorCode === 0 && data.msg === 'ok') {
-      setItem('token', data.data as any)
+      setItem('token', data.data as string)
+      setItem('userInfo', {
+        username: user.username,
+        password: user.password,
+      })
       dispatch(setToken(data.data))
       dispatch(setLogState(true))
+      dispatch(
+        setUserInfo({
+          username: user.username,
+          password: user.password,
+        }),
+      )
     }
   }
 

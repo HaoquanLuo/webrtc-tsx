@@ -1,6 +1,6 @@
 import { Models } from '../common/typings/model'
 import Config from '../config/Config'
-import { AuthFailed, Forbbiden } from '../core/HttpException'
+import { AuthFailed, Forbidden } from '../core/HttpException'
 import JWT from 'jsonwebtoken'
 import { Account } from '../common/typings/account'
 import { getTokenValue } from '../server/auth/token'
@@ -12,12 +12,16 @@ import { getRedisUserPermission } from '../server/auth'
  * @param next
  * @param callback
  */
-export default async function verifyToken(ctx: Models.Ctx, next: Function, callback?: Function) {
+export default async function verifyToken(
+  ctx: Models.Ctx,
+  next: Function,
+  callback?: Function,
+) {
   // 获取token
   const userToken = getToken(ctx)
   // 如果token不存在, 或者不存在redis里
   if (!userToken || !(await getTokenValue(userToken)).results) {
-    throw new Forbbiden('无访问权限')
+    throw new Forbidden('无访问权限')
   }
   // 尝试解析token, 获取uid和scope
   const { uid, scope } = (await analyzeToken(userToken)) as Account.Decode
@@ -59,7 +63,7 @@ async function analyzeToken(token: string) {
     if (error.name === 'TokenExpiredError') {
       throw new AuthFailed('token已过期')
     }
-    throw new Forbbiden('token不合法')
+    throw new Forbidden('token不合法')
   })
 }
 
@@ -77,7 +81,7 @@ export async function verifyTokenPermission(ctx: Models.Ctx, next: Function) {
       return path === ctx.path
     })
     if (!bool) {
-      throw new Forbbiden('权限不足')
+      throw new Forbidden('权限不足')
     }
   })
 }

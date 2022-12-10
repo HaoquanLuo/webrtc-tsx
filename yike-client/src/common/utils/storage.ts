@@ -5,7 +5,10 @@
  * @param isObj 值是否是对象
  * @returns
  */
-export function getItem(key: string, isObj = false): string | Common.Params {
+export function getItem(
+  key: string,
+  isObj = false,
+): string | Common.Params | Object {
   const value = localStorage.getItem(key)
   return value && !isObj ? value : JSON.parse(value!)
 }
@@ -17,7 +20,7 @@ export function getItem(key: string, isObj = false): string | Common.Params {
  */
 export function setItem(
   key: string,
-  value: string | Common.Params | unknown[],
+  value: string | Common.Params | unknown[] | Object,
 ) {
   localStorage.setItem(
     key,

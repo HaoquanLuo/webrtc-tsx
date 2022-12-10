@@ -1,15 +1,13 @@
-import { getToken } from '@/common/utils/helpers/getToken'
+import { getToken } from '@/common/utils/helpers/getTools'
 import UserLayout from '@/layout/UserLayout'
 import { setCurrentPath } from '@/redux/features/system/systemSlice'
-import { lazy, useEffect, useState } from 'react'
+import { lazy, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 // 快速导入工具函数
 export const lazyLoad = (moduleName: string) => {
-  const Module = lazy(
-    () => import(/* @vite-ignore */ `../../pages/${moduleName}`),
-  )
+  const Module = lazy(() => import(/* @vite-ignore */ `../pages/${moduleName}`))
 
   return <Module />
 }
@@ -17,7 +15,11 @@ export const lazyLoad = (moduleName: string) => {
 export const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
 export const inIndex = new RegExp(/^\/$/)
 
-// 路由鉴权组件
+/**
+ * @description 路由鉴权组件
+ * @param props
+ * @returns
+ */
 export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
   props,
 ) => {

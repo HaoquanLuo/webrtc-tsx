@@ -31,6 +31,7 @@ class Init {
     Init.updateRedisRole()
   }
 
+  // 加载 cors 模块
   public static loadCors() {
     Init.app.use(koaCors())
   }
