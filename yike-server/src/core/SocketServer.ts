@@ -1,15 +1,24 @@
 import { SIO } from '../../../socket'
 import { v4 as uuidV4 } from 'uuid'
+import { Socket } from 'socket.io'
 
 export class SocketIO {
   static connectedUsers: SIO.User[] = []
   static rooms: SIO.Room[] = []
 
-  public static createRoom(data: SIO.SocketData, socket: SIO.SocketType) {
+  public static createRoom(
+    data: SIO.SocketData,
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
     const { username } = data
     // 用户不存在
     if (!username) {
-      throw new Error('用户不存在')
+      return new Error('用户不存在')
     }
     console.log(`主持人${username}正在创建会议房间`, data)
     // 创建房间
@@ -40,13 +49,21 @@ export class SocketIO {
     })
   }
 
-  public static joinRoom(data: SIO.SocketData, socket: SIO.SocketType) {
+  public static joinRoom(
+    data: SIO.SocketData,
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
     const { roomId, username } = data
     if (!username) {
-      throw new Error('username must be provided')
+      return new Error('username must be provided')
     }
     if (!roomId) {
-      throw new Error('roomId must be provided')
+      return new Error('roomId must be provided')
     }
     const newUser: SIO.User = {
       username,
@@ -57,9 +74,9 @@ export class SocketIO {
     // 判断传递过来的 roomId 是否匹配存在
     const room = SocketIO.rooms.find((room) => room.id === roomId)
     if (!room) {
-      throw new Error('The room was not found')
+      return new Error('The room was not found')
     }
-    room.connectedUsers = [...SocketIO.connectedUsers, newUser]
+    room.connectedUsers = [...room.connectedUsers, newUser]
     // 加入房间
     socket.join(roomId)
     // 将新用户添加到已连接用户数组中

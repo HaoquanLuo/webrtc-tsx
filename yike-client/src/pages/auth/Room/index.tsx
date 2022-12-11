@@ -1,10 +1,18 @@
 import React, { useState } from 'react'
 import LoadingBox from '@/components/LoadingBox'
-import VideoBox from '@/components/VideoBox'
-import { useLocalStream } from '@/hooks/useLoadStream'
+import MediaBox from '@/components/MediaBox'
+import { getLocalStream, useLoadStream } from '@/hooks/useLoadStream'
+import { selectUserInfo } from '@/redux/features/user/userSlice'
+import { useSelector } from 'react-redux'
+import {
+  selectConnectOnlyWithAudio,
+  selectRoomParticipants,
+} from '@/redux/features/system/systemSlice'
 
 const Room: React.FC = () => {
-  const [roomUsers, setRoomUsers] = useState(1)
+  const { username } = useSelector(selectUserInfo)
+  const isAudioOnly = useSelector(selectConnectOnlyWithAudio)
+  const roomParticipants = useSelector(selectRoomParticipants)
 
   const FakeCamera = () => {
     return (
@@ -17,12 +25,14 @@ const Room: React.FC = () => {
   }
 
   const LocalCamera = () => {
-    const { localStream, streamStatus } = useLocalStream()
+    const { localStream, streamStatus } = useLoadStream(getLocalStream)
 
     return (
       <div grid place-items-center>
         {streamStatus === 'loading' && <LoadingBox />}
-        {streamStatus === 'complete' && <VideoBox srcObject={localStream!} />}
+        {streamStatus === 'complete' && (
+          <MediaBox audioOnly={isAudioOnly} srcObject={localStream!} />
+        )}
       </div>
     )
   }
@@ -31,7 +41,9 @@ const Room: React.FC = () => {
     <div
       id="videos-container"
       className={`relative p-1 w-full h-full gap-3 grid ${
-        roomUsers <= 4 ? 'grid-rows-2 grid-cols-2' : 'grid-rows-3 grid-cols-3'
+        roomParticipants.length <= 4
+          ? 'grid-rows-2 grid-cols-2'
+          : 'grid-rows-3 grid-cols-3'
       }`}
     >
       <LocalCamera />

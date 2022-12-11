@@ -27,14 +27,6 @@ export namespace SIO {
     toConnectSocketId?: string
   }
 
-  interface SocketType
-    extends Socket<
-      SIO.ClientToServerEvents,
-      SIO.ServerToClientEvents,
-      SIO.InterServiceEvents,
-      SIO.SocketData
-    > {}
-
   // Types
   type User = {
     username: string

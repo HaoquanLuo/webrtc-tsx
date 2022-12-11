@@ -1,6 +1,7 @@
 import {
   setRoomId,
   setRoomParticipants,
+  setRoomStatus,
 } from '@/redux/features/system/systemSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
@@ -32,6 +33,7 @@ export const initSocketAndConnect = () => {
     if (roomId) {
       console.log('room-id', data.roomId)
       dispatch(setRoomId(roomId))
+      dispatch(setRoomStatus('created'))
     }
   })
   socket.on('room-update', (data) => {

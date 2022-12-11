@@ -27,25 +27,13 @@ export const userSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload
     },
-    removeToken: (state) => {
-      state.token = ''
-      removeItem('token')
-    },
     setUserInfo: (state, action: PayloadAction<UserState['userInfo']>) => {
       state.userInfo = action.payload
-    },
-    removeUserInfo: (state) => {
-      state.userInfo = {
-        username: 'default-username',
-        password: 'default-password',
-      }
-      removeItem('userInfo')
     },
   },
 })
 
-export const { setToken, removeToken, setUserInfo, removeUserInfo } =
-  userSlice.actions
+export const { setToken, setUserInfo } = userSlice.actions
 
 export const selectToken = (state: StoreProps) => state.user.token
 export const selectUserInfo = (state: StoreProps) => state.user.userInfo

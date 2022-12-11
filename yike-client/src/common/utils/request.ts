@@ -2,11 +2,14 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { notification } from 'antd'
 import { loginRoutePath } from '@/common/constants/routes'
 import { ACCESS_TOKEN } from '@/common/constants/user'
-import { removeToken } from '@/redux/features/user/userSlice'
+import { setToken } from '@/redux/features/user/userSlice'
 import { getStore } from './getStore'
+import { store } from '@/redux/store'
+import { removeItem } from './storage'
 
 // redux
 const userState = getStore().user
+const dispatch = store.dispatch
 
 // axios 基础配置
 axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASE_URL
@@ -49,7 +52,8 @@ const errorHandler = (error: AxiosError) => {
         }, 1500)
       }
       if (token) {
-        removeToken()
+        dispatch(setToken(''))
+        removeItem('token')
       }
       reload()
     }

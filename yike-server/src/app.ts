@@ -26,15 +26,19 @@ initCore(app, httpServer, sio)
 httpServer.listen(Config.HTTP_PORT, () => {
   console.log(`ENV: ${process.env.NODE_ENV}, PORT: ${Config.HTTP_PORT}.`)
 })
-// 监听客户端 socket 连接
-sio.on('connection', (socket) => {
-  console.log(`[system] client connect: ${socket.id}`)
+try {
+  // 监听客户端 socket 连接
+  sio.on('connection', (socket) => {
+    console.log(`[Socket Server] client connect: ${socket.id}`)
 
-  socket.on('room-create', (data) => {
-    SocketIO.createRoom(data, socket)
-  })
+    socket.on('room-create', (data) => {
+      SocketIO.createRoom(data, socket)
+    })
 
-  socket.on('room-join', (data) => {
-    SocketIO.joinRoom(data, socket)
+    socket.on('room-join', (data) => {
+      SocketIO.joinRoom(data, socket)
+    })
   })
-})
+} catch (error) {
+  console.error(`[Socket Server] SocketException: ${error}`)
+}

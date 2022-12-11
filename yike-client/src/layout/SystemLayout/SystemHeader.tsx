@@ -5,11 +5,13 @@ import { showConfirm } from '@/common/utils/confirm'
 import {
   selectLogState,
   selectCurrentPath,
-  removeLogState,
+  setLogState,
+  setRoomStatus,
 } from '@/redux/features/system/systemSlice'
-import { removeToken, removeUserInfo } from '@/redux/features/user/userSlice'
+import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
+import { removeItem } from '@/common/utils/storage'
 
 const SystemHeader: React.FC = () => {
   const logState = useSelector(selectLogState)
@@ -19,14 +21,25 @@ const SystemHeader: React.FC = () => {
   async function handleLogout() {
     const { data } = await logout()
     if (data.errorCode === 0 && data.msg === 'ok') {
-      dispatch(removeToken())
-      dispatch(removeLogState())
-      dispatch(removeUserInfo())
+      dispatch(setToken(''))
+      dispatch(setLogState(false))
+      dispatch(
+        setUserInfo({
+          username: 'default-username',
+          password: 'default-password',
+        }),
+      )
+
+      removeItem('token')
+      removeItem('userInfo')
+
       location.assign('/')
     }
   }
 
   function handlePageBack() {
+    dispatch(setRoomStatus('loading'))
+
     history.go(-1)
   }
 

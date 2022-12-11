@@ -91,7 +91,7 @@ export class Forbidden extends HttpException {
     super()
     this.code = 403
     this.message = msg || '禁止访问'
-    this.errorCode = errorCode || 100006
+    this.errorCode = errorCode || 100003
   }
 }
 // 查询失败
@@ -100,9 +100,10 @@ export class QueryFailed extends HttpException {
     super()
     this.code = 500
     this.message = msg || '未查到匹配的数据'
-    this.errorCode = errorCode || 100006
+    this.errorCode = errorCode || 100004
   }
 }
+
 // 数据库出错
 export class DataBaseFailed extends HttpException {
   constructor(msg?: string, errorCode?: number) {
@@ -110,5 +111,14 @@ export class DataBaseFailed extends HttpException {
     this.code = 500
     this.message = msg || '数据库出错'
     this.errorCode = errorCode || 100005
+  }
+}
+// socket 出错
+export class SocketException extends HttpException {
+  constructor(msg?: string, errorCode?: number) {
+    super()
+    this.code = 500
+    this.message = msg || 'Socket.io 出错'
+    this.errorCode = errorCode || 100006
   }
 }
