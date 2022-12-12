@@ -1,5 +1,3 @@
-import { Socket } from './yike-server/node_modules/socket.io'
-
 export namespace SIO {
   interface ServerToClientEvents {
     // 房间相关

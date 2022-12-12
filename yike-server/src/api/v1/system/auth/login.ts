@@ -19,7 +19,10 @@ router.post(
   validator(schema, 'body'),
   verificationCodeValidator,
   async (ctx: Models.Ctx) => {
-    const { password, userName } = ctx.request.body as any
+    const { password, userName } = ctx.request.body as {
+      userName: string
+      password: string
+    }
     const res: Models.Result = await command(`
         SELECT
         id,email,deleted,info,role_ids,password

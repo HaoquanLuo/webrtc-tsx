@@ -1,11 +1,17 @@
 import { SIO } from '../../../socket'
 import { v4 as uuidV4 } from 'uuid'
-import { Socket } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 
 export class SocketIO {
   static connectedUsers: SIO.User[] = []
   static rooms: SIO.Room[] = []
 
+  /**
+   * 创建房间
+   * @param data
+   * @param socket
+   * @returns
+   */
   public static createRoom(
     data: SIO.SocketData,
     socket: Socket<
@@ -49,6 +55,12 @@ export class SocketIO {
     })
   }
 
+  /**
+   * 加入房间
+   * @param data
+   * @param socket
+   * @returns
+   */
   public static joinRoom(
     data: SIO.SocketData,
     socket: Socket<
@@ -57,13 +69,19 @@ export class SocketIO {
       SIO.InterServiceEvents,
       SIO.SocketData
     >,
+    sio: Server<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
   ) {
     const { roomId, username } = data
     if (!username) {
-      return new Error('username must be provided')
+      return new Error('用户名不存在')
     }
     if (!roomId) {
-      return new Error('roomId must be provided')
+      return new Error('房间 id 不存在')
     }
     const newUser: SIO.User = {
       username,
@@ -74,7 +92,7 @@ export class SocketIO {
     // 判断传递过来的 roomId 是否匹配存在
     const room = SocketIO.rooms.find((room) => room.id === roomId)
     if (!room) {
-      return new Error('The room was not found')
+      return new Error('房间不存在')
     }
     room.connectedUsers = [...room.connectedUsers, newUser]
     // 加入房间
@@ -89,12 +107,43 @@ export class SocketIO {
         const data = {
           toConnectSocketId: socket.id,
         }
-        socket.to(user.socketId).emit('conn-prepare', data)
+        sio.to(user.socketId).emit('conn-prepare', data)
       }
     })
-    // 发送通知告知有新用户加入并更新房间
-    socket.to(roomId).emit('room-update', {
+    // 借用 sio 发送通知告知有新用户加入并更新房间
+    sio.to(roomId).emit('room-update', {
       connectedUsers: room.connectedUsers,
     })
+  }
+
+  /**
+   * 查询房间状态(存在、满员)
+   * @param roomId
+   * @returns
+   */
+  public static async roomExistsAndFull(roomId: string) {
+    const room = SocketIO.rooms.find((room) => room.id === roomId)
+
+    // 房间存在
+    if (room) {
+      // 房间暂时定为 4 人间
+      if (room.connectedUsers.length > 3) {
+        // 房间人数已满
+        return {
+          roomExists: true,
+          full: true,
+        }
+      } else {
+        // 房间可以加入
+        return {
+          roomExists: true,
+          full: false,
+        }
+      }
+    } else {
+      return {
+        roomExists: false,
+      }
+    }
   }
 }

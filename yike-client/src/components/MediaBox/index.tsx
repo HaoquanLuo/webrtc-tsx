@@ -3,10 +3,11 @@ import React, { useEffect, useRef, VideoHTMLAttributes } from 'react'
 type Props = VideoHTMLAttributes<HTMLVideoElement> & {
   audioOnly: boolean
   srcObject: MediaStream
+  username: string
 }
 
 const MediaBox: React.FC<Props> = (props) => {
-  const { audioOnly, srcObject } = props
+  const { audioOnly, srcObject, username } = props
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const MediaBox: React.FC<Props> = (props) => {
         videoRef.current!.parentElement!.style.position = 'static'
       }
     })
-  }, [srcObject])
+  }, [videoRef.current, srcObject])
 
   return (
     <div relative w-full h-full rd-2 mx-a my-0>
@@ -42,9 +43,13 @@ const MediaBox: React.FC<Props> = (props) => {
           bg-op-40
         >
           <div grid place-items-center w-full h-full text-xl>
-            用户
-            {/* <span>{username}</span> */}
-            以音频连接
+            <div>
+              <span>用户</span>
+              <span font-600 mx-1 font-italic>
+                {username}
+              </span>
+              <span>仅以音频连接</span>
+            </div>
           </div>
         </div>
       )}

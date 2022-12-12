@@ -36,7 +36,7 @@ try {
     })
 
     socket.on('room-join', (data) => {
-      SocketIO.joinRoom(data, socket)
+      SocketIO.joinRoom(data, socket, sio)
     })
   })
 } catch (error) {

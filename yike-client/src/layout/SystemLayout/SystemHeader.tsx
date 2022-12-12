@@ -6,7 +6,8 @@ import {
   selectLogState,
   selectCurrentPath,
   setLogState,
-  setRoomStatus,
+  setRoomCreated,
+  selectRoomId,
 } from '@/redux/features/system/systemSlice'
 import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
@@ -14,9 +15,11 @@ import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
 
 const SystemHeader: React.FC = () => {
+  const dispatch = useDispatch()
+
   const logState = useSelector(selectLogState)
   const currentPath = useSelector(selectCurrentPath)
-  const dispatch = useDispatch()
+  const roomId = useSelector(selectRoomId)
 
   async function handleLogout() {
     const { data } = await logout()
@@ -38,9 +41,9 @@ const SystemHeader: React.FC = () => {
   }
 
   function handlePageBack() {
-    dispatch(setRoomStatus('loading'))
+    dispatch(setRoomCreated('loading'))
 
-    history.go(-1)
+    location.assign('/')
   }
 
   /**
@@ -68,7 +71,7 @@ const SystemHeader: React.FC = () => {
         {<BackButton />}
       </div>
       <div className="center-btns" flex flex-1 justify-center>
-        {logState && <p>center-btns</p>}
+        {roomId && <p>{roomId}</p>}
       </div>
       <div className="right-btns" flex w-48 justify-end>
         {logState && (

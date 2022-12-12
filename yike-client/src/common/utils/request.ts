@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { notification } from 'antd'
 import { loginRoutePath } from '@/common/constants/routes'
 import { ACCESS_TOKEN } from '@/common/constants/user'
@@ -62,21 +62,24 @@ const errorHandler = (error: AxiosError) => {
 }
 
 // 响应拦截
-axios.interceptors.response.use((response) => {
-  // console.log('--------------------------------')
-  // console.log('response: ', response)
-  // console.log('--------------------------------')
-  if (response?.status === 200) {
-    return Promise.resolve(response)
-  }
-  if (response.data?.errorCode !== 10000) {
-    notification.error({
-      message: '请求失败',
-      description: response.data.msg,
-    })
-    return Promise.reject(response)
-  }
-  return response.data.data
-}, errorHandler)
+axios.interceptors.response.use(
+  (response: AxiosResponse<Common.ResponseData<any>>) => {
+    // console.log('--------------------------------')
+    // console.log('response: ', response)
+    // console.log('--------------------------------')
+    if (response?.status === 200) {
+      return Promise.resolve(response)
+    }
+    if (response.data?.errorCode !== 10000) {
+      notification.error({
+        message: '请求失败',
+        description: response.data.msg,
+      })
+      return Promise.reject(response)
+    }
+    return response.data.data
+  },
+  errorHandler,
+)
 
 export default axios

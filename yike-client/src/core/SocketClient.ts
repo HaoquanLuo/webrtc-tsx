@@ -1,7 +1,10 @@
+import { getRoomState } from '@/api/system/auth'
 import {
+  setRoomExists,
   setRoomId,
   setRoomParticipants,
-  setRoomStatus,
+  setRoomCreated,
+  setErrorMessage,
 } from '@/redux/features/system/systemSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
@@ -18,6 +21,7 @@ let socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
  * @description 创建 Socket 实例对象
  */
 export const initSocketAndConnect = () => {
+  // 生成 socket 实例
   socket = io(SERVER, {
     autoConnect: false,
   })
@@ -27,13 +31,14 @@ export const initSocketAndConnect = () => {
   socket.on('connect', () => {
     console.log('connected to server', socket.id)
   })
+
   // 监听 room 相关事件
   socket.on('room-id', (data) => {
     const { roomId } = data
     if (roomId) {
       console.log('room-id', data.roomId)
       dispatch(setRoomId(roomId))
-      dispatch(setRoomStatus('created'))
+      dispatch(setRoomCreated('created'))
     }
   })
   socket.on('room-update', (data) => {
@@ -66,10 +71,27 @@ export const createRoom = (username: string) => {
 /**
  * @description 加入会议房间
  */
-export const joinRoom = (roomId: string, username: string) => {
-  const data = {
+export const joinRoom = async (roomId: string, username: string) => {
+  const emitData = {
     roomId,
     username,
   }
-  socket.emit('room-join', data)
+  const { data } = await getRoomState({
+    roomId,
+  })
+
+  if (data.data) {
+    const { roomExists, full } = data.data
+
+    if (!roomExists) {
+      debugger
+      dispatch(setErrorMessage(`房间不存在`))
+      dispatch(setRoomId(''))
+    } else if (full) {
+      dispatch(setErrorMessage(`房间人数已满`))
+    } else {
+      socket.emit('room-join', emitData)
+      dispatch(setRoomExists(true))
+    }
+  }
 }

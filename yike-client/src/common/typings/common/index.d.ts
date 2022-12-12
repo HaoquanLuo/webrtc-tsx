@@ -3,8 +3,8 @@ declare global {
   module System {}
   module Common {
     type Params = string
-    interface Response extends AxiosResponse {
-      data?: unknown
+    interface ResponseData<T> {
+      data?: T
       msg?: string
       code?: number
       errorCode?: number

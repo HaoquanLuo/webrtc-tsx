@@ -26,7 +26,7 @@ const onlyAudioConstants: MediaStreamConstraints = {
  */
 export async function getLocalStream() {
   try {
-    const constraints = getStore().system.connectOnlyWithAudio
+    const constraints = getStore().system.connectWithAudioOnly
       ? onlyAudioConstants
       : defaultConstants
     return await navigator.mediaDevices.getUserMedia(constraints)

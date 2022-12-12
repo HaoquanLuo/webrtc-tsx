@@ -25,7 +25,6 @@ router.get('/code', async (ctx: Models.Ctx) => {
   })
 
   ctx.session!.code = captcha.text //把验证码赋值给session
-  console.log('图形验证码', ctx.session!.code)
   throw new Buffer(captcha.data, 'image/svg+xml', captcha.text)
 })
 
