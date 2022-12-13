@@ -1,16 +1,25 @@
+import { WebRTC } from '@/common/typings/webRTC'
+import SimplePeer from './yike-client/node_modules/@types/simple-peer'
 export namespace SIO {
   interface ServerToClientEvents {
     // 房间相关
     'room-id': (data: SocketData) => void
     'room-update': (data: SocketData) => void
+    'user-disconnected': (data: SocketData) => void
     // webRTC 对象相关
-    'conn-prepare': (data: SocketData) => void
+    'conn-signal': (data: WebRTC.DataSignal) => void
+    'conn-prepare': (data: WebRTC.DataPrepare) => void
+    'conn-init': (data: WebRTC.DataInit) => void
   }
 
   interface ClientToServerEvents {
     // 房间相关
     'room-create': (data: SocketData) => void
     'room-join': (data: SocketData) => void
+    // webRTC 对象相关
+    'conn-signal': (data: WebRTC.DataSignal) => void
+    'conn-prepare': (data: WebRTC.DataPrepare) => void
+    'conn-init': (data: WebRTC.DataInit) => void
   }
 
   interface InterServiceEvents {
@@ -23,6 +32,8 @@ export namespace SIO {
     username?: string
     connectedUsers?: User[]
     toConnectSocketId?: string
+    socketId?: string
+    signal?: SimplePeer.SignalData
   }
 
   // Types

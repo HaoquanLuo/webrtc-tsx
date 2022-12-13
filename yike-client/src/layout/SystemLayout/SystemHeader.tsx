@@ -9,7 +9,11 @@ import {
   setRoomCreated,
   selectRoomId,
 } from '@/redux/features/system/systemSlice'
-import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
+import {
+  selectUserInfo,
+  setToken,
+  setUserInfo,
+} from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
@@ -19,6 +23,7 @@ const SystemHeader: React.FC = () => {
 
   const logState = useSelector(selectLogState)
   const currentPath = useSelector(selectCurrentPath)
+  const { username } = useSelector(selectUserInfo)
   const roomId = useSelector(selectRoomId)
 
   async function handleLogout() {
@@ -71,7 +76,10 @@ const SystemHeader: React.FC = () => {
         {<BackButton />}
       </div>
       <div className="center-btns" flex flex-1 justify-center>
-        {roomId && <p>{roomId}</p>}
+        <span mx-2 font-bold>
+          {username}
+        </span>
+        {roomId && <span>{roomId}</span>}
       </div>
       <div className="right-btns" flex w-48 justify-end>
         {logState && (

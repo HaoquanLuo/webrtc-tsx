@@ -1,4 +1,5 @@
 import { getRoomState } from '@/api/system/auth'
+import { WebRTC } from '@/common/typings/webRTC'
 import {
   setRoomExists,
   setRoomId,
@@ -7,8 +8,10 @@ import {
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
 import { store } from '@/redux/store'
+import SimplePeer from 'simple-peer'
 import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
+import { handleSignalingData } from './webRTCHandler'
 
 const dispatch = store.dispatch
 
@@ -56,6 +59,15 @@ export const initSocketAndConnect = () => {
     console.log('conn-prepare', data)
     const { toConnectSocketId } = data
   })
+  socket.on('conn-signal', (data) => {
+    console.log('conn-signal', data)
+    handleSignalingData(data)
+  })
+  socket.on('conn-init', (data) => {
+    console.log('conn-init', data)
+
+    const { toConnectSocketId } = data
+  })
 }
 
 /**
@@ -94,4 +106,12 @@ export const joinRoom = async (roomId: string, username: string) => {
       dispatch(setRoomExists(true))
     }
   }
+}
+
+/**
+ * @description 发送信令数据到服务器
+ * @param data
+ */
+export const sendSignalData = (data: WebRTC.DataSignal) => {
+  socket.emit('conn-signal', data)
 }

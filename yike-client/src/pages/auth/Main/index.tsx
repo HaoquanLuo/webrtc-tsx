@@ -12,6 +12,7 @@ import {
   setRoomId,
   selectRoomExists,
   selectErrorMessage,
+  selectRoomParticipants,
 } from '@/redux/features/system/systemSlice'
 import { selectUserInfo } from '@/redux/features/user/userSlice'
 import { Button, Input, Modal, Switch, notification } from 'antd'
@@ -34,6 +35,7 @@ const Main: React.FC = () => {
   const roomHost = useSelector(selectRoomHost)
   const roomCreated = useSelector(selectRoomCreated)
   const roomExists = useSelector(selectRoomExists)
+  const roomParticipants = useSelector(selectRoomParticipants)
 
   // Modal 组件回调事件
   const showModal = () => {

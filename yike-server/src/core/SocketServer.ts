@@ -146,4 +146,55 @@ export class SocketIO {
       }
     }
   }
+
+  public static disconnectHandler(
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+    sio: Server<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
+    //查询要离开会议房间的用户
+    const user = SocketIO.connectedUsers.find(
+      (user) => user.socketId === socket.id,
+    )
+
+    if (user) {
+      //从会议房间进行删除
+      const room = SocketIO.rooms.find((room) => room.id === user.roomId)
+
+      if (!room) {
+        return new Error('房间不存在')
+      }
+      room.connectedUsers = room.connectedUsers.filter(
+        (user) => user.socketId !== socket.id,
+      )
+
+      //离开房间
+      socket.leave(user.roomId)
+
+      //当会议房间没有人员的时候要关闭整个会议室（从rooms数组中删除该房间的信息）
+      if (room.connectedUsers.length > 0) {
+        //用户断开WebRTC连接
+        sio.to(room.id).emit('user-disconnected', { socketId: socket.id })
+
+        //发送通知告知有用户离开并更新房间
+        sio.to(room.id).emit('room-update', {
+          connectedUsers: room.connectedUsers,
+        })
+      } else {
+        console.log(`[Socket Server] Room "${room.id}" has been destroyed.`)
+
+        //从rooms数组中删除该房间的信息
+        SocketIO.rooms = SocketIO.rooms.filter((r) => r.id !== room.id)
+      }
+    }
+  }
 }

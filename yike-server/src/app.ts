@@ -38,6 +38,10 @@ try {
     socket.on('room-join', (data) => {
       SocketIO.joinRoom(data, socket, sio)
     })
+
+    socket.on('disconnect', () => {
+      SocketIO.disconnectHandler(socket, sio)
+    })
   })
 } catch (error) {
   console.error(`[Socket Server] SocketException: ${error}`)

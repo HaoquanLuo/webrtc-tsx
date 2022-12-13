@@ -4,13 +4,14 @@ import LoadingBox from '../LoadingBox'
 import MediaBox from '../MediaBox'
 
 interface Props {
+  key?: string | number | symbol
   withAudioOnly: boolean
   getStreamFunction: () => Promise<MediaStream>
   username: string
 }
 
 const CameraBox: React.FC<Props> = (props) => {
-  const { withAudioOnly: audioOnly, getStreamFunction, username } = props
+  const { withAudioOnly, getStreamFunction, username } = props
   const { localStream, streamStatus } = useLoadStream(getStreamFunction)
 
   return (
@@ -18,7 +19,7 @@ const CameraBox: React.FC<Props> = (props) => {
       {streamStatus === 'loading' && <LoadingBox />}
       {streamStatus === 'complete' && (
         <MediaBox
-          audioOnly={audioOnly}
+          audioOnly={withAudioOnly}
           srcObject={localStream!}
           username={username}
         />

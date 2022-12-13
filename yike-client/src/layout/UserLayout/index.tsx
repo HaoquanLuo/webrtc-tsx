@@ -1,4 +1,6 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { selectRoomParticipants } from '@/redux/features/system/systemSlice'
 
 const ShadowBox: React.FC<{ children: React.ReactElement }> = (props) => {
   const { children } = props
@@ -13,10 +15,23 @@ const ShadowBox: React.FC<{ children: React.ReactElement }> = (props) => {
 
 const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
   const { children } = props
+  const roomParticipants = useSelector(selectRoomParticipants)
 
   return (
     <div id="user-layout" flex-1 flex>
-      <div bg-yellow min-w="60!" h-a shrink-0></div>
+      <div min-w="60!" h-a shrink-0>
+        {roomParticipants ? (
+          roomParticipants.map((user) => {
+            return (
+              <div key={user.id} className="text-gray">
+                username:{user.username}
+              </div>
+            )
+          })
+        ) : (
+          <p>lorem</p>
+        )}
+      </div>
       <ShadowBox>{children}</ShadowBox>
     </div>
   )
