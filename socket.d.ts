@@ -30,6 +30,7 @@ export namespace SIO {
     roomId?: string
     userId?: string
     username?: string
+    audioOnly?: boolean
     connectedUsers?: User[]
     toConnectSocketId?: string
     socketId?: string
@@ -42,6 +43,7 @@ export namespace SIO {
     id: string
     roomId: string
     socketId: string
+    audioOnly: boolean
   }
   type Room = {
     id: string

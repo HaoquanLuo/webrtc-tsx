@@ -7,11 +7,11 @@ import {
   setRoomCreated,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
+import { setUserSocketId } from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
-import SimplePeer from 'simple-peer'
 import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
-import { handleSignalingData } from './webRTCHandler'
+import * as webRTCHandler from './webRTCHandler'
 
 const dispatch = store.dispatch
 
@@ -33,12 +33,13 @@ export const initSocketAndConnect = () => {
   socket.connect()
   socket.on('connect', () => {
     console.log('connected to server', socket.id)
+    dispatch(setUserSocketId(socket.id))
   })
 
   // 监听 room 相关事件
   socket.on('room-id', (data) => {
     const { roomId } = data
-    if (roomId) {
+    if (roomId !== undefined) {
       console.log('room-id', data.roomId)
       dispatch(setRoomId(roomId))
       dispatch(setRoomCreated('created'))
@@ -46,60 +47,74 @@ export const initSocketAndConnect = () => {
   })
   socket.on('room-update', (data) => {
     const { connectedUsers } = data
-    if (connectedUsers) {
-      console.log('room-participants', connectedUsers)
+    if (connectedUsers !== undefined) {
       dispatch(setRoomParticipants(connectedUsers))
     }
   })
-  /**
-   * @todo 完成 peer 对象连接
-   */
+
   // 监听 webRTC 相关事件
   socket.on('conn-prepare', (data) => {
-    console.log('conn-prepare', data)
     const { toConnectSocketId } = data
-  })
-  socket.on('conn-signal', (data) => {
-    console.log('conn-signal', data)
-    handleSignalingData(data)
-  })
-  socket.on('conn-init', (data) => {
-    console.log('conn-init', data)
 
+    // 准备 webRTC 对等连接，应答方 false
+    webRTCHandler.prepareNewPeerConnection(toConnectSocketId, false)
+
+    // 我方已准备完毕，通知对方进行 webRTC 对等连接
+    socket.emit('conn-init', data)
+  })
+
+  socket.on('conn-signal', (data) => {
+    webRTCHandler.handleSignalingData(data)
+  })
+
+  socket.on('conn-init', (data) => {
     const { toConnectSocketId } = data
+
+    // 准备 webRTC 对等连接，发起方 true
+    webRTCHandler.prepareNewPeerConnection(toConnectSocketId, true)
   })
 }
 
 /**
  * @description 创建新的会议房间
+ * @param username
  */
-export const createRoom = (username: string) => {
+export const createRoom = (username: string, audioOnly: boolean) => {
   const data = {
     username,
+    audioOnly,
   }
+
   socket.emit('room-create', data)
 }
 
 /**
  * @description 加入会议房间
+ * @param roomId
+ * @param username
  */
-export const joinRoom = async (roomId: string, username: string) => {
+export const joinRoom = async (
+  roomId: string,
+  username: string,
+  audioOnly: boolean,
+) => {
   const emitData = {
     roomId,
     username,
+    audioOnly,
   }
+
   const { data } = await getRoomState({
     roomId,
   })
 
-  if (data.data) {
+  if (data.data !== undefined) {
     const { roomExists, full } = data.data
 
-    if (!roomExists) {
-      debugger
+    if (roomExists === false) {
       dispatch(setErrorMessage(`房间不存在`))
       dispatch(setRoomId(''))
-    } else if (full) {
+    } else if (full === true) {
       dispatch(setErrorMessage(`房间人数已满`))
     } else {
       socket.emit('room-join', emitData)

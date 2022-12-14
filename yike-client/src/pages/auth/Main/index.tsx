@@ -30,12 +30,11 @@ const Main: React.FC = () => {
   // store 属性
   const errorMessage = useSelector(selectErrorMessage)
   const { username } = useSelector(selectUserInfo)
-  const isAudioOnly = useSelector(selectConnectWithAudioOnly)
+  const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomId = useSelector(selectRoomId)
   const roomHost = useSelector(selectRoomHost)
   const roomCreated = useSelector(selectRoomCreated)
   const roomExists = useSelector(selectRoomExists)
-  const roomParticipants = useSelector(selectRoomParticipants)
 
   // Modal 组件回调事件
   const showModal = () => {
@@ -44,7 +43,9 @@ const Main: React.FC = () => {
   const handleOk = () => {
     try {
       dispatch(setRoomId(joinRoomId))
-      roomHost ? createRoom(username) : joinRoom(joinRoomId, username)
+      roomHost
+        ? createRoom(username, audioOnly)
+        : joinRoom(joinRoomId, username, audioOnly)
     } catch (error) {
       console.error(error)
     } finally {
@@ -70,7 +71,7 @@ const Main: React.FC = () => {
     setJoinRoomId(e.target.value)
   }
   const handleSwitch = () => {
-    dispatch(setConnectWithAudioOnly(!isAudioOnly))
+    dispatch(setConnectWithAudioOnly(!audioOnly))
   }
 
   // 加入 Main 页面初始化 socket 实例
@@ -138,7 +139,7 @@ const Main: React.FC = () => {
             <div>连接选项</div>
             <div>
               <Switch
-                checked={isAudioOnly}
+                checked={audioOnly}
                 checkedChildren="仅音频"
                 unCheckedChildren="音视频"
                 onChange={handleSwitch}

@@ -21,34 +21,49 @@ export class SocketIO {
       SIO.SocketData
     >,
   ) {
-    const { username } = data
-    // 用户不存在
-    if (!username) {
-      return new Error('用户不存在')
+    const { username, audioOnly } = data
+    console.log('data', data)
+
+    // username 不存在
+    if (username === undefined) {
+      return new Error('没有设置 username')
     }
-    console.log(`主持人${username}正在创建会议房间`, data)
+    // audio 不存在
+    if (audioOnly === undefined) {
+      return new Error('没有设置 audioOnly')
+    }
+
+    console.log(`[Socket Server] Host ${username} is creating a new room`)
+
     // 创建房间
     const roomId = uuidV4()
+
     // 创建进入会议的用户
     const newUser: SIO.User = {
       username,
       id: uuidV4(),
       roomId,
       socketId: socket.id,
+      audioOnly,
     }
+
     SocketIO.connectedUsers = [...SocketIO.connectedUsers, newUser]
+
     // 创建新的会议房间
     const newRoom: SIO.Room = {
       id: roomId,
       connectedUsers: [newUser],
     }
+
     // 新用户加入会议房间
     socket.join(roomId)
     SocketIO.rooms = [...SocketIO.rooms, newRoom]
+
     // 告知客户端房间已创建并将 roomId 发送给客户端
     socket.emit('room-id', {
       roomId,
     })
+
     // 告知房间内所有用户有新用户加入并更新房间
     socket.emit('room-update', {
       connectedUsers: newRoom.connectedUsers,
@@ -76,29 +91,44 @@ export class SocketIO {
       SIO.SocketData
     >,
   ) {
-    const { roomId, username } = data
-    if (!username) {
-      return new Error('用户名不存在')
+    const { roomId, username, audioOnly } = data
+
+    // username 不存在
+    if (username === undefined) {
+      return new Error('没有设置 username')
     }
-    if (!roomId) {
-      return new Error('房间 id 不存在')
+    // roomId 不存在
+    if (roomId === undefined) {
+      return new Error('没有设置 roomId')
     }
+    // audio 不存在
+    if (audioOnly === undefined) {
+      return new Error('没有设置 audioOnly')
+    }
+
     const newUser: SIO.User = {
       username,
       id: uuidV4(),
       roomId,
       socketId: socket.id,
+      audioOnly,
     }
+
     // 判断传递过来的 roomId 是否匹配存在
     const room = SocketIO.rooms.find((room) => room.id === roomId)
-    if (!room) {
+
+    if (room === undefined) {
       return new Error('房间不存在')
     }
+
     room.connectedUsers = [...room.connectedUsers, newUser]
+
     // 加入房间
     socket.join(roomId)
+
     // 将新用户添加到已连接用户数组中
     SocketIO.connectedUsers = [...SocketIO.connectedUsers, newUser]
+
     // 告知房间内其他已连接用户准备 webRTC 对等连接
     room.connectedUsers.forEach((user) => {
       // 排除自身
@@ -110,6 +140,7 @@ export class SocketIO {
         sio.to(user.socketId).emit('conn-prepare', data)
       }
     })
+
     // 借用 sio 发送通知告知有新用户加入并更新房间
     sio.to(roomId).emit('room-update', {
       connectedUsers: room.connectedUsers,
@@ -125,7 +156,7 @@ export class SocketIO {
     const room = SocketIO.rooms.find((room) => room.id === roomId)
 
     // 房间存在
-    if (room) {
+    if (room !== undefined) {
       // 房间暂时定为 4 人间
       if (room.connectedUsers.length > 3) {
         // 房间人数已满
@@ -166,11 +197,11 @@ export class SocketIO {
       (user) => user.socketId === socket.id,
     )
 
-    if (user) {
+    if (user !== undefined) {
       //从会议房间进行删除
       const room = SocketIO.rooms.find((room) => room.id === user.roomId)
 
-      if (!room) {
+      if (room == undefined) {
         return new Error('房间不存在')
       }
       room.connectedUsers = room.connectedUsers.filter(

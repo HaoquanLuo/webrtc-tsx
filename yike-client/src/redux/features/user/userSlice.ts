@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { getToken, getUserInfo } from '@/common/utils/helpers/getTools'
 import { StoreProps } from '@/common/typings/store'
-import { removeItem } from '@/common/utils/storage'
 
 export interface UserState {
   token: string
@@ -10,6 +9,7 @@ export interface UserState {
     username: string
     password: string
   }
+  userSocketId: string
 }
 
 const initialUserState: UserState = {
@@ -18,6 +18,7 @@ const initialUserState: UserState = {
     username: 'default-username',
     password: 'default-password',
   },
+  userSocketId: '',
 }
 
 export const userSlice = createSlice({
@@ -30,12 +31,16 @@ export const userSlice = createSlice({
     setUserInfo: (state, action: PayloadAction<UserState['userInfo']>) => {
       state.userInfo = action.payload
     },
+    setUserSocketId: (state, action: PayloadAction<string>) => {
+      state.userSocketId = action.payload
+    },
   },
 })
 
-export const { setToken, setUserInfo } = userSlice.actions
+export const { setToken, setUserInfo, setUserSocketId } = userSlice.actions
 
 export const selectToken = (state: StoreProps) => state.user.token
 export const selectUserInfo = (state: StoreProps) => state.user.userInfo
+export const selectUserSocketId = (state: StoreProps) => state.user.userSocketId
 
 export default userSlice.reducer

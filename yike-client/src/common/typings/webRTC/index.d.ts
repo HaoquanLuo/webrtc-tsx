@@ -9,4 +9,8 @@ export namespace WebRTC {
     toConnectSocketId: string
     signal: SimplePeer.SignalData
   }
+  type StreamWithId = {
+    stream: MediaStream
+    toConnectId: string
+  }
 }
