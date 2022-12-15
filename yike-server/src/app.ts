@@ -26,9 +26,9 @@ initCore(app, httpServer, sio)
 httpServer.listen(Config.HTTP_PORT, () => {
   console.log(`ENV: ${process.env.NODE_ENV}, PORT: ${Config.HTTP_PORT}.`)
 })
-try {
-  // 监听客户端 socket 连接
-  sio.on('connection', (socket) => {
+// 监听客户端 socket 连接
+sio.on('connection', (socket) => {
+  try {
     console.log(`[Socket Server] client connect: ${socket.id}`)
 
     socket.on('room-create', (data) => {
@@ -42,7 +42,15 @@ try {
     socket.on('disconnect', () => {
       SocketIO.disconnectHandler(socket, sio)
     })
-  })
-} catch (error) {
-  console.error(`[Socket Server] SocketException: ${error}`)
-}
+
+    socket.on('conn-signal', (data) => {
+      SocketIO.SignalingHandler(data, socket, sio)
+    })
+
+    socket.on('conn-init', (data) => {
+      SocketIO.initConnection(data, socket, sio)
+    })
+  } catch (error) {
+    console.error(`[Socket Server] SocketException: ${error}`)
+  }
+})

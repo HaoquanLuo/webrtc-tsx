@@ -27,6 +27,7 @@ export namespace SIO {
   }
 
   interface SocketData {
+    id?: string
     roomId?: string
     userId?: string
     username?: string

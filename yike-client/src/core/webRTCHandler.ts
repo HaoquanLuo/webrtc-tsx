@@ -27,9 +27,8 @@ const onlyAudioConstants: MediaStreamConstraints = {
  */
 export async function getLocalStream() {
   try {
-    const constraints = getStore().system.connectWithAudioOnly
-      ? onlyAudioConstants
-      : defaultConstants
+    const isAudioOnly = getStore().system.connectWithAudioOnly
+    const constraints = isAudioOnly ? onlyAudioConstants : defaultConstants
     return await navigator.mediaDevices.getUserMedia(constraints)
   } catch (err: any) {
     throw new Error(err)
@@ -40,6 +39,8 @@ export async function getLocalStream() {
  * @description 获取远程媒体流
  */
 export async function getRemoteStream() {
+  console.log('streamWithIds', streamWithIds)
+
   return streamWithIds
 }
 
@@ -76,44 +77,43 @@ let localStream: MediaStream
 
 /**
  * @description 准备对等对象连接逻辑
- * @param toConnectSocketId
+ * @param connSocketId
  * @param isInitiator
  */
-export function prepareNewPeerConnection(
-  toConnectSocketId: string,
+export async function prepareNewPeerConnection(
+  connSocketId: string,
   isInitiator: boolean,
 ) {
-  ;(async () => {
-    if (localStream !== undefined) {
-      return
-    }
-    localStream = await getLocalStream()
-  })()
+  localStream = await getLocalStream()
 
   const configuration = getConfiguration()
 
   // 实例化对等连接对象
-  peers[toConnectSocketId] = new SimplePeer({
+  peers[connSocketId] = new SimplePeer({
     initiator: isInitiator,
     config: configuration,
     stream: localStream,
   })
 
   // 信令数据传输
-  peers[toConnectSocketId].on('signal', (data) => {
+  peers[connSocketId].on('signal', (data) => {
     const signalData = {
       signal: data,
-      toConnectSocketId,
+      connUserSocketId: connSocketId,
     }
 
     SocketClient.sendSignalData(signalData)
   })
 
   // 获取媒体流 stream
-  peers[toConnectSocketId].on('stream', (stream) => {
-    console.log('成功获取远程 stream')
+  peers[connSocketId].on('stream', (stream) => {
+    debugger
 
-    addStream(stream, toConnectSocketId)
+    addStream(stream, connSocketId)
+  })
+
+  peers[connSocketId].on('error', (err) => {
+    console.error('Peer on error:', err)
   })
 }
 
@@ -122,10 +122,12 @@ export function prepareNewPeerConnection(
  * @param data
  */
 export function handleSignalingData(data: WebRTC.DataSignal) {
-  const { toConnectSocketId, signal } = data
+  console.log('peers', peers)
+
+  const { connUserSocketId, signal } = data
 
   // 处理错误情况
-  if (toConnectSocketId === undefined) {
+  if (connUserSocketId === undefined) {
     throw new Error(`SignalData error: toConnectSocketId not defined`)
   }
   if (signal === undefined) {
@@ -133,7 +135,7 @@ export function handleSignalingData(data: WebRTC.DataSignal) {
   }
 
   // 将信令数据添加到对等连接中
-  peers[toConnectSocketId].signal(signal)
+  peers[connUserSocketId].signal(signal)
 }
 
 export function addStream(stream: MediaStream, toConnectSocketId: string) {

@@ -7,7 +7,7 @@ import {
   setRoomCreated,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
-import { setUserSocketId } from '@/redux/features/user/userSlice'
+import { setUserId, setUserSocketId } from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
@@ -25,12 +25,15 @@ let socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
  */
 export const initSocketAndConnect = () => {
   // 生成 socket 实例
-  socket = io(SERVER, {
-    autoConnect: false,
-  })
+  socket = io(
+    SERVER,
+    // {
+    //   autoConnect: false,
+    // }
+  )
 
   // 建立 socket 连接
-  socket.connect()
+  // socket.connect()
   socket.on('connect', () => {
     console.log('connected to server', socket.id)
     dispatch(setUserSocketId(socket.id))
@@ -38,12 +41,17 @@ export const initSocketAndConnect = () => {
 
   // 监听 room 相关事件
   socket.on('room-id', (data) => {
-    const { roomId } = data
-    if (roomId !== undefined) {
-      console.log('room-id', data.roomId)
-      dispatch(setRoomId(roomId))
-      dispatch(setRoomCreated('created'))
+    const { roomId, id } = data
+    if (roomId === undefined) {
+      throw new Error(`Server Error: "roomId" does not exist`)
     }
+    if (id === undefined) {
+      throw new Error(`Server Error: "id" does not exist`)
+    }
+    console.log('room-id', data.roomId)
+    dispatch(setUserId(id))
+    dispatch(setRoomId(roomId))
+    dispatch(setRoomCreated('created'))
   })
   socket.on('room-update', (data) => {
     const { connectedUsers } = data
@@ -54,7 +62,7 @@ export const initSocketAndConnect = () => {
 
   // 监听 webRTC 相关事件
   socket.on('conn-prepare', (data) => {
-    const { toConnectSocketId } = data
+    const { connUserSocketId: toConnectSocketId } = data
 
     // 准备 webRTC 对等连接，应答方 false
     webRTCHandler.prepareNewPeerConnection(toConnectSocketId, false)
@@ -68,7 +76,7 @@ export const initSocketAndConnect = () => {
   })
 
   socket.on('conn-init', (data) => {
-    const { toConnectSocketId } = data
+    const { connUserSocketId: toConnectSocketId } = data
 
     // 准备 webRTC 对等连接，发起方 true
     webRTCHandler.prepareNewPeerConnection(toConnectSocketId, true)

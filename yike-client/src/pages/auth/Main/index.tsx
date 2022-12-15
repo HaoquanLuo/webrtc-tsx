@@ -74,7 +74,7 @@ const Main: React.FC = () => {
     dispatch(setConnectWithAudioOnly(!audioOnly))
   }
 
-  // 加入 Main 页面初始化 socket 实例
+  // 进入 Main 页面初始化 socket 实例
   useEffect(() => {
     initSocketAndConnect()
   }, [])
@@ -152,4 +152,4 @@ const Main: React.FC = () => {
   )
 }
 
-export default Main
+export default React.memo(Main)

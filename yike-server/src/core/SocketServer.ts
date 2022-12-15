@@ -1,4 +1,5 @@
 import { SIO } from '../../../socket'
+import { WebRTC } from '@/common/typings/webRTC'
 import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 
@@ -22,7 +23,6 @@ export class SocketIO {
     >,
   ) {
     const { username, audioOnly } = data
-    console.log('data', data)
 
     // username 不存在
     if (username === undefined) {
@@ -37,11 +37,12 @@ export class SocketIO {
 
     // 创建房间
     const roomId = uuidV4()
+    const id = uuidV4()
 
     // 创建进入会议的用户
     const newUser: SIO.User = {
       username,
-      id: uuidV4(),
+      id,
       roomId,
       socketId: socket.id,
       audioOnly,
@@ -62,6 +63,7 @@ export class SocketIO {
     // 告知客户端房间已创建并将 roomId 发送给客户端
     socket.emit('room-id', {
       roomId,
+      id,
     })
 
     // 告知房间内所有用户有新用户加入并更新房间
@@ -135,7 +137,7 @@ export class SocketIO {
       if (user.socketId !== socket.id) {
         // 存储发起对等连接方的 socketId 信息
         const data = {
-          toConnectSocketId: socket.id,
+          connUserSocketId: socket.id,
         }
         sio.to(user.socketId).emit('conn-prepare', data)
       }
@@ -227,5 +229,66 @@ export class SocketIO {
         SocketIO.rooms = SocketIO.rooms.filter((r) => r.id !== room.id)
       }
     }
+  }
+
+  /**
+   * 发起方向接收方发送信令数据
+   * @param data
+   * @param socket
+   * @param sio
+   */
+  public static SignalingHandler(
+    data: WebRTC.DataSignal,
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+    sio: Server<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
+    const { connUserSocketId, signal } = data
+
+    const signalingData = {
+      signal,
+      connUserSocketId: socket.id,
+    }
+
+    sio.to(connUserSocketId).emit('conn-signal', signalingData)
+  }
+
+  /**
+   * 初始化对等连接
+   * @param data
+   * @param socket
+   * @param sio
+   */
+  public static initConnection(
+    data: WebRTC.DataInit,
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+    sio: Server<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
+    const { connUserSocketId } = data
+
+    const initData = {
+      connUserSocketId: socket.id,
+    }
+
+    sio.to(connUserSocketId).emit('conn-init', initData)
   }
 }

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { selectUserInfo } from '@/redux/features/user/userSlice'
+import {
+  selectUserId,
+  selectUserInfo,
+  selectUserSocketId,
+} from '@/redux/features/user/userSlice'
 import { useSelector } from 'react-redux'
 import {
   selectConnectWithAudioOnly,
+  selectRoomId,
   selectRoomParticipants,
 } from '@/redux/features/system/systemSlice'
-import CameraBox from '@/components/CameraBox'
 import { notification } from 'antd'
-import { getLocalStream, getRemoteStream } from '@/core/webRTCHandler'
+import * as WebRTCHandler from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../../socket'
+import MediaBox from '@/components/MediaBox'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -17,16 +22,41 @@ const Room: React.FC = () => {
   const [api, contextHolder] = notification.useNotification()
 
   const { username } = useSelector(selectUserInfo)
-  const connectWithAudioOnly = useSelector(selectConnectWithAudioOnly)
+  const userId = useSelector(selectUserId)
+  const userSocketId = useSelector(selectUserSocketId)
+  const roomId = useSelector(selectRoomId)
+  const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomParticipants = useSelector(selectRoomParticipants)
 
-  const [participantWithStream, setParticipantWithStream] = useState<
-    (UserWithStream | null)[]
-  >([])
+  const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
+  const [myself, setMyself] = useState<UserWithStream | null>(null)
+  const [allUsers, setAllUsers] = useState<(UserWithStream | null)[]>([])
 
+  // 加载本地的媒体流及信息
   useEffect(() => {
     ;(async () => {
-      let streamWithIds = await getRemoteStream()
+      const local = await WebRTCHandler.getLocalStream()
+
+      if (!local) {
+        throw new Error(`Could not get local stream`)
+      }
+
+      setMyself({
+        username,
+        id: userId,
+        roomId,
+        socketId: userSocketId,
+        audioOnly,
+        stream: local,
+      })
+    })()
+  }, [userId, userSocketId])
+
+  // 加载其他用户的媒体流及信息
+  useEffect(() => {
+    ;(async () => {
+      const streamWithIds = await WebRTCHandler.getRemoteStream()
+      debugger
 
       const OtherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
         (streamWithId) => {
@@ -44,9 +74,15 @@ const Room: React.FC = () => {
           }
         },
       )
-      setParticipantWithStream(OtherUserWithStreams)
+
+      setOtherUsers(OtherUserWithStreams)
     })()
   }, [roomParticipants])
+
+  // 所有用户
+  useEffect(() => {
+    setAllUsers([myself, ...otherUsers])
+  }, [myself, otherUsers])
 
   // 监听用户加入、离开事件
   useEffect(() => {
@@ -58,28 +94,10 @@ const Room: React.FC = () => {
     }
   }, [roomParticipants])
 
-  const VideosContainer: React.FC = () => {
-    const OtherUsers = participantWithStream.map((user) => {
-      return user ? (
-        <CameraBox
-          key={user.id}
-          withAudioOnly={user.audioOnly}
-          getStreamFunction={getLocalStream}
-          username={user.username}
-        />
-      ) : (
-        <div>Oops!</div>
-      )
-    })
-    const Myself = React.memo(() => (
-      <CameraBox
-        withAudioOnly={connectWithAudioOnly}
-        getStreamFunction={getLocalStream}
-        username={username}
-      />
-    ))
-    const AllUsers = [Myself, ...OtherUsers]
-
+  const VideosContainer: React.FC<{ elements: (UserWithStream | null)[] }> = (
+    props,
+  ) => {
+    const { elements } = props
     return (
       <div
         id="videos-container"
@@ -89,15 +107,43 @@ const Room: React.FC = () => {
             : 'grid-rows-3 grid-cols-3'
         }`}
       >
-        {/* {AllUsers} */}
-        <Myself />
+        {elements.map((element) => {
+          return element ? (
+            <MediaBox
+              key={element.id}
+              audioOnly={element.audioOnly}
+              username={element.username}
+              srcObject={element.stream}
+            />
+          ) : null
+        })}
       </div>
     )
   }
+
   return (
     <>
       {contextHolder}
-      <VideosContainer />
+      {/* <VideosContainer elements={allUsers} /> */}
+      <div
+        id="videos-container"
+        className={`relative p-1 w-full h-full gap-3 grid ${
+          roomParticipants.length <= 4
+            ? 'grid-rows-2 grid-cols-2'
+            : 'grid-rows-3 grid-cols-3'
+        }`}
+      >
+        {allUsers.map((element) => {
+          return element ? (
+            <MediaBox
+              key={element.id}
+              audioOnly={element.audioOnly}
+              username={element.username}
+              srcObject={element.stream}
+            />
+          ) : null
+        })}
+      </div>
     </>
   )
 }

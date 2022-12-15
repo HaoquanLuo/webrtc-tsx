@@ -13,6 +13,7 @@ specifiers:
   '@types/mysql': ^2.15.21
   '@types/node': ^18.11.9
   '@types/nodemailer': ^6.4.6
+  '@types/simple-peer': ^9.11.5
   '@types/uuid': ^9.0.0
   '@typescript-eslint/eslint-plugin': ^5.0.0
   ajv: ^8.11.2
@@ -77,6 +78,7 @@ devDependencies:
   '@types/mysql': registry.npmmirror.com/@types/mysql/2.15.21
   '@types/node': registry.npmmirror.com/@types/node/18.11.9
   '@types/nodemailer': registry.npmmirror.com/@types/nodemailer/6.4.6
+  '@types/simple-peer': registry.npmmirror.com/@types/simple-peer/9.11.5
   '@types/uuid': registry.npmmirror.com/@types/uuid/9.0.0
   '@typescript-eslint/eslint-plugin': registry.npmmirror.com/@typescript-eslint/eslint-plugin/5.43.0_nqj4bdx4ekws7aecttskpih4py
   cross-env: registry.npmmirror.com/cross-env/7.0.3
@@ -1421,6 +1423,14 @@ packages:
     version: 1.15.0
     dependencies:
       '@types/mime': registry.npmmirror.com/@types/mime/3.0.1
+      '@types/node': registry.npmmirror.com/@types/node/18.11.9
+    dev: true
+
+  registry.npmmirror.com/@types/simple-peer/9.11.5:
+    resolution: {integrity: sha512-haXgWcAa3Y3Sn+T8lzkE4ErQUpYzhW6Cz2lh00RhQTyWt+xZ3s87wJPztUxlqSdFRqGhe2MQIBd0XsyHP3No4w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/simple-peer/-/simple-peer-9.11.5.tgz}
+    name: '@types/simple-peer'
+    version: 9.11.5
+    dependencies:
       '@types/node': registry.npmmirror.com/@types/node/18.11.9
     dev: true
 

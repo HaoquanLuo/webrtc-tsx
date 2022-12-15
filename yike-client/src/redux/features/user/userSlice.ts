@@ -9,6 +9,7 @@ export interface UserState {
     username: string
     password: string
   }
+  userId: string
   userSocketId: string
 }
 
@@ -18,6 +19,7 @@ const initialUserState: UserState = {
     username: 'default-username',
     password: 'default-password',
   },
+  userId: '',
   userSocketId: '',
 }
 
@@ -31,16 +33,21 @@ export const userSlice = createSlice({
     setUserInfo: (state, action: PayloadAction<UserState['userInfo']>) => {
       state.userInfo = action.payload
     },
+    setUserId: (state, action: PayloadAction<string>) => {
+      state.userId = action.payload
+    },
     setUserSocketId: (state, action: PayloadAction<string>) => {
       state.userSocketId = action.payload
     },
   },
 })
 
-export const { setToken, setUserInfo, setUserSocketId } = userSlice.actions
+export const { setToken, setUserInfo, setUserId, setUserSocketId } =
+  userSlice.actions
 
 export const selectToken = (state: StoreProps) => state.user.token
 export const selectUserInfo = (state: StoreProps) => state.user.userInfo
+export const selectUserId = (state: StoreProps) => state.user.userId
 export const selectUserSocketId = (state: StoreProps) => state.user.userSocketId
 
 export default userSlice.reducer
