@@ -55,8 +55,11 @@ const Room: React.FC = () => {
   // 加载其他用户的媒体流及信息
   useEffect(() => {
     ;(async () => {
+      /**
+       * @todo 完成远程媒体流连接逻辑
+       */
       const streamWithIds = await WebRTCHandler.getRemoteStream()
-      debugger
+      // debugger
 
       const OtherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
         (streamWithId) => {
