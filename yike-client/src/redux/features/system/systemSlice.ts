@@ -4,7 +4,13 @@ import { StoreProps } from '@/common/typings/store'
 import { getToken } from '@/common/utils/helpers/getTools'
 import { SIO } from '../../../../../socket'
 
-type RoomStatus = 'loading' | 'created' | 'destroyed'
+type RoomStatus = 'uninitialized' | 'existed' | 'created' | 'destroyed'
+
+type WebRTCStatus =
+  | 'uninitialized'
+  | 'initializing'
+  | 'connected'
+  | 'disconnected'
 
 export interface SystemState {
   logState: boolean
@@ -12,10 +18,10 @@ export interface SystemState {
   connectWithAudioOnly: boolean
   errorMessage: string
   roomHost: boolean
-  roomCreated: RoomStatus
+  roomStatus: RoomStatus
   roomId: string
-  roomExists: boolean
   roomParticipants: SIO.User[]
+  WebRTCStatus: string
 }
 
 const initialSystemState: SystemState = {
@@ -24,10 +30,10 @@ const initialSystemState: SystemState = {
   connectWithAudioOnly: true,
   errorMessage: '',
   roomHost: false,
-  roomCreated: 'loading',
+  roomStatus: 'uninitialized',
   roomId: '',
-  roomExists: false,
   roomParticipants: [],
+  WebRTCStatus: 'uninitialized',
 }
 
 export const systemSlice = createSlice({
@@ -49,17 +55,17 @@ export const systemSlice = createSlice({
     setRoomHost: (state, action: PayloadAction<boolean>) => {
       state.roomHost = action.payload
     },
-    setRoomCreated: (state, action: PayloadAction<RoomStatus>) => {
-      state.roomCreated = action.payload
+    setRoomStatus: (state, action: PayloadAction<RoomStatus>) => {
+      state.roomStatus = action.payload
     },
     setRoomId: (state, action: PayloadAction<string>) => {
       state.roomId = action.payload
     },
-    setRoomExists: (state, action: PayloadAction<boolean>) => {
-      state.roomExists = action.payload
-    },
     setRoomParticipants: (state, action: PayloadAction<SIO.User[]>) => {
       state.roomParticipants = action.payload
+    },
+    setWebRTCStatus: (state, action: PayloadAction<WebRTCStatus>) => {
+      state.WebRTCStatus = action.payload
     },
   },
 })
@@ -70,10 +76,10 @@ export const {
   setConnectWithAudioOnly,
   setErrorMessage,
   setRoomHost,
-  setRoomCreated,
+  setRoomStatus,
   setRoomId,
-  setRoomExists,
   setRoomParticipants,
+  setWebRTCStatus,
 } = systemSlice.actions
 
 export const selectLogState = (state: StoreProps) => state.system.logState
@@ -83,10 +89,11 @@ export const selectConnectWithAudioOnly = (state: StoreProps) =>
 export const selectErrorMessage = (state: StoreProps) =>
   state.system.errorMessage
 export const selectRoomHost = (state: StoreProps) => state.system.roomHost
-export const selectRoomCreated = (state: StoreProps) => state.system.roomCreated
+export const selectRoomStatus = (state: StoreProps) => state.system.roomStatus
 export const selectRoomId = (state: StoreProps) => state.system.roomId
-export const selectRoomExists = (state: StoreProps) => state.system.roomExists
 export const selectRoomParticipants = (state: StoreProps) =>
   state.system.roomParticipants
+export const selectWebRTCStatus = (state: StoreProps) =>
+  state.system.WebRTCStatus
 
 export default systemSlice.reducer

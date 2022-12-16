@@ -6,11 +6,10 @@ import {
   selectConnectWithAudioOnly,
   selectRoomHost,
   selectRoomId,
-  selectRoomCreated,
+  selectRoomStatus,
   setConnectWithAudioOnly,
   setRoomHost,
   setRoomId,
-  selectRoomExists,
   selectErrorMessage,
   selectRoomParticipants,
 } from '@/redux/features/system/systemSlice'
@@ -33,13 +32,13 @@ const Main: React.FC = () => {
   const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomId = useSelector(selectRoomId)
   const roomHost = useSelector(selectRoomHost)
-  const roomCreated = useSelector(selectRoomCreated)
-  const roomExists = useSelector(selectRoomExists)
+  const roomStatus = useSelector(selectRoomStatus)
 
   // Modal 组件回调事件
   const showModal = () => {
     setIsModalOpen(true)
   }
+
   const handleOk = () => {
     try {
       dispatch(setRoomId(joinRoomId))
@@ -53,6 +52,7 @@ const Main: React.FC = () => {
       setJoinRoomId('')
     }
   }
+
   const handleCancel = () => {
     dispatch(setRoomHost(false))
     setIsModalOpen(false)
@@ -63,13 +63,16 @@ const Main: React.FC = () => {
     dispatch(setRoomHost(true))
     showModal()
   }
+
   const handleJoinRoom = () => {
     dispatch(setRoomHost(false))
     showModal()
   }
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJoinRoomId(e.target.value)
   }
+
   const handleSwitch = () => {
     dispatch(setConnectWithAudioOnly(!audioOnly))
   }
@@ -79,19 +82,16 @@ const Main: React.FC = () => {
     initSocketAndConnect()
   }, [])
 
-  // 监听 roomCreated 来判断是否有创建房间
+  // 监听 roomStatus 来判断是否有创建房间
   useEffect(() => {
-    if (roomCreated === 'created') {
+    if (roomStatus === 'created') {
       navigate(`/auth/room/${roomId}`)
     }
-  }, [roomCreated, roomId])
 
-  // 监听 roomExists 来判断房间是否存在
-  useEffect(() => {
-    if (roomExists) {
+    if (roomStatus === 'existed') {
       navigate(`/auth/room/${roomId}`)
     }
-  }, [roomExists, roomId])
+  }, [roomStatus, roomId])
 
   // 监听 errorMessage
   useEffect(() => {

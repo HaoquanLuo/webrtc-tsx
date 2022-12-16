@@ -6,7 +6,7 @@ import {
   selectLogState,
   selectCurrentPath,
   setLogState,
-  setRoomCreated,
+  setRoomStatus,
   selectRoomId,
 } from '@/redux/features/system/systemSlice'
 import {
@@ -46,7 +46,7 @@ const SystemHeader: React.FC = () => {
   }
 
   function handlePageBack() {
-    dispatch(setRoomCreated('loading'))
+    dispatch(setRoomStatus('uninitialized'))
 
     location.assign('/')
   }

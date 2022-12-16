@@ -1,17 +1,16 @@
 import { getRoomState } from '@/api/system/auth'
 import { WebRTC } from '@/common/typings/webRTC'
 import {
-  setRoomExists,
   setRoomId,
   setRoomParticipants,
-  setRoomCreated,
+  setRoomStatus,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
 import { setUserId, setUserSocketId } from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
-import * as webRTCHandler from './webRTCHandler'
+import { WebRTCHandler } from './webRTCHandler'
 
 const dispatch = store.dispatch
 
@@ -51,7 +50,7 @@ export const initSocketAndConnect = () => {
     console.log('room-id', data.roomId)
     dispatch(setUserId(id))
     dispatch(setRoomId(roomId))
-    dispatch(setRoomCreated('created'))
+    dispatch(setRoomStatus('created'))
   })
   socket.on('room-update', (data) => {
     const { connectedUsers } = data
@@ -65,21 +64,21 @@ export const initSocketAndConnect = () => {
     const { connUserSocketId: toConnectSocketId } = data
 
     // 准备 webRTC 对等连接，应答方 false
-    webRTCHandler.prepareNewPeerConnection(toConnectSocketId, false)
+    WebRTCHandler.handlePeerConnection(toConnectSocketId, false)
 
     // 我方已准备完毕，通知对方进行 webRTC 对等连接
     socket.emit('conn-init', data)
   })
 
   socket.on('conn-signal', (data) => {
-    webRTCHandler.handleSignalingData(data)
+    WebRTCHandler.handleSignalingData(data)
   })
 
   socket.on('conn-init', (data) => {
     const { connUserSocketId: toConnectSocketId } = data
 
     // 准备 webRTC 对等连接，发起方 true
-    webRTCHandler.prepareNewPeerConnection(toConnectSocketId, true)
+    WebRTCHandler.handlePeerConnection(toConnectSocketId, true)
   })
 }
 
@@ -116,8 +115,10 @@ export const joinRoom = async (
     roomId,
   })
 
-  if (data.data !== undefined) {
-    const { roomExists, full } = data.data
+  const result = data.data
+
+  if (result !== undefined) {
+    const { roomExists, full } = result
 
     if (roomExists === false) {
       dispatch(setErrorMessage(`房间不存在`))
@@ -126,7 +127,7 @@ export const joinRoom = async (
       dispatch(setErrorMessage(`房间人数已满`))
     } else {
       socket.emit('room-join', emitData)
-      dispatch(setRoomExists(true))
+      dispatch(setRoomStatus('existed'))
     }
   }
 }

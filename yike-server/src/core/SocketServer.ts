@@ -4,16 +4,23 @@ import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 
 export class SocketIO {
+  /**
+   * @description 服务器连接用户数
+   */
   static connectedUsers: SIO.User[] = []
+
+  /**
+   * @description 服务器现存房间数
+   */
   static rooms: SIO.Room[] = []
 
   /**
-   * 创建房间
+   * @description 创建房间
    * @param data
    * @param socket
    * @returns
    */
-  public static createRoom(
+  public static createRoomHandler(
     data: SIO.SocketData,
     socket: Socket<
       SIO.ClientToServerEvents,
@@ -73,12 +80,12 @@ export class SocketIO {
   }
 
   /**
-   * 加入房间
+   * @description 加入房间
    * @param data
    * @param socket
    * @returns
    */
-  public static joinRoom(
+  public static joinRoomHandler(
     data: SIO.SocketData,
     socket: Socket<
       SIO.ClientToServerEvents,
@@ -150,11 +157,11 @@ export class SocketIO {
   }
 
   /**
-   * 查询房间状态(存在、满员)
+   * @description 查询房间状态(存在、满员)
    * @param roomId
    * @returns
    */
-  public static async roomExistsAndFull(roomId: string) {
+  public static async roomCheckHandler(roomId: string) {
     const room = SocketIO.rooms.find((room) => room.id === roomId)
 
     // 房间存在
@@ -180,6 +187,12 @@ export class SocketIO {
     }
   }
 
+  /**
+   * @description 用户离开房间处理逻辑
+   * @param socket
+   * @param sio
+   * @returns
+   */
   public static disconnectHandler(
     socket: Socket<
       SIO.ClientToServerEvents,
@@ -232,12 +245,12 @@ export class SocketIO {
   }
 
   /**
-   * 发起方向接收方发送信令数据
+   * @description 发送信令数据
    * @param data
    * @param socket
    * @param sio
    */
-  public static SignalingHandler(
+  public static signalingHandler(
     data: WebRTC.DataSignal,
     socket: Socket<
       SIO.ClientToServerEvents,
@@ -263,12 +276,12 @@ export class SocketIO {
   }
 
   /**
-   * 初始化对等连接
+   * @description 初始化对等连接
    * @param data
    * @param socket
    * @param sio
    */
-  public static initConnection(
+  public static initConnectionHandler(
     data: WebRTC.DataInit,
     socket: Socket<
       SIO.ClientToServerEvents,

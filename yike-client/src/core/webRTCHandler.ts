@@ -2,147 +2,180 @@ import SimplePeer from 'simple-peer'
 import { WebRTC } from '@/common/typings/webRTC'
 import * as SocketClient from './SocketClient'
 import { getStore } from '@/common/utils/getStore'
+import { store } from '@/redux/store'
+import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
 
-/**
- * @description 默认媒体流配置
- */
-const defaultConstants: MediaStreamConstraints = {
-  audio: true,
-  video: {
-    width: 640,
-    height: 480,
-  },
-}
+const dispatch = store.dispatch
 
-/**
- * @description 仅音频流配置
- */
-const onlyAudioConstants: MediaStreamConstraints = {
-  audio: true,
-  video: false,
-}
+export class WebRTCHandler {
+  /**
+   * @description 本地媒体流
+   */
+  static localStream: MediaStream
 
-/**
- * @description 获取本地媒体流
- */
-export async function getLocalStream() {
-  try {
-    const isAudioOnly = getStore().system.connectWithAudioOnly
-    const constraints = isAudioOnly ? onlyAudioConstants : defaultConstants
-    return await navigator.mediaDevices.getUserMedia(constraints)
-  } catch (err: any) {
-    throw new Error(err)
+  /**
+   * @description 房间内其他用户的 peer 对象
+   */
+  static peers: {
+    [key: string]: SimplePeer.Instance
+  } = {}
+
+  /**
+   * @description 房间内其他用户的媒体流
+   */
+  static streamWithIds: WebRTC.StreamWithId[] = []
+
+  /**
+   * @description 默认媒体流配置
+   */
+  static defaultConstants: MediaStreamConstraints = {
+    audio: true,
+    video: {
+      width: 640,
+      height: 480,
+    },
   }
-}
 
-/**
- * @description 获取远程媒体流
- */
-export async function getRemoteStream() {
-  console.log('streamWithIds', streamWithIds)
+  /**
+   * @description 仅音频流配置
+   */
+  static onlyAudioConstants: MediaStreamConstraints = {
+    audio: true,
+    video: false,
+  }
 
-  return streamWithIds
-}
+  /**
+   * @description Peer 配置信息
+   * @returns
+   */
+  static getConfiguration() {
+    return {
+      iceServers: [
+        {
+          urls: 'stun:stun1.l.google.com:19302',
+        },
+      ],
+    }
+  }
 
-/**
- * @description 房间内其他用户的 peer 对象
- */
-let peers: {
-  [key: string]: SimplePeer.Instance
-} = {}
+  /**
+   * @description 获取本地媒体流
+   */
+  public static async getLocalStream() {
+    try {
+      const isAudioOnly = getStore().system.connectWithAudioOnly
+      const constraints = isAudioOnly
+        ? WebRTCHandler.onlyAudioConstants
+        : WebRTCHandler.defaultConstants
+      return await navigator.mediaDevices.getUserMedia(constraints)
+    } catch (err: any) {
+      throw new Error(err)
+    }
+  }
 
-/**
- * @description 房间内其他用户的媒体流
- */
-let streamWithIds: WebRTC.StreamWithId[] = []
+  /**
+   * @description 获取远程媒体流
+   */
+  public static getRemoteStream() {
+    return WebRTCHandler.streamWithIds
+  }
 
-/**
- * @description Peer 配置信息
- * @returns
- */
-const getConfiguration = () => {
-  return {
-    iceServers: [
-      {
-        urls: 'stun:stun1.l.google.com:19302',
+  /**
+   * @description 准备对等对象连接逻辑
+   * @param connSocketId
+   * @param isInitiator
+   */
+  public static async handlePeerConnection(
+    connSocketId: string,
+    isInitiator: boolean,
+  ) {
+    WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
+
+    const configuration = WebRTCHandler.getConfiguration()
+
+    // 实例化对等连接对象
+    WebRTCHandler.peers[connSocketId] = new SimplePeer({
+      initiator: isInitiator,
+      config: configuration,
+      stream: WebRTCHandler.localStream,
+    })
+
+    // 信令数据传输
+    WebRTCHandler.peers[connSocketId].on('signal', (data) => {
+      const signalData = {
+        signal: data,
+        connUserSocketId: connSocketId,
+      }
+
+      SocketClient.sendSignalData(signalData)
+    })
+
+    // 获取媒体流 stream
+    WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
+      WebRTCHandler.addStream(stream, connSocketId)
+
+      dispatch(setWebRTCStatus('initializing'))
+    })
+
+    WebRTCHandler.peers[connSocketId].on('error', (err) => {
+      console.error(err)
+    })
+
+    WebRTCHandler.peers[connSocketId].on('connect', () => {
+      dispatch(setWebRTCStatus('connected'))
+      WebRTCHandler.peers[connSocketId].send('whatever' + Math.random())
+    })
+
+    WebRTCHandler.peers[connSocketId].on(
+      'track',
+      (track: MediaStreamTrack, stream: MediaStream) => {
+        console.log('track', track)
+        console.log('stream', stream)
       },
-    ],
+    )
+
+    WebRTCHandler.peers[connSocketId].on('data', (data) => {
+      console.log('data: ' + data)
+    })
+
+    WebRTCHandler.peers[connSocketId].on('close', () => {
+      console.log('CLOSE')
+      delete WebRTCHandler.peers[connSocketId]
+
+      dispatch(setWebRTCStatus('disconnected'))
+    })
   }
-}
 
-/**
- * @description 本地媒体流
- */
-let localStream: MediaStream
+  /**
+   * @description 发送信令数据到对等连接中
+   * @param data
+   */
+  public static handleSignalingData(data: WebRTC.DataSignal) {
+    console.log('peers', WebRTCHandler.peers)
 
-/**
- * @description 准备对等对象连接逻辑
- * @param connSocketId
- * @param isInitiator
- */
-export async function prepareNewPeerConnection(
-  connSocketId: string,
-  isInitiator: boolean,
-) {
-  localStream = await getLocalStream()
+    const { connUserSocketId, signal } = data
 
-  const configuration = getConfiguration()
-
-  // 实例化对等连接对象
-  peers[connSocketId] = new SimplePeer({
-    initiator: isInitiator,
-    config: configuration,
-    stream: localStream,
-  })
-
-  // 信令数据传输
-  peers[connSocketId].on('signal', (data) => {
-    const signalData = {
-      signal: data,
-      connUserSocketId: connSocketId,
+    // 处理错误情况
+    if (connUserSocketId === undefined) {
+      throw new Error(`SignalData error: toConnectSocketId not defined`)
+    }
+    if (signal === undefined) {
+      throw new Error(`SignalData error: signal not defined`)
     }
 
-    SocketClient.sendSignalData(signalData)
-  })
-
-  // 获取媒体流 stream
-  peers[connSocketId].on('stream', (stream) => {
-    debugger
-
-    addStream(stream, connSocketId)
-  })
-
-  peers[connSocketId].on('error', (err) => {
-    console.error('Peer on error:', err)
-  })
-}
-
-/**
- * @description 发送信令数据到对等连接中
- * @param data
- */
-export function handleSignalingData(data: WebRTC.DataSignal) {
-  console.log('peers', peers)
-
-  const { connUserSocketId, signal } = data
-
-  // 处理错误情况
-  if (connUserSocketId === undefined) {
-    throw new Error(`SignalData error: toConnectSocketId not defined`)
-  }
-  if (signal === undefined) {
-    throw new Error(`SignalData error: signal not defined`)
+    // 将信令数据添加到对等连接中
+    WebRTCHandler.peers[connUserSocketId].signal(signal)
   }
 
-  // 将信令数据添加到对等连接中
-  peers[connUserSocketId].signal(signal)
-}
+  public static addStream(stream: MediaStream, toConnectSocketId: string) {
+    const newStreamWithId: WebRTC.StreamWithId = {
+      stream,
+      toConnectId: toConnectSocketId,
+    }
 
-export function addStream(stream: MediaStream, toConnectSocketId: string) {
-  const newStreamWithId: WebRTC.StreamWithId = {
-    stream,
-    toConnectId: toConnectSocketId,
+    WebRTCHandler.streamWithIds = [
+      ...WebRTCHandler.streamWithIds,
+      newStreamWithId,
+    ]
   }
-
-  streamWithIds = [...streamWithIds, newStreamWithId]
 }

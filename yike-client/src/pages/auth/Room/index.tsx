@@ -9,9 +9,10 @@ import {
   selectConnectWithAudioOnly,
   selectRoomId,
   selectRoomParticipants,
+  selectWebRTCStatus,
 } from '@/redux/features/system/systemSlice'
 import { notification } from 'antd'
-import * as WebRTCHandler from '@/core/webRTCHandler'
+import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../../socket'
 import MediaBox from '@/components/MediaBox'
@@ -27,6 +28,7 @@ const Room: React.FC = () => {
   const roomId = useSelector(selectRoomId)
   const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomParticipants = useSelector(selectRoomParticipants)
+  const WebRTCStatus = useSelector(selectWebRTCStatus)
 
   const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
   const [myself, setMyself] = useState<UserWithStream | null>(null)
@@ -54,33 +56,33 @@ const Room: React.FC = () => {
 
   // 加载其他用户的媒体流及信息
   useEffect(() => {
-    ;(async () => {
-      /**
-       * @todo 完成远程媒体流连接逻辑
-       */
-      const streamWithIds = await WebRTCHandler.getRemoteStream()
-      // debugger
+    /**
+     * @todo 完成远程媒体流连接逻辑
+     */
+    const streamWithIds = WebRTCHandler.getRemoteStream()
 
-      const OtherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
-        (streamWithId) => {
-          const { stream, toConnectId } = streamWithId
-          const matchUser = roomParticipants.find(
-            (participant) => toConnectId === participant.id,
-          )
-          if (matchUser === undefined) {
-            return null
-          } else {
-            return {
-              ...matchUser,
-              stream,
-            }
+    const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
+      (streamWithId) => {
+        const { stream, toConnectId } = streamWithId
+
+        const matchUser = roomParticipants.find(
+          (participant) => toConnectId === participant.socketId,
+        )
+
+        if (matchUser === undefined) {
+          return null
+        } else {
+          return {
+            ...matchUser,
+            stream,
           }
-        },
-      )
+        }
+      },
+    )
+    console.log('otherUserWithStreams', otherUserWithStreams)
 
-      setOtherUsers(OtherUserWithStreams)
-    })()
-  }, [roomParticipants])
+    setOtherUsers(otherUserWithStreams)
+  }, [roomParticipants, WebRTCStatus])
 
   // 所有用户
   useEffect(() => {
@@ -127,8 +129,8 @@ const Room: React.FC = () => {
   return (
     <>
       {contextHolder}
-      {/* <VideosContainer elements={allUsers} /> */}
-      <div
+      <VideosContainer elements={allUsers} />
+      {/* <div
         id="videos-container"
         className={`relative p-1 w-full h-full gap-3 grid ${
           roomParticipants.length <= 4
@@ -146,7 +148,7 @@ const Room: React.FC = () => {
             />
           ) : null
         })}
-      </div>
+      </div> */}
     </>
   )
 }

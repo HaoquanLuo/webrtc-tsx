@@ -9,7 +9,7 @@ const router = new KoaRouter({
 
 router.get('/room-exists/:roomId', async (ctx, next) => {
   const { roomId } = ctx.params
-  const roomState = await SocketIO.roomExistsAndFull(roomId)
+  const roomState = await SocketIO.roomCheckHandler(roomId)
 
   throw new Success(roomState)
 })

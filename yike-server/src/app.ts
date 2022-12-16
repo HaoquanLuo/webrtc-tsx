@@ -32,11 +32,11 @@ sio.on('connection', (socket) => {
     console.log(`[Socket Server] client connect: ${socket.id}`)
 
     socket.on('room-create', (data) => {
-      SocketIO.createRoom(data, socket)
+      SocketIO.createRoomHandler(data, socket)
     })
 
     socket.on('room-join', (data) => {
-      SocketIO.joinRoom(data, socket, sio)
+      SocketIO.joinRoomHandler(data, socket, sio)
     })
 
     socket.on('disconnect', () => {
@@ -44,11 +44,11 @@ sio.on('connection', (socket) => {
     })
 
     socket.on('conn-signal', (data) => {
-      SocketIO.SignalingHandler(data, socket, sio)
+      SocketIO.signalingHandler(data, socket, sio)
     })
 
     socket.on('conn-init', (data) => {
-      SocketIO.initConnection(data, socket, sio)
+      SocketIO.initConnectionHandler(data, socket, sio)
     })
   } catch (error) {
     console.error(`[Socket Server] SocketException: ${error}`)
