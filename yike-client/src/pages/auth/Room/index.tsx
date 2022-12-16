@@ -56,9 +56,6 @@ const Room: React.FC = () => {
 
   // 加载其他用户的媒体流及信息
   useEffect(() => {
-    /**
-     * @todo 完成远程媒体流连接逻辑
-     */
     const streamWithIds = WebRTCHandler.getRemoteStream()
 
     const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
@@ -79,7 +76,6 @@ const Room: React.FC = () => {
         }
       },
     )
-    console.log('otherUserWithStreams', otherUserWithStreams)
 
     setOtherUsers(otherUserWithStreams)
   }, [roomParticipants, WebRTCStatus])
@@ -130,25 +126,6 @@ const Room: React.FC = () => {
     <>
       {contextHolder}
       <VideosContainer elements={allUsers} />
-      {/* <div
-        id="videos-container"
-        className={`relative p-1 w-full h-full gap-3 grid ${
-          roomParticipants.length <= 4
-            ? 'grid-rows-2 grid-cols-2'
-            : 'grid-rows-3 grid-cols-3'
-        }`}
-      >
-        {allUsers.map((element) => {
-          return element ? (
-            <MediaBox
-              key={element.id}
-              audioOnly={element.audioOnly}
-              username={element.username}
-              srcObject={element.stream}
-            />
-          ) : null
-        })}
-      </div> */}
     </>
   )
 }

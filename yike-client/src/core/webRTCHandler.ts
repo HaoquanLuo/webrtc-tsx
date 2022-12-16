@@ -122,24 +122,16 @@ export class WebRTCHandler {
     })
 
     WebRTCHandler.peers[connSocketId].on('connect', () => {
-      dispatch(setWebRTCStatus('connected'))
       WebRTCHandler.peers[connSocketId].send('whatever' + Math.random())
-    })
 
-    WebRTCHandler.peers[connSocketId].on(
-      'track',
-      (track: MediaStreamTrack, stream: MediaStream) => {
-        console.log('track', track)
-        console.log('stream', stream)
-      },
-    )
+      dispatch(setWebRTCStatus('connected'))
+    })
 
     WebRTCHandler.peers[connSocketId].on('data', (data) => {
       console.log('data: ' + data)
     })
 
     WebRTCHandler.peers[connSocketId].on('close', () => {
-      console.log('CLOSE')
       delete WebRTCHandler.peers[connSocketId]
 
       dispatch(setWebRTCStatus('disconnected'))
@@ -151,8 +143,6 @@ export class WebRTCHandler {
    * @param data
    */
   public static handleSignalingData(data: WebRTC.DataSignal) {
-    console.log('peers', WebRTCHandler.peers)
-
     const { connUserSocketId, signal } = data
 
     // 处理错误情况

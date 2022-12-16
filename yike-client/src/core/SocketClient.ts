@@ -24,36 +24,38 @@ let socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
  */
 export const initSocketAndConnect = () => {
   // 生成 socket 实例
-  socket = io(
-    SERVER,
-    // {
-    //   autoConnect: false,
-    // }
-  )
+  socket = io(SERVER, {
+    autoConnect: false,
+  })
 
   // 建立 socket 连接
-  // socket.connect()
+  socket.connect()
   socket.on('connect', () => {
     console.log('connected to server', socket.id)
+
     dispatch(setUserSocketId(socket.id))
   })
 
   // 监听 room 相关事件
   socket.on('room-id', (data) => {
     const { roomId, id } = data
+
     if (roomId === undefined) {
       throw new Error(`Server Error: "roomId" does not exist`)
     }
+
     if (id === undefined) {
       throw new Error(`Server Error: "id" does not exist`)
     }
-    console.log('room-id', data.roomId)
+
     dispatch(setUserId(id))
     dispatch(setRoomId(roomId))
     dispatch(setRoomStatus('created'))
   })
+
   socket.on('room-update', (data) => {
     const { connectedUsers } = data
+
     if (connectedUsers !== undefined) {
       dispatch(setRoomParticipants(connectedUsers))
     }
