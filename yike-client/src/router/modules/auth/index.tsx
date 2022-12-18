@@ -1,9 +1,6 @@
 import { RouteObject } from 'react-router-dom'
-import { lazyLoad } from '@/core/RouteGuard'
 import { AuthPaths, ExceptionPaths } from '@/common/constants/components'
-import Room from '@/pages/auth/Room'
-import Redirect from '@/pages/exception/Redirect'
-import Main from '@/pages/auth/Main'
+import { lazyLoad } from '@/core/RouteGuard'
 
 /**
  * 权限路由
@@ -11,17 +8,15 @@ import Main from '@/pages/auth/Main'
 export const authRoutesMap: RouteObject[] = [
   {
     index: true,
-    // element: lazyLoad(AuthPaths.Main),
-    element: <Main />,
+    element: lazyLoad(AuthPaths.Main),
   },
   {
     path: '/auth/room/:roomId',
-    // element: lazyLoad(AuthPaths.Room),
-    element: <Room />,
+    element: lazyLoad(AuthPaths.Room),
   },
   {
     path: '*',
-    // element: lazyLoad(ExceptionPaths.Redirect),
-    element: <Redirect />,
+    element: lazyLoad(ExceptionPaths.Redirect),
+    // element: <Redirect />,
   },
 ]

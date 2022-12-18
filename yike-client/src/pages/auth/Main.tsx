@@ -11,7 +11,6 @@ import {
   setRoomHost,
   setRoomId,
   selectErrorMessage,
-  selectRoomParticipants,
 } from '@/redux/features/system/systemSlice'
 import { selectUserInfo } from '@/redux/features/user/userSlice'
 import { Button, Input, Modal, Switch, notification } from 'antd'

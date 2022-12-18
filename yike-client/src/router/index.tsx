@@ -2,19 +2,16 @@ import { RouteObject } from 'react-router-dom'
 import { RouteGuard, lazyLoad } from '@/core/RouteGuard'
 import { constantRoutesMap } from './modules/common'
 import { authRoutesMap } from './modules/auth'
-import CommonPage from '@/pages/common'
+import CommonPage from '@/pages/common/Common'
 import { ExceptionPaths } from '@/common/constants/components'
-import NotFound from '@/pages/exception/NotFound'
 
 export const finalRoutes: RouteObject[] = [
   {
     path: '/',
     element: <RouteGuard children={<CommonPage />} />,
-    // errorElement: lazyLoad(ExceptionPaths.NotFound),
-    errorElement: <NotFound />,
+    errorElement: lazyLoad(ExceptionPaths.NotFound),
     children: [...authRoutesMap],
   },
   ...constantRoutesMap,
-  // { path: '*', element: lazyLoad(ExceptionPaths.NotFound) },
-  { path: '*', element: <NotFound /> },
+  { path: '*', element: lazyLoad(ExceptionPaths.NotFound) },
 ]
