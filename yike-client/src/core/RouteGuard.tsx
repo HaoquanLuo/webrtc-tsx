@@ -8,9 +8,13 @@ import { lazy, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
+// Vite 的懒加载需要用 import.meta.glob() 实现
+const modules = import.meta.glob<{ default: React.FC }>('../pages/**/*.tsx')
+
 // 快速导入工具函数
 export const lazyLoad = (moduleName: string) => {
-  const Module = lazy(() => import(/* @vite-ignore */ `../pages/${moduleName}`))
+  const component = modules[`../pages/${moduleName}.tsx`]
+  const Module = lazy(component)
 
   return <Module />
 }

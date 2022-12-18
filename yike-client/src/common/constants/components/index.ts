@@ -1,5 +1,5 @@
 export const CommonPaths = {
-  Root: 'common',
+  Root: 'common/Common',
   Login: 'common/Login',
   Register: 'common/Register',
 }

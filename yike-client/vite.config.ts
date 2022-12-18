@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import vitePluginImp from 'vite-plugin-imp'
 
 // unocss
 import Unocss from 'unocss/vite'
@@ -12,7 +13,7 @@ function resolve(dir: string): string {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [Unocss(), react()],
+  plugins: [Unocss(), react(), vitePluginImp()],
   resolve: {
     alias: {
       '@': resolve('./src'),

@@ -1,8 +1,6 @@
 import { RouteObject } from 'react-router-dom'
-import { lazyLoad } from '@/core/RouteGuard'
 import { CommonPaths } from '@/common/constants/components'
-import Login from '@/pages/common/Login'
-import Register from '@/pages/common/Register'
+import { lazyLoad } from '@/core/RouteGuard'
 
 /**
  * 基础路由
@@ -10,12 +8,10 @@ import Register from '@/pages/common/Register'
 export const constantRoutesMap: RouteObject[] = [
   {
     path: '/login',
-    // element: lazyLoad(CommonPaths.Login),
-    element: <Login />,
+    element: lazyLoad(CommonPaths.Login),
   },
   {
     path: '/register',
-    // element: lazyLoad(CommonPaths.Register),
-    element: <Register />,
+    element: lazyLoad(CommonPaths.Register),
   },
 ]

@@ -14,7 +14,7 @@ import {
 import { notification } from 'antd'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
-import { SIO } from '../../../../../socket'
+import { SIO } from '../../../../socket'
 import MediaBox from '@/components/MediaBox'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
