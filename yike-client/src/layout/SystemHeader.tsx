@@ -17,6 +17,7 @@ import {
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
+import { useNavigate } from 'react-router-dom'
 
 const SystemHeader: React.FC = () => {
   const dispatch = useDispatch()
@@ -41,14 +42,14 @@ const SystemHeader: React.FC = () => {
       removeItem('token')
       removeItem('userInfo')
 
-      location.assign('/')
+      location.replace('/')
     }
   }
 
   function handlePageBack() {
     dispatch(setRoomStatus('uninitialized'))
 
-    location.assign('/')
+    history.go(-1)
   }
 
   /**
@@ -71,7 +72,16 @@ const SystemHeader: React.FC = () => {
   }
 
   return (
-    <div id="system-header" flex items-center px-4 gap-2 bg-gray min-h="14!">
+    <div
+      id="system-header"
+      flex
+      items-center
+      px-4
+      gap-2
+      bg-op-10
+      bg-white
+      min-h="14!"
+    >
       <div className="left-btns" flex w-48 justify-start>
         {<BackButton />}
       </div>

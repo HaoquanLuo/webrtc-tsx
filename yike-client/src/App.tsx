@@ -5,7 +5,8 @@ import { finalRoutes } from './router'
 import LoadingPage from './pages/exception/Loading'
 
 import './App.css'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, theme } from 'antd'
+import zh_CN from 'antd/es/locale/zh_CN'
 
 function App() {
   const router = createBrowserRouter(finalRoutes)
@@ -18,7 +19,9 @@ function App() {
             token: {
               colorPrimary: '#4f46e5',
             },
+            algorithm: theme.defaultAlgorithm,
           }}
+          locale={zh_CN}
         >
           <SystemLayout>
             <RouterProvider router={router} />

@@ -107,8 +107,8 @@ const Main: React.FC = () => {
       {contextHolder}
       <h2>Auth Main</h2>
       <div>
-        <Button onClick={handleCreateRoom}>create room</Button>
-        <Button onClick={handleJoinRoom}>join room</Button>
+        <Button onClick={handleCreateRoom}>创建房间</Button>
+        <Button onClick={handleJoinRoom}>加入房间</Button>
       </div>
       <Modal
         title={roomHost ? '创建房间' : '加入房间'}

@@ -9,6 +9,7 @@ import {
   selectConnectWithAudioOnly,
   selectRoomId,
   selectRoomParticipants,
+  selectRoomStatus,
   selectWebRTCStatus,
 } from '@/redux/features/system/systemSlice'
 import { notification } from 'antd'
@@ -16,17 +17,20 @@ import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../socket'
 import MediaBox from '@/components/MediaBox'
+import { useNavigate } from 'react-router-dom'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
 const Room: React.FC = () => {
+  const navigate = useNavigate()
   const [api, contextHolder] = notification.useNotification()
 
   const { username } = useSelector(selectUserInfo)
   const userId = useSelector(selectUserId)
   const userSocketId = useSelector(selectUserSocketId)
-  const roomId = useSelector(selectRoomId)
   const audioOnly = useSelector(selectConnectWithAudioOnly)
+  const roomId = useSelector(selectRoomId)
+  const roomStatus = useSelector(selectRoomStatus)
   const roomParticipants = useSelector(selectRoomParticipants)
   const WebRTCStatus = useSelector(selectWebRTCStatus)
 
@@ -85,12 +89,19 @@ const Room: React.FC = () => {
     setAllUsers([myself, ...otherUsers])
   }, [myself, otherUsers])
 
+  // 监听返回按钮事件
+  // useEffect(() => {
+  //   if (roomStatus === 'uninitialized') {
+  //     navigate(-1)
+  //   }
+  // }, [roomStatus])
+
   // 监听用户加入、离开事件
   useEffect(() => {
     if (roomParticipants.length > 0) {
       api.info({
         message: '用户事件',
-        placement: 'bottomRight',
+        placement: 'topLeft',
       })
     }
   }, [roomParticipants])
