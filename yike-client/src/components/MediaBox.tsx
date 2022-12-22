@@ -1,3 +1,4 @@
+import { stopBothVideoAndAudio } from '@/common/utils/stopBothVideoAndAudio'
 import React, { useEffect, useRef, VideoHTMLAttributes } from 'react'
 
 type Props = VideoHTMLAttributes<HTMLVideoElement> & {
@@ -25,6 +26,14 @@ const MediaBox: React.FC<Props> = (props) => {
         videoRef.current!.parentElement!.style.position = 'static'
       }
     })
+
+    return () => {
+      if (srcObject) {
+        console.log('run cleanup', srcObject)
+
+        stopBothVideoAndAudio(srcObject)
+      }
+    }
   }, [videoRef.current, srcObject])
 
   return (
@@ -54,6 +63,7 @@ const MediaBox: React.FC<Props> = (props) => {
         </div>
       )}
       <video
+        controls
         muted
         autoPlay
         ref={videoRef}

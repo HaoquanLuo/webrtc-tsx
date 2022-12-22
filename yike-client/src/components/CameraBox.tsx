@@ -1,7 +1,7 @@
 import { useLoadStream } from '@/hooks/useLoadStream'
 import * as React from 'react'
-import LoadingBox from '../LoadingBox'
-import MediaBox from '../MediaBox'
+import LoadingBox from './LoadingBox'
+import MediaBox from './MediaBox'
 
 interface Props {
   key?: string | number | symbol

@@ -83,11 +83,7 @@ const Main: React.FC = () => {
 
   // 监听 roomStatus 来判断是否有创建房间
   useEffect(() => {
-    if (roomStatus === 'created') {
-      navigate(`/auth/room/${roomId}`)
-    }
-
-    if (roomStatus === 'existed') {
+    if (roomStatus === 'created' || roomStatus === 'existed') {
       navigate(`/auth/room/${roomId}`)
     }
   }, [roomStatus, roomId])

@@ -1,5 +1,5 @@
 import { getToken } from '@/common/utils/helpers/getTools'
-import UserLayout from '@/layout/UserLayout'
+import SystemLayout from '@/layout/SystemLayout'
 import {
   setCurrentPath,
   selectRoomId,
@@ -59,10 +59,10 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
     dispatch(setCurrentPath(pathname))
   }, [pathname])
 
-  const userView = <UserLayout>{children}</UserLayout>
+  const userView = <>{children}</>
 
   const guidelines = (
-    <>
+    <div grid place-items-center>
       <ul>
         <li>
           <Link to={'login'}>Sign In</Link>
@@ -71,8 +71,8 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
           <Link to={'register'}>Sign Up</Link>
         </li>
       </ul>
-    </>
+    </div>
   )
 
-  return token ? userView : guidelines
+  return <SystemLayout>{token ? userView : guidelines}</SystemLayout>
 }

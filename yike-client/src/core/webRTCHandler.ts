@@ -157,6 +157,11 @@ export class WebRTCHandler {
     WebRTCHandler.peers[connUserSocketId].signal(signal)
   }
 
+  /**
+   * @description 添加远程媒体流到本地
+   * @param stream
+   * @param toConnectSocketId
+   */
   public static addStream(stream: MediaStream, toConnectSocketId: string) {
     const newStreamWithId: WebRTC.StreamWithId = {
       stream,

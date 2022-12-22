@@ -23,9 +23,7 @@ function App() {
           }}
           locale={zh_CN}
         >
-          <SystemLayout>
-            <RouterProvider router={router} />
-          </SystemLayout>
+          <RouterProvider router={router} />
         </ConfigProvider>
       </React.Suspense>
     </div>

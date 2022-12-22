@@ -8,10 +8,15 @@ import {
   setLogState,
   setRoomStatus,
   selectRoomId,
+  setRoomId,
+  setRoomParticipants,
+  setConnectWithAudioOnly,
+  setRoomHost,
 } from '@/redux/features/system/systemSlice'
 import {
   selectUserInfo,
   setToken,
+  setUserId,
   setUserInfo,
 } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
@@ -21,6 +26,7 @@ import { useNavigate } from 'react-router-dom'
 
 const SystemHeader: React.FC = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const logState = useSelector(selectLogState)
   const currentPath = useSelector(selectCurrentPath)
@@ -32,24 +38,23 @@ const SystemHeader: React.FC = () => {
     if (data.errorCode === 0 && data.msg === 'ok') {
       dispatch(setToken(''))
       dispatch(setLogState(false))
-      dispatch(
-        setUserInfo({
-          username: 'default-username',
-          password: 'default-password',
-        }),
-      )
 
       removeItem('token')
       removeItem('userInfo')
 
-      location.replace('/')
+      navigate('/')
     }
   }
 
   function handlePageBack() {
+    dispatch(setRoomId(''))
+    dispatch(setRoomParticipants([]))
     dispatch(setRoomStatus('uninitialized'))
+    dispatch(setUserId(''))
+    dispatch(setConnectWithAudioOnly(true))
+    dispatch(setRoomHost(false))
 
-    history.go(-1)
+    navigate(-1)
   }
 
   /**

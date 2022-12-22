@@ -16,8 +16,8 @@ export interface UserState {
 const initialUserState: UserState = {
   token: getToken() ?? '',
   userInfo: getUserInfo() ?? {
-    username: 'default-username',
-    password: 'default-password',
+    username: '',
+    password: '',
   },
   userId: '',
   userSocketId: '',

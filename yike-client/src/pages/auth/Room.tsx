@@ -18,6 +18,7 @@ import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../socket'
 import MediaBox from '@/components/MediaBox'
 import { useNavigate } from 'react-router-dom'
+import { useLoadStream } from '@/hooks/useLoadStream'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -38,25 +39,25 @@ const Room: React.FC = () => {
   const [myself, setMyself] = useState<UserWithStream | null>(null)
   const [allUsers, setAllUsers] = useState<(UserWithStream | null)[]>([])
 
+  const { localStream, streamStatus } = useLoadStream(
+    WebRTCHandler.getLocalStream,
+  )
+
   // 加载本地的媒体流及信息
   useEffect(() => {
-    ;(async () => {
-      const local = await WebRTCHandler.getLocalStream()
+    if (streamStatus === 'complete') {
+      console.log(`LocalStream is completed`)
+    }
 
-      if (!local) {
-        throw new Error(`Could not get local stream`)
-      }
-
-      setMyself({
-        username,
-        id: userId,
-        roomId,
-        socketId: userSocketId,
-        audioOnly,
-        stream: local,
-      })
-    })()
-  }, [userId, userSocketId])
+    setMyself({
+      username,
+      id: userId,
+      roomId,
+      socketId: userSocketId,
+      audioOnly,
+      stream: localStream as MediaStream,
+    })
+  }, [localStream, userId, userSocketId])
 
   // 加载其他用户的媒体流及信息
   useEffect(() => {
@@ -90,18 +91,18 @@ const Room: React.FC = () => {
   }, [myself, otherUsers])
 
   // 监听返回按钮事件
-  // useEffect(() => {
-  //   if (roomStatus === 'uninitialized') {
-  //     navigate(-1)
-  //   }
-  // }, [roomStatus])
+  useEffect(() => {
+    if (roomStatus === 'uninitialized') {
+      navigate(-1)
+    }
+  }, [roomStatus])
 
   // 监听用户加入、离开事件
   useEffect(() => {
     if (roomParticipants.length > 0) {
       api.info({
         message: '用户事件',
-        placement: 'topLeft',
+        placement: 'bottomLeft',
       })
     }
   }, [roomParticipants])

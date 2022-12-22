@@ -1,16 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { StreamStatus } from '@/common/typings/stream'
-
-/**
- * @description 退出房间时清除媒体流
- */
-function stopBothVideoAndAudio(stream: MediaStream) {
-  stream.getTracks().forEach((track) => {
-    if (track.readyState === 'live') {
-      track.stop()
-    }
-  })
-}
+import { stopBothVideoAndAudio } from '@/common/utils/stopBothVideoAndAudio'
 
 /**
  * @description 进入房间后加载媒体流
