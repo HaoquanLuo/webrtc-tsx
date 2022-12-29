@@ -24,12 +24,9 @@ let socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
  */
 export const initSocketAndConnect = () => {
   // 生成 socket 实例
-  socket = io(SERVER, {
-    autoConnect: false,
-  })
+  socket = io(SERVER)
 
   // 建立 socket 连接
-  socket.connect()
   socket.on('connect', () => {
     console.log('connected to server', socket.id)
 
@@ -63,10 +60,10 @@ export const initSocketAndConnect = () => {
 
   // 监听 webRTC 相关事件
   socket.on('conn-prepare', (data) => {
-    const { connUserSocketId: toConnectSocketId } = data
+    const { connUserSocketId } = data
 
     // 准备 webRTC 对等连接，应答方 false
-    WebRTCHandler.handlePeerConnection(toConnectSocketId, false)
+    WebRTCHandler.handlePeerConnection(connUserSocketId, false)
 
     // 我方已准备完毕，通知对方进行 webRTC 对等连接
     socket.emit('conn-init', data)
@@ -77,10 +74,14 @@ export const initSocketAndConnect = () => {
   })
 
   socket.on('conn-init', (data) => {
-    const { connUserSocketId: toConnectSocketId } = data
+    const { connUserSocketId } = data
 
     // 准备 webRTC 对等连接，发起方 true
-    WebRTCHandler.handlePeerConnection(toConnectSocketId, true)
+    WebRTCHandler.handlePeerConnection(connUserSocketId, true)
+  })
+
+  socket.on('conn-destroy', (data) => {
+    WebRTCHandler.handleRemovePeerConnection(data)
   })
 }
 
@@ -88,7 +89,7 @@ export const initSocketAndConnect = () => {
  * @description 创建新的会议房间
  * @param username
  */
-export const createRoom = (username: string, audioOnly: boolean) => {
+export const handleCreateRoom = (username: string, audioOnly: boolean) => {
   const data = {
     username,
     audioOnly,
@@ -102,7 +103,7 @@ export const createRoom = (username: string, audioOnly: boolean) => {
  * @param roomId
  * @param username
  */
-export const joinRoom = async (
+export const handleJoinRoom = async (
   roomId: string,
   username: string,
   audioOnly: boolean,
@@ -132,6 +133,10 @@ export const joinRoom = async (
       dispatch(setRoomStatus('existed'))
     }
   }
+}
+
+export const handleLeaveRoom = () => {
+  socket.emit('room-leave')
 }
 
 /**

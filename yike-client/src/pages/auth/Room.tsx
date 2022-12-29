@@ -19,6 +19,7 @@ import { SIO } from '../../../../socket'
 import MediaBox from '@/components/MediaBox'
 import { useNavigate } from 'react-router-dom'
 import { useLoadStream } from '@/hooks/useLoadStream'
+import { handleLeaveRoom } from '@/core/SocketClient'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -61,7 +62,8 @@ const Room: React.FC = () => {
 
   // 加载其他用户的媒体流及信息
   useEffect(() => {
-    const streamWithIds = WebRTCHandler.getRemoteStream()
+    const remoteStreamWithIds = WebRTCHandler.getRemoteStream()
+    const streamWithIds = remoteStreamWithIds()
 
     const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
       (streamWithId) => {
@@ -82,18 +84,23 @@ const Room: React.FC = () => {
       },
     )
 
-    setOtherUsers(otherUserWithStreams)
+    setOtherUsers(
+      otherUserWithStreams.filter(
+        (item) => item !== null && item.stream.active,
+      ),
+    )
   }, [roomParticipants, WebRTCStatus])
 
   // 所有用户
   useEffect(() => {
     setAllUsers([myself, ...otherUsers])
+    console.log('otherUsers', otherUsers)
   }, [myself, otherUsers])
 
   // 监听返回按钮事件
   useEffect(() => {
-    if (roomStatus === 'uninitialized') {
-      navigate(-1)
+    if (roomStatus === 'destroyed') {
+      handleLeaveRoom()
     }
   }, [roomStatus])
 
@@ -125,7 +132,7 @@ const Room: React.FC = () => {
             <MediaBox
               key={element.id}
               audioOnly={element.audioOnly}
-              username={element.username}
+              userName={element.username}
               srcObject={element.stream}
             />
           ) : null

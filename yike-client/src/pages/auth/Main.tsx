@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { createRoom, joinRoom, initSocketAndConnect } from '@/core/SocketClient'
+import {
+  handleCreateRoom,
+  handleJoinRoom,
+  initSocketAndConnect,
+} from '@/core/SocketClient'
 import {
   selectConnectWithAudioOnly,
   selectRoomHost,
@@ -11,8 +15,13 @@ import {
   setRoomHost,
   setRoomId,
   selectErrorMessage,
+  setErrorMessage,
+  setRoomStatus,
 } from '@/redux/features/system/systemSlice'
-import { selectUserInfo } from '@/redux/features/user/userSlice'
+import {
+  selectUserInfo,
+  selectUserSocketId,
+} from '@/redux/features/user/userSlice'
 import { Button, Input, Modal, Switch, notification } from 'antd'
 
 const Main: React.FC = () => {
@@ -28,6 +37,7 @@ const Main: React.FC = () => {
   // store 属性
   const errorMessage = useSelector(selectErrorMessage)
   const { username } = useSelector(selectUserInfo)
+  const userSocketId = useSelector(selectUserSocketId)
   const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomId = useSelector(selectRoomId)
   const roomHost = useSelector(selectRoomHost)
@@ -40,14 +50,18 @@ const Main: React.FC = () => {
 
   const handleOk = () => {
     try {
+      if (!roomHost && joinRoomId === '') {
+        dispatch(setErrorMessage(`没有输入房间号！`))
+        return
+      }
       dispatch(setRoomId(joinRoomId))
       roomHost
-        ? createRoom(username, audioOnly)
-        : joinRoom(joinRoomId, username, audioOnly)
+        ? handleCreateRoom(username, audioOnly)
+        : handleJoinRoom(joinRoomId, username, audioOnly)
     } catch (error) {
       console.error(error)
     } finally {
-      setIsModalOpen(false)
+      // setIsModalOpen(false)
       setJoinRoomId('')
     }
   }
@@ -58,12 +72,12 @@ const Main: React.FC = () => {
   }
 
   // 按钮点击事件
-  const handleCreateRoom = () => {
+  const handleCreate = () => {
     dispatch(setRoomHost(true))
     showModal()
   }
 
-  const handleJoinRoom = () => {
+  const handleJoin = () => {
     dispatch(setRoomHost(false))
     showModal()
   }
@@ -78,14 +92,17 @@ const Main: React.FC = () => {
 
   // 进入 Main 页面初始化 socket 实例
   useEffect(() => {
-    initSocketAndConnect()
-  }, [])
+    if (userSocketId === '') {
+      initSocketAndConnect()
+    }
+  }, [userSocketId])
 
   // 监听 roomStatus 来判断是否有创建房间
   useEffect(() => {
     if (roomStatus === 'created' || roomStatus === 'existed') {
       navigate(`/auth/room/${roomId}`)
     }
+    dispatch(setRoomStatus('uninitialized'))
   }, [roomStatus, roomId])
 
   // 监听 errorMessage
@@ -103,8 +120,8 @@ const Main: React.FC = () => {
       {contextHolder}
       <h2>Auth Main</h2>
       <div>
-        <Button onClick={handleCreateRoom}>创建房间</Button>
-        <Button onClick={handleJoinRoom}>加入房间</Button>
+        <Button onClick={handleCreate}>创建房间</Button>
+        <Button onClick={handleJoin}>加入房间</Button>
       </div>
       <Modal
         title={roomHost ? '创建房间' : '加入房间'}

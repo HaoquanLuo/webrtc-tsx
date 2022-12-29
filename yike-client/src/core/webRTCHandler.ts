@@ -77,7 +77,7 @@ export class WebRTCHandler {
    * @description 获取远程媒体流
    */
   public static getRemoteStream() {
-    return WebRTCHandler.streamWithIds
+    return () => WebRTCHandler.streamWithIds
   }
 
   /**
@@ -112,7 +112,7 @@ export class WebRTCHandler {
 
     // 获取媒体流 stream
     WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
-      WebRTCHandler.addStream(stream, connSocketId)
+      WebRTCHandler.handleAddStream(stream, connSocketId)
 
       dispatch(setWebRTCStatus('initializing'))
     })
@@ -162,7 +162,10 @@ export class WebRTCHandler {
    * @param stream
    * @param toConnectSocketId
    */
-  public static addStream(stream: MediaStream, toConnectSocketId: string) {
+  public static handleAddStream(
+    stream: MediaStream,
+    toConnectSocketId: string,
+  ) {
     const newStreamWithId: WebRTC.StreamWithId = {
       stream,
       toConnectId: toConnectSocketId,
@@ -172,5 +175,22 @@ export class WebRTCHandler {
       ...WebRTCHandler.streamWithIds,
       newStreamWithId,
     ]
+  }
+
+  /**
+   * @description 移除 peer 对象
+   * @param data
+   */
+  public static handleRemovePeerConnection(data: WebRTC.DataDestroy) {
+    const { socketId } = data
+
+    if (WebRTCHandler.peers[socketId]) {
+      debugger
+      WebRTCHandler.peers[socketId].destroy()
+      delete WebRTCHandler.peers[socketId]
+      WebRTCHandler.streamWithIds = WebRTCHandler.streamWithIds.filter(
+        (item) => item.toConnectId !== socketId,
+      )
+    }
   }
 }

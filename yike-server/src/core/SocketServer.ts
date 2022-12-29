@@ -193,7 +193,7 @@ export class SocketIO {
    * @param sio
    * @returns
    */
-  public static disconnectHandler(
+  public static leaveRoomHandler(
     socket: Socket<
       SIO.ClientToServerEvents,
       SIO.ServerToClientEvents,
@@ -229,7 +229,7 @@ export class SocketIO {
       //当会议房间没有人员的时候要关闭整个会议室（从rooms数组中删除该房间的信息）
       if (room.connectedUsers.length > 0) {
         //用户断开WebRTC连接
-        sio.to(room.id).emit('user-disconnected', { socketId: socket.id })
+        sio.to(room.id).emit('conn-destroy', { socketId: socket.id })
 
         //发送通知告知有用户离开并更新房间
         sio.to(room.id).emit('room-update', {

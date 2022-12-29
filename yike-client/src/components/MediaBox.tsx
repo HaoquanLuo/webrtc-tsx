@@ -1,14 +1,25 @@
-import { stopBothVideoAndAudio } from '@/common/utils/stopBothVideoAndAudio'
 import React, { useEffect, useRef, VideoHTMLAttributes } from 'react'
 
 type Props = VideoHTMLAttributes<HTMLVideoElement> & {
   audioOnly: boolean
   srcObject: MediaStream
-  username: string
+  userName: string
+}
+
+/**
+ * @description 移除音视频轨道
+ * @param stream
+ */
+function stopBothVideoAndAudio(stream: MediaStream) {
+  stream.getTracks().forEach((track) => {
+    if (track.readyState === 'live') {
+      track.stop()
+    }
+  })
 }
 
 const MediaBox: React.FC<Props> = (props) => {
-  const { audioOnly, srcObject, username } = props
+  const { audioOnly, srcObject, userName } = props
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -28,13 +39,13 @@ const MediaBox: React.FC<Props> = (props) => {
     })
 
     return () => {
-      if (srcObject) {
-        console.log('run cleanup', srcObject)
+      if (videoRef.current) {
+        console.log('Run remote cleanup')
 
         stopBothVideoAndAudio(srcObject)
       }
     }
-  }, [videoRef.current, srcObject])
+  }, [srcObject])
 
   return (
     <div relative w-full h-full rd-2 mx-a my-0>
@@ -55,7 +66,7 @@ const MediaBox: React.FC<Props> = (props) => {
             <div>
               <span>用户</span>
               <span font-600 mx-1 font-italic>
-                {username}
+                {userName}
               </span>
               <span>仅以音频连接</span>
             </div>
@@ -64,7 +75,7 @@ const MediaBox: React.FC<Props> = (props) => {
       )}
       <video
         controls
-        muted
+        // muted
         autoPlay
         ref={videoRef}
         className={`rd-2 absolute block w-full h-full object-cover`}
@@ -73,4 +84,4 @@ const MediaBox: React.FC<Props> = (props) => {
   )
 }
 
-export default MediaBox
+export default React.memo(MediaBox)

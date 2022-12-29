@@ -17,6 +17,5 @@ export const authRoutesMap: RouteObject[] = [
   {
     path: '*',
     element: lazyLoad(ExceptionPaths.Redirect),
-    // element: <Redirect />,
   },
 ]

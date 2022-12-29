@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '@/api/system/auth'
 import { showConfirm } from '@/common/utils/confirm'
@@ -17,12 +17,12 @@ import {
   selectUserInfo,
   setToken,
   setUserId,
-  setUserInfo,
 } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
 import { useNavigate } from 'react-router-dom'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
 const SystemHeader: React.FC = () => {
   const dispatch = useDispatch()
@@ -32,6 +32,8 @@ const SystemHeader: React.FC = () => {
   const currentPath = useSelector(selectCurrentPath)
   const { username } = useSelector(selectUserInfo)
   const roomId = useSelector(selectRoomId)
+
+  const [showTips, setShowTips] = useState(false)
 
   async function handleLogout() {
     const { data } = await logout()
@@ -49,12 +51,21 @@ const SystemHeader: React.FC = () => {
   function handlePageBack() {
     dispatch(setRoomId(''))
     dispatch(setRoomParticipants([]))
-    dispatch(setRoomStatus('uninitialized'))
+    dispatch(setRoomStatus('destroyed'))
     dispatch(setUserId(''))
     dispatch(setConnectWithAudioOnly(true))
     dispatch(setRoomHost(false))
 
+    // todo: 返回时不会断开peer连接
     navigate(-1)
+    // location.assign('/')
+  }
+
+  function handleCopyToClipboard() {
+    setShowTips(true)
+    setTimeout(() => {
+      setShowTips(false)
+    }, 1500)
   }
 
   /**
@@ -79,12 +90,13 @@ const SystemHeader: React.FC = () => {
   return (
     <div
       id="system-header"
+      relative
       flex
       items-center
       px-4
       gap-2
       bg-op-10
-      bg-white
+      bg-gray
       min-h="14!"
     >
       <div className="left-btns" flex w-48 justify-start>
@@ -94,7 +106,16 @@ const SystemHeader: React.FC = () => {
         <span mx-2 font-bold>
           {username}
         </span>
-        {roomId && <span>{roomId}</span>}
+        {roomId && (
+          <CopyToClipboard onCopy={handleCopyToClipboard} text={roomId}>
+            <span>{roomId}</span>
+          </CopyToClipboard>
+        )}
+        {showTips && (
+          <span absolute bottom="-4" font-bold b-2 rd-2 px-1 bg-op-40>
+            Copied!
+          </span>
+        )}
       </div>
       <div className="right-btns" flex w-48 justify-end>
         {logState && (

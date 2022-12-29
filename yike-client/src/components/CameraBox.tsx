@@ -21,7 +21,7 @@ const CameraBox: React.FC<Props> = (props) => {
         <MediaBox
           audioOnly={withAudioOnly}
           srcObject={localStream!}
-          username={username}
+          userName={username}
         />
       )}
     </div>

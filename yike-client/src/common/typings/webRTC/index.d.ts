@@ -7,6 +7,10 @@ export namespace WebRTC {
   type DataInit = {
     connUserSocketId: string
   }
+
+  type DataDestroy = {
+    socketId: string
+  }
   type DataSignal = {
     connUserSocketId: string
     signal: SimplePeer.SignalData

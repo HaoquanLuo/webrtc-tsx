@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { StreamStatus } from '@/common/typings/stream'
-import { stopBothVideoAndAudio } from '@/common/utils/stopBothVideoAndAudio'
+
+/**
+ * @description 移除音视频轨道
+ * @param stream
+ */
+function stopBothVideoAndAudio(stream: MediaStream) {
+  console.log('Run local cleanup')
+  stream.getTracks().forEach((track) => {
+    if (track.readyState === 'live') {
+      track.stop()
+    }
+  })
+}
 
 /**
  * @description 进入房间后加载媒体流

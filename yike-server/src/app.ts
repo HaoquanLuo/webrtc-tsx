@@ -29,7 +29,7 @@ httpServer.listen(Config.HTTP_PORT, () => {
 // 监听客户端 socket 连接
 sio.on('connection', (socket) => {
   try {
-    console.log(`[Socket Server] client connect: ${socket.id}`)
+    console.log(`[Socket Server] User ${socket.id} connected`)
 
     socket.on('room-create', (data) => {
       SocketIO.createRoomHandler(data, socket)
@@ -39,8 +39,12 @@ sio.on('connection', (socket) => {
       SocketIO.joinRoomHandler(data, socket, sio)
     })
 
+    socket.on('room-leave', () => {
+      SocketIO.leaveRoomHandler(socket, sio)
+    })
+
     socket.on('disconnect', () => {
-      SocketIO.disconnectHandler(socket, sio)
+      console.log(`[Socket Server] User ${socket.id} disconnected.`)
     })
 
     socket.on('conn-signal', (data) => {
@@ -50,6 +54,8 @@ sio.on('connection', (socket) => {
     socket.on('conn-init', (data) => {
       SocketIO.initConnectionHandler(data, socket, sio)
     })
+
+    socket.on('conn-destroy', (data) => {})
   } catch (error) {
     console.error(`[Socket Server] SocketException: ${error}`)
   }

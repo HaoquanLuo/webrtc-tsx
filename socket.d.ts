@@ -5,21 +5,23 @@ export namespace SIO {
     // 房间相关
     'room-id': (data: SocketData) => void
     'room-update': (data: SocketData) => void
-    'user-disconnected': (data: SocketData) => void
     // webRTC 对象相关
     'conn-signal': (data: WebRTC.DataSignal) => void
     'conn-prepare': (data: WebRTC.DataPrepare) => void
     'conn-init': (data: WebRTC.DataInit) => void
+    'conn-destroy': (data: WebRTC.DataDestroy) => void
   }
 
   interface ClientToServerEvents {
     // 房间相关
     'room-create': (data: SocketData) => void
     'room-join': (data: SocketData) => void
+    'room-leave': () => void
     // webRTC 对象相关
     'conn-signal': (data: WebRTC.DataSignal) => void
     'conn-prepare': (data: WebRTC.DataPrepare) => void
     'conn-init': (data: WebRTC.DataInit) => void
+    'conn-destroy': (data: WebRTC.DataDestroy) => void
   }
 
   interface InterServiceEvents {
