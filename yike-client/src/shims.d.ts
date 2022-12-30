@@ -20,5 +20,6 @@ declare module 'react' {
     shadow?: boolean
     absolute?: boolean
     screen?: string
+    translate?: string
   }
 }

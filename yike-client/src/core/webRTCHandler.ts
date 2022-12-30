@@ -67,7 +67,9 @@ export class WebRTCHandler {
       const constraints = isAudioOnly
         ? WebRTCHandler.onlyAudioConstants
         : WebRTCHandler.defaultConstants
-      return await navigator.mediaDevices.getUserMedia(constraints)
+      const localStream = await navigator.mediaDevices.getUserMedia(constraints)
+      WebRTCHandler.localStream = localStream
+      return localStream
     } catch (err: any) {
       throw new Error(err)
     }
@@ -185,12 +187,74 @@ export class WebRTCHandler {
     const { socketId } = data
 
     if (WebRTCHandler.peers[socketId]) {
-      debugger
       WebRTCHandler.peers[socketId].destroy()
       delete WebRTCHandler.peers[socketId]
       WebRTCHandler.streamWithIds = WebRTCHandler.streamWithIds.filter(
         (item) => item.toConnectId !== socketId,
       )
+    }
+  }
+
+  /**
+   * @description 麦克风控制按钮
+   * @param microphoneStatus
+   */
+  public static handleToggleMicrophone(microphoneStatus: System.Microphone) {
+    const micFlag = microphoneStatus === 'loud'
+    WebRTCHandler.localStream.getAudioTracks()[0].enabled = micFlag
+      ? false
+      : true
+    console.log(WebRTCHandler.localStream.getAudioTracks())
+  }
+
+  /**
+   * @description 摄像头控制按钮
+   * @param isDisabled
+   */
+  public static handleToggleCamera(cameraStatus: System.Camera) {
+    const cameraFlag = cameraStatus === 'off'
+    WebRTCHandler.localStream.getVideoTracks()[0].enabled = cameraFlag
+      ? false
+      : true
+    console.log(WebRTCHandler.localStream.getVideoTracks())
+  }
+
+  /**
+   * @description 屏幕共享控制按钮
+   * @param isScreenActive
+   * @param shareStream
+   */
+  public static handleToggleScreenShare(
+    screenStatus: System.ScreenShare,
+    screenStream?: MediaStream,
+  ) {
+    const streamFlag = screenStatus === 'camera'
+    streamFlag
+      ? WebRTCHandler.switchVideoTracks(WebRTCHandler.localStream)
+      : screenStream && WebRTCHandler.switchVideoTracks(screenStream)
+  }
+
+  /**
+   * @description 切换共享媒体轨道
+   * @param streamToShare
+   */
+  static switchVideoTracks(streamToShare: MediaStream) {
+    for (const peer in WebRTCHandler.peers) {
+      for (let index in WebRTCHandler.peers[peer].streams[0].getTracks()) {
+        for (let index2 in streamToShare.getTracks()) {
+          // kind属性规定轨道的种类（eg:audio,video）
+          if (
+            WebRTCHandler.peers[peer].streams[0].getTracks()[index].kind ===
+            streamToShare.getTracks()[index2].kind
+          ) {
+            WebRTCHandler.peers[peer].replaceTrack(
+              WebRTCHandler.peers[peer].streams[0].getTracks()[index],
+              streamToShare.getTracks()[index2],
+              WebRTCHandler.peers[peer].streams[0],
+            )
+          }
+        }
+      }
     }
   }
 }
