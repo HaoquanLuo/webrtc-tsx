@@ -94,7 +94,6 @@ const Room: React.FC = () => {
   // 所有用户
   useEffect(() => {
     setAllUsers([myself, ...otherUsers])
-    console.log('otherUsers', otherUsers)
   }, [myself, otherUsers])
 
   // 监听返回按钮事件

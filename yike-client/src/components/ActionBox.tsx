@@ -18,8 +18,8 @@ const ActionBox = () => {
     WebRTCHandler.handleToggleMicrophone(micStatus)
     setMicStatus(micStatus === 'loud' ? 'muted' : 'loud')
   }
+
   const handleCamera = () => {
-    debugger
     WebRTCHandler.handleToggleCamera(cameraStatus)
     setCameraStatus(cameraStatus === 'off' ? 'on' : 'off')
   }

@@ -91,8 +91,6 @@ export class WebRTCHandler {
     connSocketId: string,
     isInitiator: boolean,
   ) {
-    WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
-
     const configuration = WebRTCHandler.getConfiguration()
 
     // 实例化对等连接对象
@@ -168,6 +166,7 @@ export class WebRTCHandler {
     stream: MediaStream,
     toConnectSocketId: string,
   ) {
+    debugger
     const newStreamWithId: WebRTC.StreamWithId = {
       stream,
       toConnectId: toConnectSocketId,

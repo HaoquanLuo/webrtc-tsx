@@ -74,7 +74,7 @@ const MediaBox: React.FC<Props> = (props) => {
         </div>
       )}
       <video
-        controls
+        // controls
         // muted
         autoPlay
         ref={videoRef}
