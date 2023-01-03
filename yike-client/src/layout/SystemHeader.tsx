@@ -136,4 +136,4 @@ const SystemHeader: React.FC = () => {
   )
 }
 
-export default SystemHeader
+export default React.memo(SystemHeader)

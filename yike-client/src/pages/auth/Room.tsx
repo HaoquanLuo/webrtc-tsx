@@ -16,10 +16,11 @@ import { notification } from 'antd'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../socket'
-import MediaBox from '@/components/MediaBox'
+import MediaBox, { stopBothVideoAndAudio } from '@/components/MediaBox'
 import { useNavigate } from 'react-router-dom'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { handleLeaveRoom } from '@/core/SocketClient'
+import ActionBox from '@/components/ActionBox'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -62,8 +63,7 @@ const Room: React.FC = () => {
 
   // 加载其他用户的媒体流及信息
   useEffect(() => {
-    const remoteStreamWithIds = WebRTCHandler.getRemoteStream()
-    const streamWithIds = remoteStreamWithIds()
+    const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
 
     const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
       (streamWithId) => {
@@ -100,6 +100,7 @@ const Room: React.FC = () => {
   useEffect(() => {
     if (roomStatus === 'destroyed') {
       handleLeaveRoom()
+      localStream && stopBothVideoAndAudio(localStream)
     }
   }, [roomStatus])
 
@@ -113,20 +114,20 @@ const Room: React.FC = () => {
     }
   }, [roomParticipants])
 
-  const VideosContainer: React.FC<{ elements: (UserWithStream | null)[] }> = (
-    props,
-  ) => {
-    const { elements } = props
-    return (
+  return (
+    <>
+      {contextHolder}
       <div
         id="videos-container"
-        className={`relative p-1 w-full h-full gap-3 grid ${
+        className={`relative w-full h-full gap-3 grid ${
           roomParticipants.length <= 4
             ? 'grid-rows-2 grid-cols-2'
             : 'grid-rows-3 grid-cols-3'
         }`}
       >
-        {elements.map((element) => {
+        {allUsers.map((element) => {
+          console.log('allUsers', allUsers)
+
           return element ? (
             <MediaBox
               key={element.id}
@@ -137,13 +138,7 @@ const Room: React.FC = () => {
           ) : null
         })}
       </div>
-    )
-  }
-
-  return (
-    <>
-      {contextHolder}
-      <VideosContainer elements={allUsers} />
+      <ActionBox />
     </>
   )
 }

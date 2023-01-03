@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, VideoHTMLAttributes } from 'react'
 
 type Props = VideoHTMLAttributes<HTMLVideoElement> & {
-  audioOnly: boolean
+  audioOnly?: boolean
   srcObject: MediaStream
-  userName: string
+  userName?: string
 }
 
 /**
  * @description 移除音视频轨道
  * @param stream
  */
-function stopBothVideoAndAudio(stream: MediaStream) {
+export function stopBothVideoAndAudio(stream: MediaStream) {
   stream.getTracks().forEach((track) => {
     if (track.readyState === 'live') {
       track.stop()
@@ -39,19 +39,20 @@ const MediaBox: React.FC<Props> = (props) => {
     })
 
     return () => {
-      if (videoRef.current) {
+      if (videoRef.current?.srcObject) {
         console.log('Run remote cleanup')
 
         stopBothVideoAndAudio(srcObject)
       }
     }
-  }, [srcObject])
+  }, [videoRef.current, srcObject])
 
   return (
     <div relative w-full h-full rd-2 mx-a my-0>
       {audioOnly && (
         <div
           absolute
+          pointer-events-auto
           w-full
           h-full
           z-9
@@ -74,8 +75,6 @@ const MediaBox: React.FC<Props> = (props) => {
         </div>
       )}
       <video
-        // controls
-        // muted
         autoPlay
         ref={videoRef}
         className={`rd-2 absolute block w-full h-full object-cover`}

@@ -250,7 +250,7 @@ export class SocketIO {
    * @param socket
    * @param sio
    */
-  public static signalingHandler(
+  public static signalingDataHandler(
     data: WebRTC.DataSignal,
     socket: Socket<
       SIO.ClientToServerEvents,

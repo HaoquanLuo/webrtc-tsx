@@ -49,14 +49,16 @@ sio.on('connection', (socket) => {
     })
 
     socket.on('conn-signal', (data) => {
-      SocketIO.signalingHandler(data, socket, sio)
+      SocketIO.signalingDataHandler(data, socket, sio)
     })
 
     socket.on('conn-init', (data) => {
       SocketIO.initConnectionHandler(data, socket, sio)
     })
 
-    socket.on('conn-destroy', (data) => {})
+    socket.on('conn-destroy', (data) => {
+      SocketIO.leaveRoomHandler(socket, sio)
+    })
   } catch (error) {
     console.error(`[Socket Server] SocketException: ${error}`)
   }

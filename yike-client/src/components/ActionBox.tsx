@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import IconBox from './IconBox'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { WebRTCHandler } from '@/core/webRTCHandler'
+import { selectConnectWithAudioOnly } from '@/redux/features/system/systemSlice'
+import IconBox from './IconBox'
 
 const screenConstraints: DisplayMediaStreamOptions = {
   video: true,
@@ -8,6 +10,8 @@ const screenConstraints: DisplayMediaStreamOptions = {
 }
 
 const ActionBox = () => {
+  const audioOnlyStatus: boolean = useSelector(selectConnectWithAudioOnly)
+
   const [micStatus, setMicStatus] = useState<System.Microphone>('loud')
   const [cameraStatus, setCameraStatus] = useState<System.Camera>('off')
   const [screenShareStatus, setScreenShareStatus] =
@@ -90,20 +94,30 @@ const ActionBox = () => {
           }
           handleClick={() => handleMicrophone()}
         />
+        {!audioOnlyStatus && (
+          <IconBox
+            icon={
+              <i
+                className={
+                  cameraStatus === 'off'
+                    ? 'i-mdi:camera-off-outline'
+                    : 'i-mdi:camera-outline'
+                }
+              />
+            }
+            handleClick={() => handleCamera()}
+          />
+        )}
         <IconBox
           icon={
             <i
               className={
-                cameraStatus === 'off'
-                  ? 'i-mdi:camera-off-outline'
-                  : 'i-mdi:camera-outline'
+                screenShareStatus === 'camera'
+                  ? 'i-mdi:camera-flip-outline'
+                  : 'i-mdi:camera-off'
               }
             />
           }
-          handleClick={() => handleCamera()}
-        />
-        <IconBox
-          icon={<i className={'i-mdi:camera-flip-outline'} />}
           handleClick={() => handleScreenShare()}
         />
       </div>
@@ -111,4 +125,4 @@ const ActionBox = () => {
   )
 }
 
-export default ActionBox
+export default React.memo(ActionBox)

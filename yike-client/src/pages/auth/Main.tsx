@@ -61,7 +61,6 @@ const Main: React.FC = () => {
     } catch (error) {
       console.error(error)
     } finally {
-      // setIsModalOpen(false)
       setJoinRoomId('')
     }
   }
