@@ -1,6 +1,5 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import SystemLayout from './layout/SystemLayout'
 import { finalRoutes } from './router'
 import LoadingPage from './pages/exception/Loading'
 

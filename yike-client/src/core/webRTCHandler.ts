@@ -11,7 +11,7 @@ export class WebRTCHandler {
   /**
    * @description 本地媒体流
    */
-  public static localStream: MediaStream
+  static localStream: MediaStream
 
   /**
    * @description 房间内其他用户的 peer 对象
@@ -67,7 +67,9 @@ export class WebRTCHandler {
       const constraints = isAudioOnly
         ? WebRTCHandler.onlyAudioConstants
         : WebRTCHandler.defaultConstants
-      return await navigator.mediaDevices.getUserMedia(constraints)
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      WebRTCHandler.localStream = stream
+      return stream
     } catch (err: any) {
       throw new Error(err)
     }
@@ -89,8 +91,6 @@ export class WebRTCHandler {
     connSocketId: string,
     isInitiator: boolean,
   ) {
-    WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
-
     const configuration = WebRTCHandler.getConfiguration()
 
     // 实例化对等连接对象
