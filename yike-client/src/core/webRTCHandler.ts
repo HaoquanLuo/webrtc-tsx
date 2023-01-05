@@ -79,7 +79,7 @@ export class WebRTCHandler {
    * @description 获取远程媒体流
    */
   public static getRemoteStreamWithIds() {
-    return WebRTCHandler.streamWithIds
+    return () => WebRTCHandler.streamWithIds
   }
 
   /**
@@ -87,7 +87,7 @@ export class WebRTCHandler {
    * @param connSocketId
    * @param isInitiator
    */
-  public static async handlePeerConnection(
+  public static handlePeerConnection(
     connSocketId: string,
     isInitiator: boolean,
   ) {
@@ -112,6 +112,7 @@ export class WebRTCHandler {
 
     // 获取媒体流 stream
     WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
+      debugger
       WebRTCHandler.handleAddStream(stream, connSocketId)
 
       dispatch(setWebRTCStatus('initializing'))

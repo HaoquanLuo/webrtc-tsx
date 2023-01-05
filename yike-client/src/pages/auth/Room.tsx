@@ -17,7 +17,6 @@ import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../socket'
 import MediaBox, { stopBothVideoAndAudio } from '@/components/MediaBox'
-import { useNavigate } from 'react-router-dom'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { handleLeaveRoom } from '@/core/SocketClient'
 import ActionBox from '@/components/ActionBox'
@@ -25,7 +24,6 @@ import ActionBox from '@/components/ActionBox'
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
 const Room: React.FC = () => {
-  const navigate = useNavigate()
   const [api, contextHolder] = notification.useNotification()
 
   const { username } = useSelector(selectUserInfo)
@@ -64,8 +62,9 @@ const Room: React.FC = () => {
   // 加载其他用户的媒体流及信息
   useEffect(() => {
     const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
+    console.log('streamWithIds', streamWithIds)
 
-    const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds.map(
+    const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds().map(
       (streamWithId) => {
         const { stream, toConnectId } = streamWithId
 
@@ -106,7 +105,7 @@ const Room: React.FC = () => {
 
   // 监听用户加入、离开事件
   useEffect(() => {
-    if (roomParticipants.length > 0) {
+    if (roomParticipants.length > 1) {
       api.info({
         message: '用户事件',
         placement: 'bottomLeft',
