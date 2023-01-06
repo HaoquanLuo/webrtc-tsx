@@ -100,6 +100,8 @@ export class WebRTCHandler {
       stream: WebRTCHandler.localStream,
     })
 
+    console.log('peers', WebRTCHandler.peers)
+
     // 信令数据传输
     WebRTCHandler.peers[connSocketId].on('signal', (data) => {
       const signalData = {
@@ -112,7 +114,6 @@ export class WebRTCHandler {
 
     // 获取媒体流 stream
     WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
-      debugger
       WebRTCHandler.handleAddStream(stream, connSocketId)
 
       dispatch(setWebRTCStatus('initializing'))
@@ -241,7 +242,7 @@ export class WebRTCHandler {
     for (const peer in WebRTCHandler.peers) {
       for (let index in WebRTCHandler.peers[peer].streams[0].getTracks()) {
         for (let index2 in streamToShare.getTracks()) {
-          // kind属性规定轨道的种类（eg:audio,video）
+          // kind 属性规定轨道的种类（eg: audio, video）
           if (
             WebRTCHandler.peers[peer].streams[0].getTracks()[index].kind ===
             streamToShare.getTracks()[index2].kind

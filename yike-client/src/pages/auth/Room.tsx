@@ -62,7 +62,6 @@ const Room: React.FC = () => {
   // 加载其他用户的媒体流及信息
   useEffect(() => {
     const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
-    console.log('streamWithIds', streamWithIds)
 
     const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds().map(
       (streamWithId) => {
@@ -125,11 +124,9 @@ const Room: React.FC = () => {
         }`}
       >
         {allUsers.map((element) => {
-          console.log('allUsers', allUsers)
-
           return element ? (
             <MediaBox
-              key={element.id}
+              key={element.socketId}
               audioOnly={element.audioOnly}
               userName={element.username}
               srcObject={element.stream}

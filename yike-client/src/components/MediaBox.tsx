@@ -43,6 +43,7 @@ const MediaBox: React.FC<Props> = (props) => {
         console.log('Run remote cleanup')
 
         stopBothVideoAndAudio(srcObject)
+        videoRef.current.srcObject = null
       }
     }
   }, [videoRef.current, srcObject])
