@@ -17,7 +17,7 @@ const sio = new Server<
   SIO.SocketData
 >(httpServer, {
   cors: {
-    origin: 'http://127.0.0.1:3000',
+    origin: '*',
   },
 })
 // 执行初始化

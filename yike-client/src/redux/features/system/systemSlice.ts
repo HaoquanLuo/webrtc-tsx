@@ -8,8 +8,10 @@ type RoomStatus = 'uninitialized' | 'existed' | 'created' | 'destroyed'
 
 type WebRTCStatus =
   | 'uninitialized'
-  | 'initializing'
+  | 'signaling'
+  | 'dataing'
   | 'connected'
+  | 'streaming'
   | 'disconnected'
 
 export interface SystemState {
@@ -21,7 +23,7 @@ export interface SystemState {
   roomStatus: RoomStatus
   roomId: string
   roomParticipants: SIO.User[]
-  WebRTCStatus: string
+  webRTCStatus: WebRTCStatus
 }
 
 const initialSystemState: SystemState = {
@@ -33,7 +35,7 @@ const initialSystemState: SystemState = {
   roomStatus: 'uninitialized',
   roomId: '',
   roomParticipants: [],
-  WebRTCStatus: 'uninitialized',
+  webRTCStatus: 'uninitialized',
 }
 
 export const systemSlice = createSlice({
@@ -65,7 +67,7 @@ export const systemSlice = createSlice({
       state.roomParticipants = action.payload
     },
     setWebRTCStatus: (state, action: PayloadAction<WebRTCStatus>) => {
-      state.WebRTCStatus = action.payload
+      state.webRTCStatus = action.payload
     },
   },
 })
@@ -94,6 +96,6 @@ export const selectRoomId = (state: StoreProps) => state.system.roomId
 export const selectRoomParticipants = (state: StoreProps) =>
   state.system.roomParticipants
 export const selectWebRTCStatus = (state: StoreProps) =>
-  state.system.WebRTCStatus
+  state.system.webRTCStatus
 
 export default systemSlice.reducer

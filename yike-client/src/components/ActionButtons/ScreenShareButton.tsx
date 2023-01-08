@@ -16,27 +16,29 @@ const ScreenShareButton: React.FC<ScreenShareButtonProps> = () => {
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null)
 
   const handleScreenShare = async () => {
-    setScreenShareStatus(screenShareStatus === 'screen' ? 'camera' : 'screen')
+    setScreenShareStatus(screenShareStatus === 'camera' ? 'screen' : 'camera')
     if (screenShareStatus === 'camera') {
       let stream: MediaStream | null = null
 
       try {
         stream = await navigator.mediaDevices.getDisplayMedia(screenConstraints)
       } catch (error) {
-        console.error(`Failed to get display media.`)
+        console.error(`Failed to get display media: ${error}`)
+        setScreenShareStatus('camera')
       }
 
       if (stream) {
         stream.getTracks()[0].onended = () => {
           setScreenShareStatus('camera')
+          WebRTCHandler.handleToggleScreenShare('camera')
         }
-        WebRTCHandler.handleToggleScreenShare(screenShareStatus, stream)
         setScreenStream(stream)
         setScreenShareStatus('screen')
+        WebRTCHandler.handleToggleScreenShare('screen', stream)
       }
     } else {
-      WebRTCHandler.handleToggleScreenShare(screenShareStatus)
       setScreenShareStatus('camera')
+      WebRTCHandler.handleToggleScreenShare('camera')
       // 停止共享屏幕
       screenStream?.getTracks()?.forEach((track) => track.stop())
       setScreenStream(null)

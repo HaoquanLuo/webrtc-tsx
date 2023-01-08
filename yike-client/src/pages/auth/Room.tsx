@@ -16,14 +16,16 @@ import { notification } from 'antd'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
 import { SIO } from '../../../../socket'
-import MediaBox, { stopBothVideoAndAudio } from '@/components/MediaBox'
+import MediaBox from '@/components/MediaBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { handleLeaveRoom } from '@/core/SocketClient'
 import ActionBox from '@/components/ActionBox'
+import { useNavigate } from 'react-router-dom'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
 const Room: React.FC = () => {
+  const navigate = useNavigate()
   const [api, contextHolder] = notification.useNotification()
 
   const { username } = useSelector(selectUserInfo)
@@ -33,84 +35,92 @@ const Room: React.FC = () => {
   const roomId = useSelector(selectRoomId)
   const roomStatus = useSelector(selectRoomStatus)
   const roomParticipants = useSelector(selectRoomParticipants)
-  const WebRTCStatus = useSelector(selectWebRTCStatus)
+  const webRTCStatus = useSelector(selectWebRTCStatus)
 
   const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
   const [myself, setMyself] = useState<UserWithStream | null>(null)
   const [allUsers, setAllUsers] = useState<(UserWithStream | null)[]>([])
 
-  const { localStream, streamStatus } = useLoadStream(
-    WebRTCHandler.getLocalStream,
-  )
+  try {
+    const { localStream, streamStatus } = useLoadStream(
+      WebRTCHandler.getLocalStream,
+    )
 
-  // 加载本地的媒体流及信息
-  useEffect(() => {
-    if (streamStatus === 'complete') {
-      console.log(`LocalStream is completed`)
-    }
+    // 加载本地的媒体流及信息
+    useEffect(() => {
+      if (streamStatus === 'complete') {
+        console.log(`LocalStream is completed`)
 
-    setMyself({
-      username,
-      id: userId,
-      roomId,
-      socketId: userSocketId,
-      audioOnly,
-      stream: localStream as MediaStream,
-    })
-  }, [localStream, userId, userSocketId])
+        setMyself({
+          username,
+          id: userId,
+          roomId,
+          socketId: userSocketId,
+          audioOnly,
+          stream: localStream as MediaStream,
+        })
+      }
+    }, [localStream])
 
-  // 加载其他用户的媒体流及信息
-  useEffect(() => {
-    const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
+    // 加载其他用户的媒体流及信息
+    useEffect(() => {
+      if (webRTCStatus !== 'uninitialized') {
+        const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
 
-    const otherUserWithStreams: (UserWithStream | null)[] = streamWithIds().map(
-      (streamWithId) => {
-        const { stream, toConnectId } = streamWithId
+        const otherUserWithStreams: (UserWithStream | null)[] =
+          streamWithIds().map((streamWithId) => {
+            const { stream, toConnectId } = streamWithId
 
-        const matchUser = roomParticipants.find(
-          (participant) => toConnectId === participant.socketId,
+            const matchUser = roomParticipants.find(
+              (participant) => toConnectId === participant.socketId,
+            )
+
+            if (matchUser === undefined) {
+              return null
+            } else {
+              return {
+                ...matchUser,
+                stream,
+              }
+            }
+          })
+
+        setOtherUsers(
+          otherUserWithStreams.filter(
+            (item) => item !== null && item.stream.active,
+          ),
         )
+      }
+    }, [roomParticipants, webRTCStatus])
 
-        if (matchUser === undefined) {
-          return null
-        } else {
-          return {
-            ...matchUser,
-            stream,
-          }
-        }
-      },
-    )
+    // 所有用户
+    useEffect(() => {
+      setAllUsers([myself, ...otherUsers])
+    }, [myself, otherUsers])
 
-    setOtherUsers(
-      otherUserWithStreams.filter(
-        (item) => item !== null && item.stream.active,
-      ),
-    )
-  }, [roomParticipants, WebRTCStatus])
+    // 监听返回按钮事件
+    useEffect(() => {
+      if (roomStatus === 'destroyed') {
+        handleLeaveRoom()
+        setMyself(null)
+        setOtherUsers([])
+        setAllUsers([])
+        navigate('/')
+      }
+    }, [roomStatus])
 
-  // 所有用户
-  useEffect(() => {
-    setAllUsers([myself, ...otherUsers])
-  }, [myself, otherUsers])
-
-  // 监听返回按钮事件
-  useEffect(() => {
-    if (roomStatus === 'destroyed') {
-      handleLeaveRoom()
-      localStream && stopBothVideoAndAudio(localStream)
-    }
-  }, [roomStatus])
-
-  // 监听用户加入、离开事件
-  useEffect(() => {
-    if (roomParticipants.length > 1) {
-      api.info({
-        message: '用户事件',
-        placement: 'bottomLeft',
-      })
-    }
-  }, [roomParticipants])
+    // 监听用户加入、离开事件
+    useEffect(() => {
+      if (roomParticipants.length > 1) {
+        api.info({
+          message: '用户事件',
+          placement: 'bottomLeft',
+        })
+      }
+    }, [roomParticipants])
+  } catch (e) {
+    console.error(e)
+  }
 
   return (
     <>

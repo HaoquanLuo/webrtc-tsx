@@ -87,7 +87,7 @@ export class WebRTCHandler {
    * @param connSocketId
    * @param isInitiator
    */
-  public static handlePeerConnection(
+  public static async handlePeerConnection(
     connSocketId: string,
     isInitiator: boolean,
   ) {
@@ -100,9 +100,7 @@ export class WebRTCHandler {
       stream: WebRTCHandler.localStream,
     })
 
-    console.log('peers', WebRTCHandler.peers)
-
-    // 信令数据传输
+    // 1. 信令数据传输
     WebRTCHandler.peers[connSocketId].on('signal', (data) => {
       const signalData = {
         signal: data,
@@ -110,33 +108,37 @@ export class WebRTCHandler {
       }
 
       SocketClient.sendSignalData(signalData)
+      dispatch(setWebRTCStatus('signaling'))
     })
 
-    // 获取媒体流 stream
-    WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
-      WebRTCHandler.handleAddStream(stream, connSocketId)
-
-      dispatch(setWebRTCStatus('initializing'))
-    })
-
-    WebRTCHandler.peers[connSocketId].on('error', (err) => {
-      console.error(err)
-    })
-
+    // 2. 对等对象连接
     WebRTCHandler.peers[connSocketId].on('connect', () => {
       WebRTCHandler.peers[connSocketId].send('whatever' + Math.random())
 
       dispatch(setWebRTCStatus('connected'))
     })
 
+    // 3. 对等对象数据
     WebRTCHandler.peers[connSocketId].on('data', (data) => {
       console.log('data: ' + data)
+      dispatch(setWebRTCStatus('dataing'))
     })
 
+    // 4. 获取媒体流
+    WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
+      WebRTCHandler.handleAddStream(stream, connSocketId)
+      dispatch(setWebRTCStatus('streaming'))
+    })
+
+    // 5. 对等连接关闭
     WebRTCHandler.peers[connSocketId].on('close', () => {
       delete WebRTCHandler.peers[connSocketId]
 
       dispatch(setWebRTCStatus('disconnected'))
+    })
+
+    WebRTCHandler.peers[connSocketId].on('error', (err) => {
+      console.error(err)
     })
   }
 
@@ -164,10 +166,7 @@ export class WebRTCHandler {
    * @param stream
    * @param toConnectSocketId
    */
-  public static handleAddStream(
-    stream: MediaStream,
-    toConnectSocketId: string,
-  ) {
+  static handleAddStream(stream: MediaStream, toConnectSocketId: string) {
     const newStreamWithId: WebRTC.StreamWithId = {
       stream,
       toConnectId: toConnectSocketId,
@@ -204,7 +203,6 @@ export class WebRTCHandler {
     WebRTCHandler.localStream.getAudioTracks()[0].enabled = micFlag
       ? false
       : true
-    console.log(WebRTCHandler.localStream.getAudioTracks())
   }
 
   /**
@@ -216,7 +214,6 @@ export class WebRTCHandler {
     WebRTCHandler.localStream.getVideoTracks()[0].enabled = cameraFlag
       ? false
       : true
-    console.log(WebRTCHandler.localStream.getVideoTracks())
   }
 
   /**
@@ -228,8 +225,7 @@ export class WebRTCHandler {
     screenStatus: System.ScreenShare,
     screenStream?: MediaStream,
   ) {
-    const streamFlag = screenStatus === 'camera'
-    streamFlag
+    screenStatus === 'camera'
       ? WebRTCHandler.switchVideoTracks(WebRTCHandler.localStream)
       : screenStream && WebRTCHandler.switchVideoTracks(screenStream)
   }

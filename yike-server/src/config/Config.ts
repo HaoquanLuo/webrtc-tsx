@@ -20,15 +20,15 @@ export default class Config {
     USER_NAME: 'root',
     PASSWORD: '123456',
     CONNECTION_LIMIT: 60 * 60 * 1000,
-    CONNECT_TIMEOUT: 1000 * 60 * 60 * 1000,
+    CONNECT_TIMEOUT: 60 * 60 * 1000,
     ACQUIRE_TIMEOUT: 60 * 60 * 1000,
-    TIMEOUT: 1000 * 60 * 60 * 1000,
+    TIMEOUT: 60 * 60 * 1000,
   }
   // redis
   public static readonly REDIS = {
     PORT: 6379,
     HOST: '127.0.0.1',
-    PASSWORD: 'admin',
+    // PASSWORD: 'admin',
     DB: 0,
   }
   // 默认时间格式

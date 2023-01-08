@@ -17,6 +17,7 @@ import {
   selectUserInfo,
   setToken,
   setUserId,
+  setUserInfo,
 } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
@@ -40,6 +41,12 @@ const SystemHeader: React.FC = () => {
     if (data.errorCode === 0 && data.msg === 'ok') {
       dispatch(setToken(''))
       dispatch(setLogState(false))
+      dispatch(
+        setUserInfo({
+          username: 'default user',
+          password: 'default password',
+        }),
+      )
 
       removeItem('token')
       removeItem('userInfo')

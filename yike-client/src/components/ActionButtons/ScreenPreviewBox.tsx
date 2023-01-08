@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { stopBothVideoAndAudio } from '../MediaBox'
+import { useEffect, useRef, useState } from 'react'
+import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
 
 interface ScreenPreviewBoxProps {
   screenStream: MediaStream
@@ -9,6 +9,7 @@ const ScreenPreviewBox: React.FC<ScreenPreviewBoxProps> = ({
   screenStream,
 }) => {
   const previewRef = useRef<HTMLVideoElement>(null)
+  const [readyState, setReadyState] = useState(false)
 
   useEffect(() => {
     if (!previewRef.current) {
@@ -16,20 +17,30 @@ const ScreenPreviewBox: React.FC<ScreenPreviewBoxProps> = ({
     }
 
     previewRef.current.srcObject = screenStream
+    setReadyState(true)
 
     return () => {
-      if (previewRef.current?.srcObject) {
-        console.log('run screen cleanup')
+      if (readyState) {
+        console.log('Run screen cleanup')
 
         stopBothVideoAndAudio(screenStream)
-        previewRef.current.srcObject = null
       }
     }
   }, [screenStream])
 
   return (
-    <div absolute rd-2 top-0 bottom-0 left-0 right-0 px-2>
-      <video width={'auto'} height={'90%'} ref={previewRef} muted autoPlay />
+    <div
+      pointer-events-none
+      w-a
+      absolute
+      rd-2
+      top-0
+      bottom-0
+      left-0
+      right-0
+      px-2
+    >
+      <video width={'auto'} height={'100%'} ref={previewRef} muted autoPlay />
     </div>
   )
 }

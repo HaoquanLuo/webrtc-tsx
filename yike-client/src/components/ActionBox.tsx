@@ -10,6 +10,7 @@ const ActionBox = () => {
 
   return (
     <div
+      z-99
       absolute
       w-full
       h-36
