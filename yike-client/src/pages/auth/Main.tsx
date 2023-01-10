@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import {
-  handleCreateRoom,
-  handleJoinRoom,
-  initSocketAndConnect,
-} from '@/core/SocketClient'
+import { SocketClient } from '@/core/SocketClient'
 import {
   selectConnectWithAudioOnly,
   selectRoomHost,
@@ -56,8 +52,8 @@ const Main: React.FC = () => {
       }
       dispatch(setRoomId(joinRoomId))
       roomHost
-        ? handleCreateRoom(username, audioOnly)
-        : handleJoinRoom(joinRoomId, username, audioOnly)
+        ? SocketClient.handleCreateRoom(username, audioOnly)
+        : SocketClient.handleJoinRoom(joinRoomId, username, audioOnly)
     } catch (error) {
       console.error(error)
     } finally {
@@ -92,7 +88,7 @@ const Main: React.FC = () => {
   // 进入 Main 页面初始化 socket 实例
   useEffect(() => {
     if (userSocketId === '') {
-      initSocketAndConnect()
+      SocketClient.initSocketAndConnect()
     }
   }, [userSocketId])
 
@@ -101,7 +97,7 @@ const Main: React.FC = () => {
     if (roomStatus === 'created' || roomStatus === 'existed') {
       navigate(`/auth/room/${roomId}`)
     }
-    dispatch(setRoomStatus('uninitialized'))
+    dispatch(setRoomStatus('unbuild'))
   }, [roomStatus, roomId])
 
   // 监听 errorMessage

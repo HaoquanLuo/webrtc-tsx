@@ -4,7 +4,7 @@ import { StoreProps } from '@/common/typings/store'
 import { getToken } from '@/common/utils/helpers/getTools'
 import { SIO } from '../../../../../socket'
 
-type RoomStatus = 'uninitialized' | 'existed' | 'created' | 'destroyed'
+type RoomStatus = 'unbuild' | 'existed' | 'created' | 'destroyed'
 
 type WebRTCStatus =
   | 'uninitialized'
@@ -32,7 +32,7 @@ const initialSystemState: SystemState = {
   connectWithAudioOnly: true,
   errorMessage: '',
   roomHost: false,
-  roomStatus: 'uninitialized',
+  roomStatus: 'unbuild',
   roomId: '',
   roomParticipants: [],
   webRTCStatus: 'uninitialized',

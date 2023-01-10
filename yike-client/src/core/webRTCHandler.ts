@@ -1,6 +1,6 @@
 import SimplePeer from 'simple-peer'
 import { WebRTC } from '@/common/typings/webRTC'
-import * as SocketClient from './SocketClient'
+import { SocketClient } from './SocketClient'
 import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
@@ -11,7 +11,7 @@ export class WebRTCHandler {
   /**
    * @description 本地媒体流
    */
-  static localStream: MediaStream
+  static localStream: MediaStream | null = null
 
   /**
    * @description 房间内其他用户的 peer 对象
@@ -91,6 +91,10 @@ export class WebRTCHandler {
     connSocketId: string,
     isInitiator: boolean,
   ) {
+    if (WebRTCHandler.localStream === null) {
+      WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
+    }
+
     const configuration = WebRTCHandler.getConfiguration()
 
     // 实例化对等连接对象
@@ -199,10 +203,12 @@ export class WebRTCHandler {
    * @param microphoneStatus
    */
   public static handleToggleMicrophone(microphoneStatus: System.Microphone) {
+    if (WebRTCHandler.localStream === null) {
+      throw new Error(`'WebRTCHandler.localStream' is not exist.`)
+    }
+
     const micFlag = microphoneStatus === 'loud'
-    WebRTCHandler.localStream.getAudioTracks()[0].enabled = micFlag
-      ? false
-      : true
+    WebRTCHandler.localStream.getAudioTracks()[0].enabled = !micFlag
   }
 
   /**
@@ -210,10 +216,12 @@ export class WebRTCHandler {
    * @param isDisabled
    */
   public static handleToggleCamera(cameraStatus: System.Camera) {
+    if (WebRTCHandler.localStream === null) {
+      throw new Error(`'WebRTCHandler.localStream' is not exist.`)
+    }
+
     const cameraFlag = cameraStatus === 'off'
-    WebRTCHandler.localStream.getVideoTracks()[0].enabled = cameraFlag
-      ? false
-      : true
+    WebRTCHandler.localStream.getVideoTracks()[0].enabled = !cameraFlag
   }
 
   /**
@@ -225,6 +233,10 @@ export class WebRTCHandler {
     screenStatus: System.ScreenShare,
     screenStream?: MediaStream,
   ) {
+    if (WebRTCHandler.localStream === null) {
+      throw new Error(`'WebRTCHandler.localStream' is not exist.`)
+    }
+
     screenStatus === 'camera'
       ? WebRTCHandler.switchVideoTracks(WebRTCHandler.localStream)
       : screenStream && WebRTCHandler.switchVideoTracks(screenStream)

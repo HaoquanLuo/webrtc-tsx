@@ -1,6 +1,4 @@
-import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
-import React, { useEffect, useRef, useState, VideoHTMLAttributes } from 'react'
-import LoadingBox from './LoadingBox'
+import React, { useEffect, useRef, VideoHTMLAttributes } from 'react'
 
 type Props = VideoHTMLAttributes<HTMLVideoElement> & {
   audioOnly?: boolean
@@ -11,53 +9,50 @@ type Props = VideoHTMLAttributes<HTMLVideoElement> & {
 const MediaBox: React.FC<Props> = (props) => {
   const { audioOnly, srcObject, userName } = props
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [readyState, setReadyState] = useState<boolean>(false)
+
+  const handleAddFullScreen = (element: HTMLElement) => {
+    return () => {
+      if (element === null) {
+        throw new Error(`'element' is null`)
+      }
+
+      if (element.parentElement === null) {
+        throw new Error(`'element.parentElement' is null`)
+      }
+
+      if (element.classList.contains('screen-full')) {
+        element.classList.remove('screen-full')
+        element.parentElement.style.position = 'relative'
+      } else {
+        element.classList.add('screen-full')
+        element.parentElement.style.position = 'static'
+      }
+    }
+  }
 
   useEffect(() => {
     if (videoRef.current === null) {
       throw new Error(`'videoRef.current' is null`)
     }
 
-    if (srcObject !== null) {
-      if (videoRef.current === null) {
-        throw new Error(`'videoRef.current' is null`)
-      }
+    videoRef.current.srcObject = srcObject
+    videoRef.current.addEventListener
 
-      if (videoRef.current.parentElement === null) {
-        throw new Error(`'videoRef.current.parentElement' is null`)
-      }
-
-      videoRef.current.srcObject = srcObject
-      videoRef.current.addEventListener('click', () => {
-        if (videoRef.current === null) {
-          throw new Error(`'videoRef.current' is null`)
-        }
-
-        if (videoRef.current.parentElement === null) {
-          throw new Error(`'videoRef.current.parentElement' is null`)
-        }
-
-        if (videoRef.current.classList.contains('screen-full')) {
-          videoRef.current.classList.remove('screen-full')
-          videoRef.current.parentElement.style.position = 'relative'
-        } else {
-          videoRef.current.classList.add('screen-full')
-          videoRef.current.parentElement.style.position = 'static'
-        }
-      })
-      setReadyState(true)
-    }
+    videoRef.current.addEventListener(
+      'click',
+      handleAddFullScreen(videoRef.current),
+    )
 
     return () => {
-      console.log('Run cleanup')
-
-      stopBothVideoAndAudio(srcObject)
-      setReadyState(false)
+      videoRef.current?.removeEventListener(
+        'click',
+        handleAddFullScreen(videoRef.current),
+      )
     }
   }, [srcObject])
 
   return (
-    <div relative w-full h-full rd-2 mx-a my-0>
+    <div relative w-full h-full rd-2 mx-a my-0 b-gray b-1 b-op-50>
       {audioOnly && (
         <div
           pointer-events-auto
@@ -66,9 +61,6 @@ const MediaBox: React.FC<Props> = (props) => {
           h-full
           z-9
           rd-2
-          b-gray
-          b-2
-          b-op-50
           bg-gray
           bg-op-40
         >
@@ -83,7 +75,6 @@ const MediaBox: React.FC<Props> = (props) => {
           </div>
         </div>
       )}
-      {!readyState && <LoadingBox absolute />}
       <video
         autoPlay
         ref={videoRef}

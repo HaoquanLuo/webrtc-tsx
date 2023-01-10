@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { StreamStatus } from '@/common/typings/stream'
+import { WebRTCHandler } from '@/core/webRTCHandler'
 
 /**
  * @description 进入房间后加载媒体流
@@ -11,9 +12,14 @@ export const useLoadStream = (streamCallback: () => Promise<MediaStream>) => {
 
   async function getStream() {
     try {
-      const localStream = await streamCallback()
-      streamRef.current = localStream
-      setStreamStatus('complete')
+      if (WebRTCHandler.localStream !== null) {
+        streamRef.current = WebRTCHandler.localStream
+      } else {
+        const localStream = await streamCallback()
+        WebRTCHandler.localStream = localStream
+        streamRef.current = localStream
+      }
+      setStreamStatus('completed')
     } catch (error) {
       throw new Error(`Local MediaStream not available: ${error}`)
     }

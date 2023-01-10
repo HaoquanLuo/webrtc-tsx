@@ -5,6 +5,11 @@ import {
   selectUserSocketId,
 } from '@/redux/features/user/userSlice'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { SIO } from '../../../../socket'
+import { notification } from 'antd'
+import { SocketClient } from '@/core/SocketClient'
+import { WebRTCHandler } from '@/core/webRTCHandler'
 import {
   selectConnectWithAudioOnly,
   selectRoomId,
@@ -12,15 +17,10 @@ import {
   selectRoomStatus,
   selectWebRTCStatus,
 } from '@/redux/features/system/systemSlice'
-import { notification } from 'antd'
-import { WebRTCHandler } from '@/core/webRTCHandler'
 import { WebRTC } from '@/common/typings/webRTC'
-import { SIO } from '../../../../socket'
 import MediaBox from '@/components/MediaBox'
-import { useLoadStream } from '@/hooks/useLoadStream'
-import { handleLeaveRoom } from '@/core/SocketClient'
 import ActionBox from '@/components/ActionBox'
-import { useNavigate } from 'react-router-dom'
+import { useLoadStream } from '@/hooks/useLoadStream'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -37,8 +37,8 @@ const Room: React.FC = () => {
   const roomParticipants = useSelector(selectRoomParticipants)
   const webRTCStatus = useSelector(selectWebRTCStatus)
 
-  const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
   const [myself, setMyself] = useState<UserWithStream | null>(null)
+  const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
   const [allUsers, setAllUsers] = useState<(UserWithStream | null)[]>([])
 
   try {
@@ -48,8 +48,8 @@ const Room: React.FC = () => {
 
     // 加载本地的媒体流及信息
     useEffect(() => {
-      if (streamStatus === 'complete') {
-        console.log(`LocalStream is completed`)
+      if (streamStatus === 'completed') {
+        console.log(`LocalStream is completed`, localStream)
 
         setMyself({
           username,
@@ -60,7 +60,7 @@ const Room: React.FC = () => {
           stream: localStream as MediaStream,
         })
       }
-    }, [localStream])
+    }, [userId, userSocketId, localStream])
 
     // 加载其他用户的媒体流及信息
     useEffect(() => {
@@ -101,10 +101,12 @@ const Room: React.FC = () => {
     // 监听返回按钮事件
     useEffect(() => {
       if (roomStatus === 'destroyed') {
-        handleLeaveRoom()
+        SocketClient.handleLeaveRoom()
+
         setMyself(null)
         setOtherUsers([])
         setAllUsers([])
+
         navigate('/')
       }
     }, [roomStatus])

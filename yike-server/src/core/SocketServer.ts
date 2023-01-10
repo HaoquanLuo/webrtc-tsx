@@ -219,6 +219,7 @@ export class SocketIO {
       if (room == undefined) {
         return new Error('房间不存在')
       }
+
       room.connectedUsers = room.connectedUsers.filter(
         (user) => user.socketId !== socket.id,
       )

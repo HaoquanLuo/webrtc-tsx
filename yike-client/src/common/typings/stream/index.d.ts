@@ -1,1 +1,1 @@
-export type StreamStatus = 'loading' | 'complete'
+export type StreamStatus = 'loading' | 'completed'
