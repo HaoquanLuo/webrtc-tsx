@@ -93,6 +93,7 @@ export class WebRTCHandler {
   ) {
     if (WebRTCHandler.localStream === null) {
       WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
+      console.log('WebRTCHandler.localStream', WebRTCHandler.localStream)
     }
 
     const configuration = WebRTCHandler.getConfiguration()

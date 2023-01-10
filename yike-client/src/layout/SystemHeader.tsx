@@ -63,9 +63,7 @@ const SystemHeader: React.FC = () => {
     dispatch(setConnectWithAudioOnly(true))
     dispatch(setRoomHost(false))
 
-    // todo: 返回时不会断开peer连接
     navigate(-1)
-    // location.assign('/')
   }
 
   function handleCopyToClipboard() {

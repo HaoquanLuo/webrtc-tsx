@@ -145,6 +145,8 @@ export class SocketClient {
     }
 
     stopBothVideoAndAudio(WebRTCHandler.localStream)
+    WebRTCHandler.localStream = null
+    WebRTCHandler.streamWithIds = []
     SocketClient.socket.emit('room-leave')
   }
 

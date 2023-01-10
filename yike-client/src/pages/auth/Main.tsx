@@ -12,7 +12,6 @@ import {
   setRoomId,
   selectErrorMessage,
   setErrorMessage,
-  setRoomStatus,
 } from '@/redux/features/system/systemSlice'
 import {
   selectUserInfo,
@@ -97,7 +96,6 @@ const Main: React.FC = () => {
     if (roomStatus === 'created' || roomStatus === 'existed') {
       navigate(`/auth/room/${roomId}`)
     }
-    dispatch(setRoomStatus('unbuild'))
   }, [roomStatus, roomId])
 
   // 监听 errorMessage

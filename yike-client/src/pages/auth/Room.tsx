@@ -4,8 +4,7 @@ import {
   selectUserInfo,
   selectUserSocketId,
 } from '@/redux/features/user/userSlice'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { SIO } from '../../../../socket'
 import { notification } from 'antd'
 import { SocketClient } from '@/core/SocketClient'
@@ -16,16 +15,19 @@ import {
   selectRoomParticipants,
   selectRoomStatus,
   selectWebRTCStatus,
+  setRoomStatus,
 } from '@/redux/features/system/systemSlice'
 import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
 import ActionBox from '@/components/ActionBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
+import { useNavigate } from 'react-router-dom'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
 const Room: React.FC = () => {
-  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const [api, contextHolder] = notification.useNotification()
 
   const { username } = useSelector(selectUserInfo)
@@ -64,11 +66,12 @@ const Room: React.FC = () => {
 
     // 加载其他用户的媒体流及信息
     useEffect(() => {
-      if (webRTCStatus !== 'uninitialized') {
-        const streamWithIds = WebRTCHandler.getRemoteStreamWithIds()
+      if (webRTCStatus === 'connected' || webRTCStatus === 'disconnected') {
+        const streamWithIdsFn = WebRTCHandler.getRemoteStreamWithIds()
+        const streamWithIds = streamWithIdsFn()
 
         const otherUserWithStreams: (UserWithStream | null)[] =
-          streamWithIds().map((streamWithId) => {
+          streamWithIds.map((streamWithId) => {
             const { stream, toConnectId } = streamWithId
 
             const matchUser = roomParticipants.find(
@@ -85,11 +88,7 @@ const Room: React.FC = () => {
             }
           })
 
-        setOtherUsers(
-          otherUserWithStreams.filter(
-            (item) => item !== null && item.stream.active,
-          ),
-        )
+        setOtherUsers(otherUserWithStreams.filter((item) => item !== null))
       }
     }, [roomParticipants, webRTCStatus])
 
@@ -98,16 +97,20 @@ const Room: React.FC = () => {
       setAllUsers([myself, ...otherUsers])
     }, [myself, otherUsers])
 
-    // 监听返回按钮事件
+    // 监听房间状态事件
     useEffect(() => {
-      if (roomStatus === 'destroyed') {
-        SocketClient.handleLeaveRoom()
+      if (roomStatus === 'created') {
+        dispatch(setRoomStatus('existed'))
+      }
 
-        setMyself(null)
-        setOtherUsers([])
-        setAllUsers([])
+      return () => {
+        if (roomStatus === 'destroyed') {
+          SocketClient.handleLeaveRoom()
 
-        navigate('/')
+          setMyself(null)
+          setOtherUsers([])
+          setAllUsers([])
+        }
       }
     }, [roomStatus])
 
