@@ -12,7 +12,9 @@ export const useLoadStream = (streamCallback: () => Promise<MediaStream>) => {
 
   async function getStream() {
     try {
+      await WebRTCHandler.initLocalStream()
       const localStream = WebRTCHandler.getLocalStream()
+
       if (localStream === null) {
         const stream = await streamCallback()
         WebRTCHandler.setLocalStream(stream)

@@ -81,8 +81,30 @@ export class WebRTCHandler {
     return WebRTCHandler.localStream
   }
 
-  public static setLocalStream(stream: MediaStream | null) {
-    WebRTCHandler.localStream = stream
+  /**
+   * @description 设置本地媒体流
+   * @param streamObject
+   */
+  public static setLocalStream(streamObject: MediaStream | null) {
+    WebRTCHandler.localStream = streamObject
+  }
+
+  /**
+   * @description 初始化本地媒体流
+   */
+  public static async initLocalStream() {
+    // 若已存在本地媒体流则退出该函数执行
+    if (WebRTCHandler.localStream !== null) {
+      return
+    }
+
+    let localStream: MediaStream = await WebRTCHandler.getUserCamera()
+
+    if (localStream !== null) {
+      WebRTCHandler.setLocalStream(localStream)
+    } else {
+      throw new Error(`Cannot get user camera`)
+    }
   }
 
   /**
@@ -101,10 +123,7 @@ export class WebRTCHandler {
     connSocketId: string,
     isInitiator: boolean,
   ) {
-    if (WebRTCHandler.localStream === null) {
-      const stream = await WebRTCHandler.getUserCamera()
-      WebRTCHandler.localStream = stream
-    }
+    await WebRTCHandler.initLocalStream()
 
     const configuration = WebRTCHandler.getConfiguration()
 
@@ -112,7 +131,7 @@ export class WebRTCHandler {
     WebRTCHandler.peers[connSocketId] = new SimplePeer({
       initiator: isInitiator,
       config: configuration,
-      stream: WebRTCHandler.localStream,
+      stream: WebRTCHandler.localStream as MediaStream,
     })
 
     // 1. 信令数据传输
