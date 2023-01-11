@@ -11,7 +11,7 @@ export class WebRTCHandler {
   /**
    * @description 本地媒体流
    */
-  static localStream: MediaStream | null = null
+  private static localStream: MediaStream | null = null
 
   /**
    * @description 房间内其他用户的 peer 对象
@@ -59,20 +59,30 @@ export class WebRTCHandler {
   }
 
   /**
-   * @description 获取本地媒体流
+   * @description 获取本地摄像头
    */
-  public static async getLocalStream() {
+  public static async getUserCamera() {
     try {
       const isAudioOnly = getStore().system.connectWithAudioOnly
       const constraints = isAudioOnly
         ? WebRTCHandler.onlyAudioConstants
         : WebRTCHandler.defaultConstants
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      WebRTCHandler.localStream = stream
-      return stream
+      return await navigator.mediaDevices.getUserMedia(constraints)
     } catch (err: any) {
       throw new Error(err)
     }
+  }
+
+  /**
+   * @description 获取本地媒体流
+   * @returns
+   */
+  public static getLocalStream() {
+    return WebRTCHandler.localStream
+  }
+
+  public static setLocalStream(stream: MediaStream | null) {
+    WebRTCHandler.localStream = stream
   }
 
   /**
@@ -92,8 +102,8 @@ export class WebRTCHandler {
     isInitiator: boolean,
   ) {
     if (WebRTCHandler.localStream === null) {
-      WebRTCHandler.localStream = await WebRTCHandler.getLocalStream()
-      console.log('WebRTCHandler.localStream', WebRTCHandler.localStream)
+      const stream = await WebRTCHandler.getUserCamera()
+      WebRTCHandler.localStream = stream
     }
 
     const configuration = WebRTCHandler.getConfiguration()

@@ -45,7 +45,7 @@ const Room: React.FC = () => {
 
   try {
     const { localStream, streamStatus } = useLoadStream(
-      WebRTCHandler.getLocalStream,
+      WebRTCHandler.getUserCamera,
     )
 
     // 加载本地的媒体流及信息

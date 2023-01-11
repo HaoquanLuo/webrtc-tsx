@@ -140,12 +140,13 @@ export class SocketClient {
   }
 
   public static handleLeaveRoom() {
-    if (WebRTCHandler.localStream === null) {
+    const localStream = WebRTCHandler.getLocalStream()
+    if (localStream === null) {
       throw new Error(`'WebRTCHandler.localStream' is not exist.`)
     }
 
-    stopBothVideoAndAudio(WebRTCHandler.localStream)
-    WebRTCHandler.localStream = null
+    stopBothVideoAndAudio(localStream)
+    WebRTCHandler.setLocalStream(null)
     WebRTCHandler.streamWithIds = []
     SocketClient.socket.emit('room-leave')
   }
