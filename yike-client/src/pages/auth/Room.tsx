@@ -44,9 +44,24 @@ const Room: React.FC = () => {
   const [allUsers, setAllUsers] = useState<(UserWithStream | null)[]>([])
 
   try {
-    const { localStream, streamStatus } = useLoadStream(
-      WebRTCHandler.getUserCamera,
-    )
+    const { localStream, streamStatus } = useLoadStream()
+
+    // 监听房间状态事件
+    useEffect(() => {
+      if (roomStatus === 'created') {
+        dispatch(setRoomStatus('existed'))
+      }
+
+      return () => {
+        if (roomStatus === 'destroyed') {
+          SocketClient.handleLeaveRoom()
+
+          setMyself(null)
+          setOtherUsers([])
+          setAllUsers([])
+        }
+      }
+    }, [roomStatus])
 
     // 加载本地的媒体流及信息
     useEffect(() => {
@@ -96,23 +111,6 @@ const Room: React.FC = () => {
     useEffect(() => {
       setAllUsers([myself, ...otherUsers])
     }, [myself, otherUsers])
-
-    // 监听房间状态事件
-    useEffect(() => {
-      if (roomStatus === 'created') {
-        dispatch(setRoomStatus('existed'))
-      }
-
-      return () => {
-        if (roomStatus === 'destroyed') {
-          SocketClient.handleLeaveRoom()
-
-          setMyself(null)
-          setOtherUsers([])
-          setAllUsers([])
-        }
-      }
-    }, [roomStatus])
 
     // 监听用户加入、离开事件
     useEffect(() => {

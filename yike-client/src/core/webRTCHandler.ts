@@ -101,7 +101,13 @@ export class WebRTCHandler {
     let localStream: MediaStream = await WebRTCHandler.getUserCamera()
 
     if (localStream !== null) {
-      WebRTCHandler.setLocalStream(localStream)
+      if (WebRTCHandler.localStream !== null) {
+        console.log(`'localStream' is already exist.`)
+        return
+      } else {
+        WebRTCHandler.setLocalStream(localStream)
+        console.log(`'localStream' has been initialized successfully.`)
+      }
     } else {
       throw new Error(`Cannot get user camera`)
     }
@@ -277,18 +283,18 @@ export class WebRTCHandler {
    * @param streamToShare
    */
   static switchVideoTracks(streamToShare: MediaStream) {
-    for (const peer in WebRTCHandler.peers) {
-      for (let index in WebRTCHandler.peers[peer].streams[0].getTracks()) {
+    for (const socketId in WebRTCHandler.peers) {
+      for (let index in WebRTCHandler.peers[socketId].streams[0].getTracks()) {
         for (let index2 in streamToShare.getTracks()) {
           // kind 属性规定轨道的种类（eg: audio, video）
           if (
-            WebRTCHandler.peers[peer].streams[0].getTracks()[index].kind ===
+            WebRTCHandler.peers[socketId].streams[0].getTracks()[index].kind ===
             streamToShare.getTracks()[index2].kind
           ) {
-            WebRTCHandler.peers[peer].replaceTrack(
-              WebRTCHandler.peers[peer].streams[0].getTracks()[index],
+            WebRTCHandler.peers[socketId].replaceTrack(
+              WebRTCHandler.peers[socketId].streams[0].getTracks()[index],
               streamToShare.getTracks()[index2],
-              WebRTCHandler.peers[peer].streams[0],
+              WebRTCHandler.peers[socketId].streams[0],
             )
           }
         }

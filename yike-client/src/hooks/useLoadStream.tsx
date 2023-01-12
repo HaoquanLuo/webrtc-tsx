@@ -6,7 +6,7 @@ import { WebRTCHandler } from '@/core/webRTCHandler'
  * @description 进入房间后加载媒体流
  * @returns `stream`: 媒体流 , `status`: 媒体流状态
  */
-export const useLoadStream = (streamCallback: () => Promise<MediaStream>) => {
+export const useLoadStream = () => {
   const streamRef = useRef<MediaStream | null>(null)
   const [streamStatus, setStreamStatus] = useState<StreamStatus>('loading')
 
@@ -16,7 +16,7 @@ export const useLoadStream = (streamCallback: () => Promise<MediaStream>) => {
       const localStream = WebRTCHandler.getLocalStream()
 
       if (localStream === null) {
-        const stream = await streamCallback()
+        const stream = await WebRTCHandler.getUserCamera()
         WebRTCHandler.setLocalStream(stream)
         streamRef.current = stream
       } else {

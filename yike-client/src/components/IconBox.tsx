@@ -14,14 +14,16 @@ const IconBox: React.FC<Props> = (props) => {
       b-1
       b-gray
       b-op-60
+      bg-white
       rd-36
       grid
       place-items-center
+      text-black
       text-xl
       cursor-pointer
       hover:text-blue
       hover:b-blue
-      transition-200
+      transition-250
       onClick={() => handleClick && handleClick()}
     >
       {icon}

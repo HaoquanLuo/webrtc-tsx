@@ -30,7 +30,7 @@ const ActionBox = () => {
         px-6
         rd-1
         bg-gray
-        bg-op-40
+        bg-op-20
         left-0
         right-0
         bottom-12
