@@ -102,11 +102,13 @@ export class WebRTCHandler {
 
     if (localStream !== null) {
       if (WebRTCHandler.localStream !== null) {
-        console.log(`'localStream' is already exist.`)
+        console.log(`'localStream' ${localStream.id} is already exist.`)
         return
       } else {
         WebRTCHandler.setLocalStream(localStream)
-        console.log(`'localStream' has been initialized successfully.`)
+        console.log(
+          `'localStream' ${localStream.id} has been initialized successfully.`,
+        )
       }
     } else {
       throw new Error(`Cannot get user camera`)

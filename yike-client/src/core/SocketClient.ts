@@ -145,10 +145,10 @@ export class SocketClient {
       throw new Error(`'WebRTCHandler.localStream' is not exist.`)
     }
 
+    SocketClient.socket.emit('room-leave')
     stopBothVideoAndAudio(localStream)
     WebRTCHandler.setLocalStream(null)
     WebRTCHandler.streamWithIds = []
-    SocketClient.socket.emit('room-leave')
   }
 
   /**

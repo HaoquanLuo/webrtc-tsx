@@ -13,7 +13,7 @@ const IconBox: React.FC<Props> = (props) => {
       h-8
       b-1
       b-gray
-      b-op-60
+      b-op-40
       bg-white
       rd-36
       grid

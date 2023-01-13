@@ -10,17 +10,17 @@ const ActionBox = () => {
 
   return (
     <div
-      z-99
+      pointer-events-auto
       absolute
+      z-99
       w-full
       h-36
       op-0
-      hover:op-100
-      transition-1000
+      transition-600
       bottom-0
       left-0
       right-0
-      pointer-events-auto
+      hover:op-100
     >
       <div
         w-96
@@ -30,7 +30,7 @@ const ActionBox = () => {
         px-6
         rd-1
         bg-gray
-        bg-op-20
+        bg-op-10
         left-0
         right-0
         bottom-12
