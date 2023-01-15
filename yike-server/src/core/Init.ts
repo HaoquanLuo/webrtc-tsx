@@ -1,6 +1,5 @@
 import path from 'path'
 import Koa from 'koa'
-import io from 'socket.io'
 import http from 'http'
 import koaCors from '@koa/cors'
 import koaBodyParser from 'koa-bodyparser'
@@ -14,15 +13,12 @@ import { updateRedisRole } from '../server/auth'
 class Init {
   public static app: Koa
   public static server: http.Server
-  public static io: io.Server
   public static initCore(
     app: Koa<Koa.DefaultState, Koa.DefaultContext>,
     server: http.Server,
-    io: io.Server,
   ) {
     Init.app = app
     Init.server = server
-    Init.io = io
     Init.loadBodyParser()
     Init.initCatchError()
     Init.loadSession()

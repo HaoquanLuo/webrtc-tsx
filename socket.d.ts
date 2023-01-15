@@ -21,7 +21,7 @@ export namespace SIO {
     'conn-signal': (data: WebRTC.DataSignal) => void
     'conn-prepare': (data: WebRTC.DataPrepare) => void
     'conn-init': (data: WebRTC.DataInit) => void
-    'conn-destroy': (data: WebRTC.DataDestroy) => void
+    'conn-destroy': () => void
   }
 
   interface InterServiceEvents {
@@ -48,6 +48,7 @@ export namespace SIO {
     socketId: string
     audioOnly: boolean
   }
+
   type Room = {
     id: string
     connectedUsers: User[]
