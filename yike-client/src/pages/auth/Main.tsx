@@ -12,6 +12,9 @@ import {
   setRoomId,
   selectErrorMessage,
   setErrorMessage,
+  setWebRTCStatus,
+  setRoomStatus,
+  selectWebRTCStatus,
 } from '@/redux/features/system/systemSlice'
 import {
   selectUserInfo,
@@ -37,6 +40,7 @@ const Main: React.FC = () => {
   const roomId = useSelector(selectRoomId)
   const roomHost = useSelector(selectRoomHost)
   const roomStatus = useSelector(selectRoomStatus)
+  const webRTCStatus = useSelector(selectWebRTCStatus)
 
   // Modal 组件回调事件
   const showModal = () => {
@@ -88,6 +92,14 @@ const Main: React.FC = () => {
   useEffect(() => {
     if (userSocketId === '') {
       SocketClient.initSocketAndConnect()
+    }
+
+    if (roomStatus !== 'unbuild') {
+      dispatch(setRoomStatus('unbuild'))
+    }
+
+    if (webRTCStatus !== 'uninitialized') {
+      dispatch(setWebRTCStatus('uninitialized'))
     }
   }, [userSocketId])
 

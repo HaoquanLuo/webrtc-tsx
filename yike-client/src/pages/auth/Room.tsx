@@ -21,7 +21,6 @@ import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
 import ActionBox from '@/components/ActionBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
-import { useNavigate } from 'react-router-dom'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
