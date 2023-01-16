@@ -169,16 +169,6 @@ export class SocketServer {
         throw new Error("'audioOnly' is not provided.")
       }
 
-      // 生成用户号和需要创建房间的用户的新状态
-      const uid = uuidV4()
-      const newUser: SIO.User = {
-        username,
-        id: uid,
-        roomId,
-        socketId: socket.id,
-        audioOnly,
-      }
-
       // 查询需要创建房间的用户是否已连接到 SocketServer
       const selectUser = SocketServer.connectedUsers.find(
         (user) => user.socketId === socket.id,
@@ -189,6 +179,21 @@ export class SocketServer {
         throw new Error(
           `[Socket Server] User '${username}' not found in server.`,
         )
+      }
+
+      // 存在则开始加入房间
+      logger.info(
+        `[Socket Server] User '${socket.id}' is joining the room '${roomId}'.`,
+      )
+
+      // 生成用户号和需要创建房间的用户的新状态
+      const uid = uuidV4()
+      const newUser: SIO.User = {
+        username,
+        id: uid,
+        roomId,
+        socketId: socket.id,
+        audioOnly,
       }
 
       // 若用户存在，则将其信息变更
