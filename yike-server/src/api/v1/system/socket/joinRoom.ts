@@ -7,9 +7,9 @@ const router = new KoaRouter({
   prefix: `${Config.API_PREFIX}v1/system/auth`,
 })
 
-router.get('/room-exists/:roomId', (ctx) => {
+router.get('/room-exists/:roomId', async (ctx) => {
   const { roomId } = ctx.params
-  const roomState = SocketServer.roomCheckHandler(roomId)
+  const roomState = await SocketServer.roomCheckHandler(roomId)
 
   throw new Success(roomState)
 })

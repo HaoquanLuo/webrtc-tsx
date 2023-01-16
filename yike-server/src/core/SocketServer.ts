@@ -179,7 +179,7 @@ export class SocketServer {
    * @param roomId
    * @returns
    */
-  public static roomCheckHandler(roomId: string) {
+  public static async roomCheckHandler(roomId: string) {
     const room = SocketServer.rooms.find((room) => room.id === roomId)
 
     // 房间存在
@@ -269,7 +269,7 @@ export class SocketServer {
         SocketServer.rooms = SocketServer.rooms.filter((r) => r.id !== room.id)
       }
     } catch (error) {
-      logger.error(`[Socket Server] SocketException: ${error}`)
+      logger.error(`[Socket Server] ${error}`)
     }
   }
 
@@ -347,7 +347,7 @@ export class SocketServer {
         (user) => user.socketId !== socket.id,
       )
     } catch (error) {
-      logger.error(`[Socket Server] SocketException: ${error}`)
+      logger.error(`[Socket Server] ${error}`)
     }
   }
 }
