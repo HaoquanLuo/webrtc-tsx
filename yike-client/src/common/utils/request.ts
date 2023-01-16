@@ -64,9 +64,6 @@ const errorHandler = (error: AxiosError) => {
 // 响应拦截
 axios.interceptors.response.use(
   (response: AxiosResponse<Common.ResponseData<any>>) => {
-    // console.log('--------------------------------')
-    // console.log('response: ', response)
-    // console.log('--------------------------------')
     if (response?.status === 200) {
       return Promise.resolve(response)
     }

@@ -15,7 +15,6 @@ specifiers:
   '@unocss/preset-attributify': ^0.46.5
   '@unocss/preset-icons': ^0.46.5
   '@unocss/preset-uno': ^0.46.5
-  '@unocss/preset-wind': ^0.47.6
   '@unocss/reset': ^0.46.5
   '@unocss/transformer-attributify-jsx': ^0.46.5
   '@vitejs/plugin-react': ^2.2.0
@@ -74,7 +73,6 @@ devDependencies:
   '@unocss/preset-attributify': registry.npmmirror.com/@unocss/preset-attributify/0.46.5
   '@unocss/preset-icons': registry.npmmirror.com/@unocss/preset-icons/0.46.5
   '@unocss/preset-uno': registry.npmmirror.com/@unocss/preset-uno/0.46.5
-  '@unocss/preset-wind': registry.npmmirror.com/@unocss/preset-wind/0.47.6
   '@unocss/reset': registry.npmmirror.com/@unocss/reset/0.46.5
   '@unocss/transformer-attributify-jsx': registry.npmmirror.com/@unocss/transformer-attributify-jsx/0.46.5
   '@vitejs/plugin-react': registry.npmmirror.com/@vitejs/plugin-react/2.2.0_vite@3.2.4
@@ -1110,12 +1108,6 @@ packages:
     version: 0.46.5
     dev: true
 
-  registry.npmmirror.com/@unocss/core/0.47.6:
-    resolution: {integrity: sha512-Pjg/NdpuTwZk2Ns3bzI/3XVPuXU+AQ78Sw+9QJyMgA56dArd3TlpNDN6UTOD9XAK6mxdPUu7rNSKpNTLpBW2og==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@unocss/core/-/core-0.47.6.tgz}
-    name: '@unocss/core'
-    version: 0.47.6
-    dev: true
-
   registry.npmmirror.com/@unocss/inspector/0.46.5:
     resolution: {integrity: sha512-L7bMqtp94qtADeGm0ZU1IPtRatChSqHHxFG2s11+VuElPjktcnwnEfTPY5Obm++sy0kNNPU0M3xJD4TPk/M22g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@unocss/inspector/-/inspector-0.46.5.tgz}
     name: '@unocss/inspector'
@@ -1151,14 +1143,6 @@ packages:
     version: 0.46.5
     dependencies:
       '@unocss/core': registry.npmmirror.com/@unocss/core/0.46.5
-    dev: true
-
-  registry.npmmirror.com/@unocss/preset-mini/0.47.6:
-    resolution: {integrity: sha512-XP7ShDB42WU0xvZA1dG4E3LnzN4TYISm6AKQee3gmITUtE0ELTp9XutMgt0sqTe5FXeTRqw9XH7axv+4EqnE3Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@unocss/preset-mini/-/preset-mini-0.47.6.tgz}
-    name: '@unocss/preset-mini'
-    version: 0.47.6
-    dependencies:
-      '@unocss/core': registry.npmmirror.com/@unocss/core/0.47.6
     dev: true
 
   registry.npmmirror.com/@unocss/preset-tagify/0.46.5:
@@ -1203,15 +1187,6 @@ packages:
     dependencies:
       '@unocss/core': registry.npmmirror.com/@unocss/core/0.46.5
       '@unocss/preset-mini': registry.npmmirror.com/@unocss/preset-mini/0.46.5
-    dev: true
-
-  registry.npmmirror.com/@unocss/preset-wind/0.47.6:
-    resolution: {integrity: sha512-yl9zayR/CRfgnlM1iGEBKI3CkIVADv72UQHY+ZHqq/0VzeW8lSRG1KezqDKz2x3fMfrtbfls/fGLXQPNpD0mIw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@unocss/preset-wind/-/preset-wind-0.47.6.tgz}
-    name: '@unocss/preset-wind'
-    version: 0.47.6
-    dependencies:
-      '@unocss/core': registry.npmmirror.com/@unocss/core/0.47.6
-      '@unocss/preset-mini': registry.npmmirror.com/@unocss/preset-mini/0.47.6
     dev: true
 
   registry.npmmirror.com/@unocss/reset/0.46.5:

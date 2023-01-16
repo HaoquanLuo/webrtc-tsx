@@ -36,6 +36,7 @@ httpServer.listen(Config.HTTP_PORT, () => {
 // 监听客户端 socket 连接
 sio.on('connection', (socket) => {
   logger.info(`[Socket Server] User '${socket.id}' connected.`)
+  SocketServer.addSocketUser(socket.id)
 
   socket.on('room-create', (data) => {
     SocketServer.createRoomHandler(data, socket)

@@ -65,8 +65,6 @@ const Room: React.FC = () => {
     // 加载本地的媒体流及信息
     useEffect(() => {
       if (streamStatus === 'completed') {
-        console.log(`LocalStream is completed`, localStream)
-
         setMyself({
           username,
           id: userId,

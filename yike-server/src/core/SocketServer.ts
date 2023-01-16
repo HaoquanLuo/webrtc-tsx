@@ -16,13 +16,39 @@ export class SocketServer {
   static rooms: SIO.Room[] = []
 
   /**
+   * @description 添加连接到 SocketServer 的用户
+   * @param newUser
+   */
+  public static addSocketUser(socketId: string) {
+    const newUser: SIO.User = {
+      username: '',
+      id: '',
+      roomId: '',
+      socketId,
+      audioOnly: true,
+    }
+
+    SocketServer.connectedUsers = [...SocketServer.connectedUsers, newUser]
+  }
+
+  /**
+   * @description 删除连接到 SocketServer 的用户
+   * @param newUser
+   */
+  public static removeSocketUser(socketId: string) {
+    SocketServer.connectedUsers = SocketServer.connectedUsers.filter(
+      (user) => user.socketId !== socketId,
+    )
+  }
+
+  /**
    * @description 创建房间
    * @param data
    * @param socket
    * @returns
    */
   public static createRoomHandler(
-    data: SIO.SocketData,
+    data: Pick<SIO.SocketData, 'username' | 'audioOnly'>,
     socket: Socket<
       SIO.ClientToServerEvents,
       SIO.ServerToClientEvents,
@@ -35,36 +61,55 @@ export class SocketServer {
 
       // username 不存在
       if (username === undefined) {
-        throw new Error(`'username' is not provided.`)
+        throw new Error("'username' is not provided.")
       }
 
       // audio 不存在
       if (audioOnly === undefined) {
-        throw new Error(`'audioOnly' is not provided.`)
+        throw new Error("'audioOnly' is not provided.")
       }
 
-      logger.info(`[Socket Server] Host '${username}' is creating a new room.`)
+      // 查询需要创建房间的用户是否已连接到 SocketServer
+      const selectUser = SocketServer.connectedUsers.find(
+        (user) => user.socketId === socket.id,
+      )
 
-      // 创建房间
+      // 判断该用户是否存在，不存在则抛错
+      if (selectUser === undefined) {
+        throw new Error(
+          `[Socket Server] User '${username}' not found in server.`,
+        )
+      }
+
+      // 存在则开始创建房间
+      logger.info(`[Socket Server] User '${socket.id}' is creating a new room.`)
+
+      // 生成房间号、用户号和需要创建房间的用户的新状态
       const roomId = uuidV4()
-      const id = uuidV4()
-
-      // 创建进入会议的用户
+      const uid = uuidV4()
       const newUser: SIO.User = {
+        ...selectUser,
         username,
-        id,
         roomId,
-        socketId: socket.id,
+        id: uid,
         audioOnly,
       }
 
-      SocketServer.connectedUsers = [...SocketServer.connectedUsers, newUser]
+      // 若用户存在，则将其信息变更
+      SocketServer.connectedUsers = SocketServer.connectedUsers.map((user) => {
+        if (user.socketId === socket.id) {
+          return newUser
+        }
+        return user
+      })
 
       // 创建新的会议房间
       const newRoom: SIO.Room = {
         id: roomId,
         connectedUsers: [newUser],
       }
+
+      logger.info(`[Socket Server] Room '${newRoom.id}' is created.`)
 
       // 新用户加入会议房间
       socket.join(roomId)
@@ -73,7 +118,7 @@ export class SocketServer {
       // 告知客户端房间已创建并将 roomId 发送给客户端
       socket.emit('room-id', {
         roomId,
-        id,
+        id: uid,
       })
 
       // 告知房间内所有用户有新用户加入并更新房间
@@ -92,7 +137,7 @@ export class SocketServer {
    * @returns
    */
   public static joinRoomHandler(
-    data: SIO.SocketData,
+    data: Pick<SIO.SocketData, 'roomId' | 'username' | 'audioOnly'>,
     socket: Socket<
       SIO.ClientToServerEvents,
       SIO.ServerToClientEvents,
@@ -111,28 +156,48 @@ export class SocketServer {
 
       // username 不存在
       if (username === undefined) {
-        throw new Error(`'username' is not provided.`)
+        throw new Error("'username' is not provided.")
       }
 
       // roomId 不存在
       if (roomId === undefined) {
-        throw new Error(`'roomId' is not provided.`)
+        throw new Error("'roomId' is not provided.")
       }
 
       // audio 不存在
       if (audioOnly === undefined) {
-        throw new Error(`'audioOnly' is not provided.`)
+        throw new Error("'audioOnly' is not provided.")
       }
 
-      const id = uuidV4()
-
+      // 生成用户号和需要创建房间的用户的新状态
+      const uid = uuidV4()
       const newUser: SIO.User = {
         username,
-        id,
+        id: uid,
         roomId,
         socketId: socket.id,
         audioOnly,
       }
+
+      // 查询需要创建房间的用户是否已连接到 SocketServer
+      const selectUser = SocketServer.connectedUsers.find(
+        (user) => user.socketId === socket.id,
+      )
+
+      // 判断该用户是否存在，不存在则抛错
+      if (selectUser === undefined) {
+        throw new Error(
+          `[Socket Server] User '${username}' not found in server.`,
+        )
+      }
+
+      // 若用户存在，则将其信息变更
+      SocketServer.connectedUsers = SocketServer.connectedUsers.map((user) => {
+        if (user.socketId === socket.id) {
+          return newUser
+        }
+        return user
+      })
 
       // 判断传递过来的 roomId 是否匹配存在
       const room = SocketServer.rooms.find((room) => room.id === roomId)
@@ -149,9 +214,6 @@ export class SocketServer {
       logger.info(
         `[Socket Server] User '${username}' has joined the room '${room.id}'.`,
       )
-
-      // 将新用户添加到已连接用户数组中
-      SocketServer.connectedUsers = [...SocketServer.connectedUsers, newUser]
 
       // 告知房间内其他已连接用户准备 webRTC 对等连接
       room.connectedUsers.forEach((user) => {
@@ -226,7 +288,7 @@ export class SocketServer {
     >,
   ) {
     try {
-      //查询要离开会议房间的用户
+      // 查询要离开会议房间的用户
       const user = SocketServer.connectedUsers.find(
         (user) => user.socketId === socket.id,
       )
@@ -235,37 +297,37 @@ export class SocketServer {
         throw new Error(`User '${socket.id}' is not found.`)
       }
 
-      //从会议房间进行删除
       const room = SocketServer.rooms.find((room) => room.id === user.roomId)
 
       if (room === undefined) {
-        throw new Error(`Room '${room}' is not found.`)
+        throw new Error(`Room '${user.roomId}' is not found.`)
       }
 
+      // 从会议房间进行删除
       room.connectedUsers = room.connectedUsers.filter(
         (user) => user.socketId !== socket.id,
       )
 
-      //离开房间
+      // 离开房间
       socket.leave(user.roomId)
 
       logger.info(
         `[Socket Server] User '${user.username}' has left the room '${room.id}'.`,
       )
 
-      //当会议房间没有人员的时候要关闭整个会议室（从 rooms 数组中删除该房间的信息）
+      // 当会议房间没有人员的时候要关闭整个会议室（从 rooms 数组中删除该房间的信息）
       if (room.connectedUsers.length > 0) {
-        //用户断开 WebRTC 连接
+        // 用户断开 WebRTC 连接
         sio.to(room.id).emit('conn-destroy', { socketId: socket.id })
 
-        //发送通知告知有用户离开并更新房间
+        // 发送通知告知有用户离开并更新房间
         sio.to(room.id).emit('room-update', {
           connectedUsers: room.connectedUsers,
         })
       } else {
         logger.info(`[Socket Server] Room '${room.id}' has been destroyed.`)
 
-        //从rooms数组中删除该房间的信息
+        // 从rooms数组中删除该房间的信息
         SocketServer.rooms = SocketServer.rooms.filter((r) => r.id !== room.id)
       }
     } catch (error) {
@@ -334,6 +396,10 @@ export class SocketServer {
     sio.to(connUserSocketId).emit('conn-init', initData)
   }
 
+  /**
+   * @description Socket 断开连接逻辑
+   * @param socket
+   */
   public static disconnectHandler(
     socket: Socket<
       SIO.ClientToServerEvents,
@@ -343,9 +409,7 @@ export class SocketServer {
     >,
   ) {
     try {
-      SocketServer.connectedUsers = SocketServer.connectedUsers.filter(
-        (user) => user.socketId !== socket.id,
-      )
+      SocketServer.removeSocketUser(socket.id)
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)
     }
