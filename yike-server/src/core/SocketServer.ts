@@ -128,9 +128,9 @@ export class SocketServer {
 
       const newUser: SIO.User = {
         username,
-        id: uuidV4(),
+        id,
         roomId,
-        socketId: id,
+        socketId: socket.id,
         audioOnly,
       }
 
