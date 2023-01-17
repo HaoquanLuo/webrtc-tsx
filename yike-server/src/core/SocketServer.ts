@@ -4,6 +4,30 @@ import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 import logger from '@/server/logs/logger'
 
+type TUser = 'user'
+type TRoom = 'room'
+type FindKey = TUser | TRoom
+
+type FindOption = {
+  user: string
+  room: string
+}
+type Test<K extends FindKey> = (
+  option: K extends keyof FindOption
+    ? {
+        [P in K]: FindOption[P]
+      }
+    : never,
+) => void
+
+type T = keyof Test<TUser>
+
+const test: Test<TUser> = ({ user: string }) => {}
+type FindMatch = {
+  user: SIO.User
+  room: SIO.Room
+}
+
 export class SocketServer {
   /**
    * @description 服务器连接用户数
@@ -14,6 +38,61 @@ export class SocketServer {
    * @description 服务器现存房间数
    */
   static rooms: SIO.Room[] = []
+
+  static find<K extends FindKey>(
+    keyword: FindKey,
+    option: K extends keyof FindOption ? { [P in K]: FindOption[P] } : never,
+  ): K extends keyof FindMatch ? FindMatch[K] : void
+  static find(keyword: FindKey[], option: FindOption): (SIO.User | SIO.Room)[]
+  static find(
+    keyword: FindKey | FindKey[],
+    option: FindOption,
+  ): SIO.User | SIO.Room | (SIO.User | SIO.Room)[] | undefined {
+    const constants = {
+      user: 'user',
+      room: 'room',
+    }
+
+    const { user: socketId, room: roomId } = option
+
+    if (keyword instanceof Array) {
+      for (const key of keyword) {
+      }
+      return []
+    }
+
+    if (typeof keyword === 'string') {
+      switch (constants[keyword]) {
+        case constants.user: {
+          // 查询需要创建房间的用户是否已连接到 SocketServer
+          const user = SocketServer.connectedUsers.find(
+            (user) => user.socketId === socketId,
+          )
+
+          // 判断该用户是否存在，不存在则抛错
+          if (user === undefined) {
+            throw new Error(
+              `[Socket Server] User '${socketId}' not found in server.`,
+            )
+          }
+          return user
+        }
+
+        case constants.room: {
+          const room = SocketServer.rooms.find((room) => room.id === roomId)
+
+          if (room === undefined) {
+            throw new Error(`Room '${roomId}' is not found.`)
+          }
+
+          return room
+        }
+
+        default:
+          throw new Error(`Invalid key '${keyword}'`)
+      }
+    }
+  }
 
   /**
    * @description 添加连接到 SocketServer 的用户
@@ -68,6 +147,10 @@ export class SocketServer {
       if (audioOnly === undefined) {
         throw new Error("'audioOnly' is not provided.")
       }
+
+      const user = SocketServer.find<TUser>('user', {
+        user: socket.id,
+      })
 
       // 查询需要创建房间的用户是否已连接到 SocketServer
       const selectUser = SocketServer.connectedUsers.find(
