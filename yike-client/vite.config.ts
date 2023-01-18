@@ -21,7 +21,7 @@ export default defineConfig({
     },
   },
   server: {
-    hmr: false,
+    hmr: true,
     port: 3000,
     proxy: {
       '/api': {

@@ -1,12 +1,12 @@
 import React from 'react'
 
-interface Props {
-  icon?: React.ReactElement
+interface Props extends React.HtmlHTMLAttributes<HTMLDivElement> {
+  icon: React.ReactElement
   handleClick?: (event?: MouseEvent) => void
 }
 
 const IconBox: React.FC<Props> = (props) => {
-  const { icon, handleClick } = props
+  const { icon, handleClick, ...rest } = props
   return (
     <div
       w-8
@@ -25,6 +25,7 @@ const IconBox: React.FC<Props> = (props) => {
       hover:b-blue
       transition-250
       onClick={() => handleClick && handleClick()}
+      {...rest}
     >
       {icon}
     </div>

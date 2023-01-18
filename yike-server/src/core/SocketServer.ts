@@ -12,21 +12,29 @@ type FindOption = {
   user: string
   room: string
 }
-type Test<K extends FindKey> = (
-  option: K extends keyof FindOption
-    ? {
-        [P in K]: FindOption[P]
-      }
-    : never,
-) => void
 
-type T = keyof Test<TUser>
-
-const test: Test<TUser> = ({ user: string }) => {}
 type FindMatch = {
   user: SIO.User
   room: SIO.Room
 }
+
+type Test<T> = (keyword: FindKey[], option: FindOption) => []
+
+type TestType = keyof Test<string>
+
+const user: SIO.User = {
+  username: '',
+  id: '',
+  roomId: '',
+  socketId: '',
+  audioOnly: false,
+}
+const room: SIO.Room = {
+  id: '',
+  connectedUsers: [],
+}
+const test = () => [user, room]
+const [newUser, newRoom] = test()
 
 export class SocketServer {
   /**
@@ -48,28 +56,20 @@ export class SocketServer {
     keyword: FindKey | FindKey[],
     option: FindOption,
   ): SIO.User | SIO.Room | (SIO.User | SIO.Room)[] | undefined {
-    const constants = {
-      user: 'user',
-      room: 'room',
-    }
+    function getResult(keyword: FindKey) {
+      const constants = {
+        user: 'user',
+        room: 'room',
+      } as const
 
-    const { user: socketId, room: roomId } = option
+      const { user: socketId, room: roomId } = option
 
-    if (keyword instanceof Array) {
-      for (const key of keyword) {
-      }
-      return []
-    }
-
-    if (typeof keyword === 'string') {
       switch (constants[keyword]) {
         case constants.user: {
-          // 查询需要创建房间的用户是否已连接到 SocketServer
           const user = SocketServer.connectedUsers.find(
             (user) => user.socketId === socketId,
           )
 
-          // 判断该用户是否存在，不存在则抛错
           if (user === undefined) {
             throw new Error(
               `[Socket Server] User '${socketId}' not found in server.`,
@@ -91,6 +91,14 @@ export class SocketServer {
         default:
           throw new Error(`Invalid key '${keyword}'`)
       }
+    }
+
+    if (keyword instanceof Array) {
+      return keyword.map((key) => getResult(key))
+    }
+
+    if (typeof keyword === 'string') {
+      return getResult(keyword)
     }
   }
 
@@ -148,21 +156,9 @@ export class SocketServer {
         throw new Error("'audioOnly' is not provided.")
       }
 
-      const user = SocketServer.find<TUser>('user', {
+      const selectUser = SocketServer.find<TUser>('user', {
         user: socket.id,
       })
-
-      // 查询需要创建房间的用户是否已连接到 SocketServer
-      const selectUser = SocketServer.connectedUsers.find(
-        (user) => user.socketId === socket.id,
-      )
-
-      // 判断该用户是否存在，不存在则抛错
-      if (selectUser === undefined) {
-        throw new Error(
-          `[Socket Server] User '${username}' not found in server.`,
-        )
-      }
 
       // 存在则开始创建房间
       logger.info(`[Socket Server] User '${socket.id}' is creating a new room.`)
@@ -252,30 +248,22 @@ export class SocketServer {
         throw new Error("'audioOnly' is not provided.")
       }
 
-      // 查询需要创建房间的用户是否已连接到 SocketServer
-      const selectUser = SocketServer.connectedUsers.find(
-        (user) => user.socketId === socket.id,
-      )
-
-      // 判断该用户是否存在，不存在则抛错
-      if (selectUser === undefined) {
-        throw new Error(
-          `[Socket Server] User '${username}' not found in server.`,
-        )
-      }
-
-      // 存在则开始加入房间
+      // 开始加入房间操作
       logger.info(
         `[Socket Server] User '${socket.id}' is joining the room '${roomId}'.`,
       )
 
+      const selectUser = SocketServer.find<TUser>('user', {
+        user: socket.id,
+      })
+
       // 生成用户号和需要创建房间的用户的新状态
       const uid = uuidV4()
       const newUser: SIO.User = {
+        ...selectUser,
         username,
         id: uid,
         roomId,
-        socketId: socket.id,
         audioOnly,
       }
 
@@ -288,23 +276,19 @@ export class SocketServer {
       })
 
       // 判断传递过来的 roomId 是否匹配存在
-      const room = SocketServer.rooms.find((room) => room.id === roomId)
+      const selectRoom = SocketServer.find<TRoom>('room', { room: roomId })
 
-      if (room === undefined) {
-        throw new Error(`Room '${roomId}' is not found.`)
-      }
-
-      room.connectedUsers = [...room.connectedUsers, newUser]
+      selectRoom.connectedUsers = [...selectRoom.connectedUsers, newUser]
 
       // 加入房间
       socket.join(roomId)
 
       logger.info(
-        `[Socket Server] User '${username}' has joined the room '${room.id}'.`,
+        `[Socket Server] User '${username}' has joined the room '${selectRoom.id}'.`,
       )
 
       // 告知房间内其他已连接用户准备 webRTC 对等连接
-      room.connectedUsers.forEach((user) => {
+      selectRoom.connectedUsers.forEach((user) => {
         // 排除自身
         if (user.socketId !== socket.id) {
           // 存储发起对等连接方的 socketId 信息
@@ -317,7 +301,7 @@ export class SocketServer {
 
       // 借用 sio 发送通知告知有新用户加入并更新房间
       sio.to(roomId).emit('room-update', {
-        connectedUsers: room.connectedUsers,
+        connectedUsers: selectRoom.connectedUsers,
       })
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)

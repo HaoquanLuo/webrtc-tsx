@@ -52,7 +52,7 @@ const MediaBox: React.FC<Props> = (props) => {
   }, [srcObject])
 
   return (
-    <div relative w-full h-full rd-2 mx-a my-0 b-gray b-1 b-op-50>
+    <div relative w-full h-full rd-2 mx-a my-0 b-gray b-op-50>
       {audioOnly && (
         <div
           pointer-events-auto
