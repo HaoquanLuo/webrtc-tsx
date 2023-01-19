@@ -114,9 +114,9 @@ const UserPanel: React.FC<Props> = (props) => {
   }, [noticeFlag])
 
   return (
-    <div className="sm:w-60 md:w-80 h-a shrink-0 p-2 flex flex-col gap-y-2 justify-between">
+    <div className="sm:w-60 md:w-80 h-a shrink-0 p-2 flex flex-col gap-y-0.5 justify-between">
       {contextHolder}
-      <div h-60>
+      <div id="participants" h-60>
         {roomParticipants
           ? roomParticipants.map((user) => {
               return (
@@ -131,7 +131,21 @@ const UserPanel: React.FC<Props> = (props) => {
             })
           : null}
       </div>
-      <div flex-1 flex flex-col bg-slate-400 bg-op-20 rd-2>
+      <div
+        id="resizeBar"
+        w-full
+        h="2.4"
+        hover:bg-dark-50
+        transition-100
+        bg-op-20
+        cursor-ns-resize
+        py="0.25"
+        grid
+        place-items-center
+        before="content-empty w-4 h-0.2 bg-white"
+        after="content-empty w-4 h-0.2 bg-white"
+      ></div>
+      <div id="messageBox" flex-1 flex flex-col bg-slate-400 bg-op-20 rd-2>
         <div h-90 max-h-180 flex flex-col p-1 overflow-y-scroll rd-2>
           {messages.map((msg, index) => {
             const sameAuthor =
