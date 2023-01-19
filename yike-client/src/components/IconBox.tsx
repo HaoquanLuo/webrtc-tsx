@@ -1,14 +1,14 @@
 import React from 'react'
 
-interface Props extends React.HtmlHTMLAttributes<HTMLDivElement> {
+interface Props extends React.HtmlHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactElement
-  handleClick?: (event?: MouseEvent) => void
+  handleClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
 const IconBox: React.FC<Props> = (props) => {
   const { icon, handleClick, ...rest } = props
   return (
-    <div
+    <button
       w-8
       h-8
       b-1
@@ -24,11 +24,11 @@ const IconBox: React.FC<Props> = (props) => {
       hover:text-blue
       hover:b-blue
       transition-250
-      onClick={() => handleClick && handleClick()}
+      onClick={(e) => handleClick && handleClick(e)}
       {...rest}
     >
       {icon}
-    </div>
+    </button>
   )
 }
 

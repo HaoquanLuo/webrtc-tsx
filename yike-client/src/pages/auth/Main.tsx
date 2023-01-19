@@ -31,6 +31,7 @@ const Main: React.FC = () => {
   // 控制弹窗显示
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [joinRoomId, setJoinRoomId] = useState('')
+  const [noticeFlag, setNoticeFlag] = useState<string>('')
 
   // store 属性
   const errorMessage = useSelector(selectErrorMessage)
@@ -51,8 +52,11 @@ const Main: React.FC = () => {
     try {
       if (!roomHost && joinRoomId === '') {
         dispatch(setErrorMessage(`没有输入房间号！`))
+        setNoticeFlag(crypto.randomUUID())
         return
       }
+
+      setNoticeFlag('')
       dispatch(setRoomId(joinRoomId))
       roomHost
         ? SocketClient.handleCreateRoom(username, audioOnly)
@@ -91,7 +95,7 @@ const Main: React.FC = () => {
   // 进入 Main 页面初始化 socket 实例
   useEffect(() => {
     if (userSocketId === '') {
-      SocketClient.initSocketAndConnect()
+      // SocketClient.initSocketAndConnect()
     }
 
     if (roomStatus !== 'unbuild') {
@@ -112,13 +116,13 @@ const Main: React.FC = () => {
 
   // 监听 errorMessage
   useEffect(() => {
-    if (errorMessage) {
+    if (noticeFlag !== '') {
       api.error({
         message: errorMessage,
         placement: 'top',
       })
     }
-  }, [errorMessage])
+  }, [noticeFlag])
 
   return (
     <>
