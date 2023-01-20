@@ -140,13 +140,17 @@ export class SocketClient {
   }
 
   public static handleLeaveRoom() {
+    // 关闭本地媒体流连接
     const localStream = WebRTCHandler.getLocalStream()
     if (localStream === null) {
       throw new Error(`'WebRTCHandler.localStream' is not exist.`)
     }
-
-    SocketClient.socket.emit('room-leave')
     stopBothVideoAndAudio(localStream)
+
+    // 通知 SocketServer 进行退出房间操作
+    SocketClient.socket.emit('room-leave')
+
+    // 将 WebRTCHandler 内的静态属性重置为初始状态
     WebRTCHandler.setLocalStream(null)
     WebRTCHandler.streamWithIds = []
   }

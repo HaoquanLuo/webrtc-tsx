@@ -113,8 +113,8 @@ const Room: React.FC = () => {
     useEffect(() => {
       if (roomParticipants.length > 1) {
         api.info({
-          message: '用户事件',
-          placement: 'bottomLeft',
+          message: '新用户加入',
+          placement: 'top',
         })
       }
     }, [roomParticipants])

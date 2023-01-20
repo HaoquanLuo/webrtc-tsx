@@ -2,14 +2,8 @@ import { selectUserInfo } from '@/redux/features/user/userSlice'
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-export interface Message {
-  id: string
-  author: string
-  content: string
-}
-
 interface Props {
-  message: Message & {
+  message: User.Message & {
     sameAuthor: boolean
   }
 }
@@ -20,7 +14,7 @@ const MessageBox: React.FC<Props> = (props) => {
   const { username } = useSelector(selectUserInfo)
 
   return (
-    <div key={message.id} className={`m-1`}>
+    <div key={message.id} className={`my-1`}>
       {!message.sameAuthor && (
         <div
           font-bold
@@ -30,7 +24,7 @@ const MessageBox: React.FC<Props> = (props) => {
             message.author === username ? 'text-right' : 'text-left'
           }`}
         >
-          {message.author}
+          {message.author === username ? '我' : message.author}
         </div>
       )}
       <div

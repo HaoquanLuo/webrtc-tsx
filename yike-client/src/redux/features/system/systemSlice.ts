@@ -4,26 +4,16 @@ import { StoreProps } from '@/common/typings/store'
 import { getToken } from '@/common/utils/helpers/getTools'
 import { SIO } from '../../../../../socket'
 
-type RoomStatus = 'unbuild' | 'existed' | 'created' | 'destroyed'
-
-type WebRTCStatus =
-  | 'uninitialized'
-  | 'signaling'
-  | 'dataing'
-  | 'connected'
-  | 'streaming'
-  | 'disconnected'
-
 export interface SystemState {
   logState: boolean
   currentPath: string
   connectWithAudioOnly: boolean
   errorMessage: string
   roomHost: boolean
-  roomStatus: RoomStatus
+  roomStatus: System.RoomStatus
   roomId: string
   roomParticipants: SIO.User[]
-  webRTCStatus: WebRTCStatus
+  webRTCStatus: System.WebRTCStatus
 }
 
 const initialSystemState: SystemState = {
@@ -57,7 +47,7 @@ export const systemSlice = createSlice({
     setRoomHost: (state, action: PayloadAction<boolean>) => {
       state.roomHost = action.payload
     },
-    setRoomStatus: (state, action: PayloadAction<RoomStatus>) => {
+    setRoomStatus: (state, action: PayloadAction<System.RoomStatus>) => {
       state.roomStatus = action.payload
     },
     setRoomId: (state, action: PayloadAction<string>) => {
@@ -66,7 +56,7 @@ export const systemSlice = createSlice({
     setRoomParticipants: (state, action: PayloadAction<SIO.User[]>) => {
       state.roomParticipants = action.payload
     },
-    setWebRTCStatus: (state, action: PayloadAction<WebRTCStatus>) => {
+    setWebRTCStatus: (state, action: PayloadAction<System.WebRTCStatus>) => {
       state.webRTCStatus = action.payload
     },
   },

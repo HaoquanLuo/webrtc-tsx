@@ -4,6 +4,7 @@ import { SocketClient } from './SocketClient'
 import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
+import { setMessages } from '@/redux/features/user/userSlice'
 
 const dispatch = store.dispatch
 
@@ -151,21 +152,24 @@ export class WebRTCHandler {
 
     // 2. 对等对象连接
     WebRTCHandler.peers[connSocketId].on('connect', () => {
-      WebRTCHandler.peers[connSocketId].send('whatever' + Math.random())
+      WebRTCHandler.peers[connSocketId].send(
+        JSON.stringify('whatever' + Math.random()),
+      )
 
       dispatch(setWebRTCStatus('connected'))
     })
 
-    // 3. 对等对象数据
-    WebRTCHandler.peers[connSocketId].on('data', (data) => {
-      console.log('data: ' + data)
-      dispatch(setWebRTCStatus('dataing'))
-    })
-
-    // 4. 获取媒体流
+    // 3. 获取媒体流
     WebRTCHandler.peers[connSocketId].on('stream', (stream) => {
       WebRTCHandler.handleAddStream(stream, connSocketId)
       dispatch(setWebRTCStatus('streaming'))
+    })
+
+    // 4. 对等对象数据
+    WebRTCHandler.peers[connSocketId].on('data', (data) => {
+      console.log('data: ' + data)
+      const messageData = JSON.parse(data)
+      WebRTCHandler.appendNewMessage(messageData)
     })
 
     // 5. 对等连接关闭
@@ -297,6 +301,36 @@ export class WebRTCHandler {
           }
         }
       }
+    }
+  }
+
+  /**
+   * @description 保存新消息到本地存储
+   * @param message
+   */
+  public static appendNewMessage(message: User.Message) {
+    // 同步到 store 进行保存
+    const messages = getStore().user.messages
+    dispatch(setMessages([...messages, message]))
+  }
+
+  /**
+   * @description 通过 data 通道发送聊天信息
+   * @param message
+   */
+  public static sendMessageUsingDataChannel(message: User.Message) {
+    // 将本地发送的聊天信息存储到 store
+    WebRTCHandler.appendNewMessage(message)
+
+    // 聊天信息发送给远程 webRTC 对等方
+    const messageData = {
+      ...message,
+    }
+
+    const stringifiedMessageData = JSON.stringify(messageData)
+
+    for (const peer in WebRTCHandler.peers) {
+      WebRTCHandler.peers[peer].send(stringifiedMessageData)
     }
   }
 }

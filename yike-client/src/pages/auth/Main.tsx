@@ -95,7 +95,7 @@ const Main: React.FC = () => {
   // 进入 Main 页面初始化 socket 实例
   useEffect(() => {
     if (userSocketId === '') {
-      // SocketClient.initSocketAndConnect()
+      SocketClient.initSocketAndConnect()
     }
 
     if (roomStatus !== 'unbuild') {
