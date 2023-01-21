@@ -2,15 +2,15 @@
 /**
  * 获取数据
  * @param key
- * @param isObj 值是否是对象
+ * @param isObject 值是否是对象
  * @returns
  */
 export function getItem(
   key: string,
-  isObj = false,
+  isObject = false,
 ): string | Common.Params | Object {
   const value = localStorage.getItem(key)
-  return value && !isObj ? value : JSON.parse(value!)
+  return value && !isObject ? value : JSON.parse(value!)
 }
 
 /**
