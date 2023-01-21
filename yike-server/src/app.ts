@@ -63,4 +63,8 @@ sio.on('connection', (socket) => {
   socket.on('conn-init', (data) => {
     SocketServer.initPeerConnectionHandler(data, socket, sio)
   })
+
+  socket.on('direct-message', (data) => {
+    SocketServer.transportDirectMessageHandler(data, socket)
+  })
 })

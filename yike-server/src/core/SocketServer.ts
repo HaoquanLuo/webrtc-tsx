@@ -486,4 +486,35 @@ export class SocketServer {
       logger.error(`[Socket Server] ${error}`)
     }
   }
+
+  public static transportDirectMessageHandler(
+    data: Pick<SIO.SocketData, 'receiverSocketId' | 'messageContent'>,
+    socket: Socket<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
+  ) {
+    try {
+      const { receiverSocketId, messageContent } = data
+
+      const toReceiveUser = SocketServer.find<TUser>('user', {
+        user: receiverSocketId,
+      })
+
+      // 给接收方/发送方的消息
+      const message = {
+        id: crypto.randomUUID(),
+        receiverSocketId: toReceiveUser.socketId,
+        senderSocketId: socket.id,
+        messageContent,
+      }
+
+      socket.to(receiverSocketId).emit('direct-message', message)
+      socket.emit('direct-message', message)
+    } catch (error) {
+      logger.error(`[Socket Server] ${error}`)
+    }
+  }
 }

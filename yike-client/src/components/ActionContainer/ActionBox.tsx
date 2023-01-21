@@ -1,9 +1,9 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectConnectWithAudioOnly } from '@/redux/features/system/systemSlice'
-import CameraButton from './ActionButtons/CameraButton'
-import MicButton from './ActionButtons/MicButton'
-import ScreenShareButton from './ActionButtons/ScreenShareButton'
+import CameraButton from './CameraButton'
+import MicButton from './MicButton'
+import ScreenShareButton from './ScreenShareButton'
 
 const ActionBox = () => {
   const audioOnlyStatus: boolean = useSelector(selectConnectWithAudioOnly)

@@ -1,5 +1,6 @@
 import { WebRTC } from './yike-client/src/common/typings/webRTC'
 import SimplePeer from './yike-client/node_modules/@types/simple-peer'
+
 export namespace SIO {
   interface ServerToClientEvents {
     // 房间相关
@@ -10,6 +11,7 @@ export namespace SIO {
     'conn-prepare': (data: WebRTC.DataPrepare) => void
     'conn-init': (data: WebRTC.DataInit) => void
     'conn-destroy': (data: WebRTC.DataDestroy) => void
+    'direct-message': (data: SIO.DirectMessage) => void
   }
 
   interface ClientToServerEvents {
@@ -24,11 +26,10 @@ export namespace SIO {
     // webRTC 对象相关
     'conn-signal': (data: WebRTC.DataSignal) => void
     'conn-init': (data: WebRTC.DataInit) => void
+    'direct-message': (data: SIO.DirectMessage) => void
   }
 
-  interface InterServiceEvents {
-    ping: () => void
-  }
+  interface InterServiceEvents {}
 
   interface SocketData {
     id: string
@@ -40,12 +41,15 @@ export namespace SIO {
     toConnectSocketId: string
     socketId: string
     signal: SimplePeer.SignalData
+    senderSocketId: string
+    receiverSocketId: string
+    messageContent: string
   }
 
   // Types
   type User = {
-    username: string
     id: string
+    username: string
     roomId: string
     socketId: string
     audioOnly: boolean
@@ -54,5 +58,12 @@ export namespace SIO {
   type Room = {
     id: string
     connectedUsers: User[]
+  }
+
+  type DirectMessage = {
+    id: string
+    senderSocketId: string
+    receiverSocketId: string
+    messageContent: string
   }
 }

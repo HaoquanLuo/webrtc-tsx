@@ -5,10 +5,11 @@ import { StoreProps } from '@/common/typings/store'
 
 export interface UserState {
   token: string
-  userInfo: User.UserInfo
+  userInfo: User.Info
   userId: string
   userSocketId: string
-  messages: User.Message[]
+  publicMessages: User.PublicMessage[]
+  directMessages: User.DirectMessages
 }
 
 const initialUserState: UserState = {
@@ -19,7 +20,8 @@ const initialUserState: UserState = {
   },
   userId: '',
   userSocketId: '',
-  messages: [],
+  publicMessages: [],
+  directMessages: {},
 }
 
 export const userSlice = createSlice({
@@ -29,7 +31,7 @@ export const userSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload
     },
-    setUserInfo: (state, action: PayloadAction<User.UserInfo>) => {
+    setUserInfo: (state, action: PayloadAction<User.Info>) => {
       state.userInfo = action.payload
     },
     setUserId: (state, action: PayloadAction<string>) => {
@@ -38,8 +40,11 @@ export const userSlice = createSlice({
     setUserSocketId: (state, action: PayloadAction<string>) => {
       state.userSocketId = action.payload
     },
-    setMessages: (state, action: PayloadAction<User.Message[]>) => {
-      state.messages = action.payload
+    setPublicMessages: (state, action: PayloadAction<User.PublicMessage[]>) => {
+      state.publicMessages = action.payload
+    },
+    setDirectMessages: (state, action: PayloadAction<User.DirectMessages>) => {
+      state.directMessages = action.payload
     },
   },
 })
@@ -49,13 +54,17 @@ export const {
   setUserInfo,
   setUserId,
   setUserSocketId,
-  setMessages,
+  setPublicMessages,
+  setDirectMessages,
 } = userSlice.actions
 
 export const selectToken = (state: StoreProps) => state.user.token
 export const selectUserInfo = (state: StoreProps) => state.user.userInfo
 export const selectUserId = (state: StoreProps) => state.user.userId
 export const selectUserSocketId = (state: StoreProps) => state.user.userSocketId
-export const selectMessages = (state: StoreProps) => state.user.messages
+export const selectPublicMessages = (state: StoreProps) =>
+  state.user.publicMessages
+export const selectDirectMessage = (state: StoreProps) =>
+  state.user.directMessages
 
 export default userSlice.reducer

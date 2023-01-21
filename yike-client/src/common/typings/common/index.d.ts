@@ -16,15 +16,18 @@ declare global {
   }
 
   module User {
-    type UserInfo = {
+    type Info = {
       username: string
       password: string
     }
-    type Message = {
+    type PublicMessage = {
       id: string
       author: string
+      authorId: string
       content: string
-      createdByMe: boolean
+    }
+    type DirectMessages = {
+      [key: string]: Omit<User.PublicMessage, 'author'>[]
     }
   }
 

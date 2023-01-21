@@ -19,7 +19,7 @@ import {
 } from '@/redux/features/system/systemSlice'
 import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
-import ActionBox from '@/components/ActionBox'
+import ActionBox from '@/components/ActionContainer/ActionBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>

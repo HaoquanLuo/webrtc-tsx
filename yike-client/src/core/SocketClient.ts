@@ -12,6 +12,7 @@ import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
 import { WebRTCHandler } from './webRTCHandler'
 import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
+import { getStore } from '@/common/utils/getStore'
 
 const dispatch = store.dispatch
 
@@ -87,6 +88,10 @@ export class SocketClient {
     SocketClient.socket.on('conn-destroy', (data) => {
       WebRTCHandler.handleRemovePeerConnection(data)
     })
+
+    SocketClient.socket.on('direct-message', (data) => {
+      SocketClient.handleSaveDirectMessage(data)
+    })
   }
 
   /**
@@ -159,7 +164,54 @@ export class SocketClient {
    * @description 发送信令数据到服务器
    * @param data
    */
-  public static sendSignalData(data: WebRTC.DataSignal) {
+  public static handleSendSignalData(data: WebRTC.DataSignal) {
     SocketClient.socket.emit('conn-signal', data)
+  }
+
+  /**
+   * @description 发送私信
+   * @param data
+   */
+  public static handleSendDirectMessage(data: SIO.DirectMessage) {
+    SocketClient.socket.emit('direct-message', data)
+  }
+
+  public static handleSaveDirectMessage(data: SIO.DirectMessage) {
+    const { senderSocketId, receiverSocketId } = data
+
+    if (senderSocketId === SocketClient.socket.id) {
+      SocketClient.appendNewDirectMessageToStore(true, data)
+    } else if (receiverSocketId === SocketClient.socket.id) {
+      SocketClient.appendNewDirectMessageToStore(false, data)
+    }
+  }
+
+  static appendNewDirectMessageToStore(
+    createdByMe: boolean,
+    directMessage: SIO.DirectMessage,
+  ) {
+    const { id, senderSocketId, receiverSocketId, messageContent } =
+      directMessage
+
+    const directMessages = getStore().user.directMessages
+
+    for (const chatUsername in directMessages) {
+    }
+
+    let newMessage: Omit<User.PublicMessage, 'author'>
+
+    if (createdByMe) {
+      newMessage = {
+        id,
+        authorId: senderSocketId,
+        content: messageContent,
+      }
+    } else {
+      newMessage = {
+        id,
+        authorId: receiverSocketId,
+        content: messageContent,
+      }
+    }
   }
 }

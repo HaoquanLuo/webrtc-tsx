@@ -4,7 +4,7 @@ import { SocketClient } from './SocketClient'
 import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
-import { setMessages } from '@/redux/features/user/userSlice'
+import { setPublicMessages } from '@/redux/features/user/userSlice'
 
 const dispatch = store.dispatch
 
@@ -146,16 +146,12 @@ export class WebRTCHandler {
         connUserSocketId: connSocketId,
       }
 
-      SocketClient.sendSignalData(signalData)
+      SocketClient.handleSendSignalData(signalData)
       dispatch(setWebRTCStatus('signaling'))
     })
 
     // 2. 对等对象连接
     WebRTCHandler.peers[connSocketId].on('connect', () => {
-      WebRTCHandler.peers[connSocketId].send(
-        JSON.stringify('whatever' + Math.random()),
-      )
-
       dispatch(setWebRTCStatus('connected'))
     })
 
@@ -308,17 +304,17 @@ export class WebRTCHandler {
    * @description 保存新消息到本地存储
    * @param message
    */
-  public static appendNewMessage(message: User.Message) {
+  public static appendNewMessage(message: User.PublicMessage) {
     // 同步到 store 进行保存
-    const messages = getStore().user.messages
-    dispatch(setMessages([...messages, message]))
+    const messages = getStore().user.publicMessages
+    dispatch(setPublicMessages([...messages, message]))
   }
 
   /**
    * @description 通过 data 通道发送聊天信息
    * @param message
    */
-  public static sendMessageUsingDataChannel(message: User.Message) {
+  public static sendMessageUsingDataChannel(message: User.PublicMessage) {
     // 将本地发送的聊天信息存储到 store
     WebRTCHandler.appendNewMessage(message)
 
