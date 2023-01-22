@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios'
+import { SIO } from '../../../../../socket'
 declare global {
   module System {
     type RoomStatus = 'unbuild' | 'existed' | 'created' | 'destroyed'
@@ -20,14 +21,21 @@ declare global {
       username: string
       password: string
     }
-    type PublicMessage = {
+    type PublicChatMessage = {
       id: string
-      author: string
-      authorId: string
-      content: string
+      senderName: string
+      senderSocketId: string
+      receiverName?: string
+      receiverSocketId?: string
+      messageContent: string
     }
-    type DirectMessages = {
-      [key: string]: Omit<User.PublicMessage, 'author'>[]
+    type ChatSectionStructure = {
+      chatId: string
+      chatTitle: string
+      chatMessages: SIO.TDirectMessage[]
+    }
+    type ChatSectionStore = {
+      [userName: string]: ChatSectionStructure
     }
   }
 

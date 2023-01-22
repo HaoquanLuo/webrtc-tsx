@@ -11,7 +11,7 @@ const ParticipantContainer: React.FC<ParticipantContainerProps> = (props) => {
     <>
       {participants
         ? participants.map((user) => {
-            return <ParticipantInfoBox key={user.socketId} userInfo={user} />
+            return <ParticipantInfoBox key={user.socketId} user={user} />
           })
         : null}
     </>

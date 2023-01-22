@@ -11,7 +11,7 @@ export namespace SIO {
     'conn-prepare': (data: WebRTC.DataPrepare) => void
     'conn-init': (data: WebRTC.DataInit) => void
     'conn-destroy': (data: WebRTC.DataDestroy) => void
-    'direct-message': (data: SIO.DirectMessage) => void
+    'direct-message': (data: SIO.TDirectMessage) => void
   }
 
   interface ClientToServerEvents {
@@ -26,7 +26,7 @@ export namespace SIO {
     // webRTC 对象相关
     'conn-signal': (data: WebRTC.DataSignal) => void
     'conn-init': (data: WebRTC.DataInit) => void
-    'direct-message': (data: SIO.DirectMessage) => void
+    'direct-message': (data: SIO.TDirectMessage) => void
   }
 
   interface InterServiceEvents {}
@@ -60,10 +60,12 @@ export namespace SIO {
     connectedUsers: User[]
   }
 
-  type DirectMessage = {
+  type TDirectMessage = {
     id: string
+    senderName: string
     senderSocketId: string
-    receiverSocketId: string
+    receiverName?: string
+    receiverSocketId?: string
     messageContent: string
   }
 }

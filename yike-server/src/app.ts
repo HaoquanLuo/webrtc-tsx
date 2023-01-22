@@ -53,7 +53,7 @@ sio.on('connection', (socket) => {
   socket.on('disconnect', () => {
     logger.info(`[Socket Server] User '${socket.id}' disconnected.`)
 
-    SocketServer.disconnectHandler(socket)
+    SocketServer.disconnectHandler(socket, sio)
   })
 
   socket.on('conn-signal', (data) => {

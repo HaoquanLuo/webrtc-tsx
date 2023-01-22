@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import {
+  selectChatSectionStore,
   selectUserId,
   selectUserInfo,
   selectUserSocketId,
+  setChatSectionStore,
+  setCurrChatTargetId,
 } from '@/redux/features/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { SIO } from '../../../../socket'
@@ -37,6 +40,7 @@ const Room: React.FC = () => {
   const roomStatus = useSelector(selectRoomStatus)
   const roomParticipants = useSelector(selectRoomParticipants)
   const webRTCStatus = useSelector(selectWebRTCStatus)
+  const chatSectionStore = useSelector(selectChatSectionStore)
 
   const [myself, setMyself] = useState<UserWithStream | null>(null)
   const [otherUsers, setOtherUsers] = useState<(UserWithStream | null)[]>([])
@@ -49,6 +53,21 @@ const Room: React.FC = () => {
     useEffect(() => {
       if (roomStatus === 'created') {
         dispatch(setRoomStatus('existed'))
+      }
+
+      if (roomStatus === 'existed') {
+        dispatch(
+          setChatSectionStore({
+            [roomId]: {
+              ...chatSectionStore[roomId],
+              chatId: roomId,
+              chatTitle: '聊天室',
+              chatMessages: [],
+            },
+          }),
+        )
+
+        dispatch(setCurrChatTargetId(roomId))
       }
 
       return () => {

@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 interface Props {
-  message: Partial<User.PublicMessage> & {
+  message: Partial<User.PublicChatMessage> & {
     sameAuthor: boolean
   }
 }
@@ -15,24 +15,24 @@ const MessageBox: React.FC<Props> = (props) => {
 
   return (
     <div key={message.id} className={`my-1`}>
-      {message.author && !message.sameAuthor && (
+      {message.senderName && !message.sameAuthor && (
         <div
           font-bold
           text-sm
           mx-1
           className={`${
-            message.author === username ? 'text-right' : 'text-left'
+            message.senderName === username ? 'text-right' : 'text-left'
           }`}
         >
-          {message.author === username ? '我' : message.author}
+          {message.senderName === username ? '我' : message.senderName}
         </div>
       )}
       <div
         className={`px-2 py-1 bg-violet rd-2 w-fit  ${
-          message.author === username ? 'float-right' : 'float-left'
+          message.senderName === username ? 'float-right' : 'float-left'
         }`}
       >
-        {message.content}
+        {message.messageContent}
       </div>
     </div>
   )

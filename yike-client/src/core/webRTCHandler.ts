@@ -304,7 +304,7 @@ export class WebRTCHandler {
    * @description 保存新消息到本地存储
    * @param message
    */
-  public static appendNewMessage(message: User.PublicMessage) {
+  public static appendNewMessage(message: User.PublicChatMessage) {
     // 同步到 store 进行保存
     const messages = getStore().user.publicMessages
     dispatch(setPublicMessages([...messages, message]))
@@ -314,7 +314,7 @@ export class WebRTCHandler {
    * @description 通过 data 通道发送聊天信息
    * @param message
    */
-  public static sendMessageUsingDataChannel(message: User.PublicMessage) {
+  public static sendMessageUsingDataChannel(message: User.PublicChatMessage) {
     // 将本地发送的聊天信息存储到 store
     WebRTCHandler.appendNewMessage(message)
 

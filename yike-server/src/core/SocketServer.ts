@@ -48,7 +48,7 @@ export class SocketServer {
   static rooms: SIO.Room[] = []
 
   static find<K extends FindKey>(
-    keyword: FindKey,
+    keyword: K,
     option: K extends keyof FindOption ? { [P in K]: FindOption[P] } : never,
   ): K extends keyof FindMatch ? FindMatch[K] : void
   static find(keyword: FindKey[], option: FindOption): (SIO.User | SIO.Room)[]
@@ -82,7 +82,9 @@ export class SocketServer {
           const room = SocketServer.rooms.find((room) => room.id === roomId)
 
           if (room === undefined) {
-            throw new Error(`Room '${roomId}' is not found.`)
+            throw new Error(
+              `[Socket Server] Room '${roomId}' not found in server.`,
+            )
           }
 
           return room
@@ -156,7 +158,7 @@ export class SocketServer {
         throw new Error("'audioOnly' is not provided.")
       }
 
-      const selectUser = SocketServer.find<TUser>('user', {
+      const selectUser = SocketServer.find('user', {
         user: socket.id,
       })
 
@@ -253,7 +255,7 @@ export class SocketServer {
         `[Socket Server] User '${socket.id}' is joining the room '${roomId}'.`,
       )
 
-      const selectUser = SocketServer.find<TUser>('user', {
+      const selectUser = SocketServer.find('user', {
         user: socket.id,
       })
 
@@ -276,7 +278,7 @@ export class SocketServer {
       })
 
       // 判断传递过来的 roomId 是否匹配存在
-      const selectRoom = SocketServer.find<TRoom>('room', { room: roomId })
+      const selectRoom = SocketServer.find('room', { room: roomId })
 
       selectRoom.connectedUsers = [...selectRoom.connectedUsers, newUser]
 
@@ -284,7 +286,7 @@ export class SocketServer {
       socket.join(roomId)
 
       logger.info(
-        `[Socket Server] User '${username}' has joined the room '${selectRoom.id}'.`,
+        `[Socket Server] User '${selectUser.socketId}' has joined the room '${selectRoom.id}'.`,
       )
 
       // 告知房间内其他已连接用户准备 webRTC 对等连接
@@ -314,11 +316,12 @@ export class SocketServer {
    * @returns
    */
   public static async roomCheckHandler(roomId: string) {
-    const room = SocketServer.rooms.find((room) => room.id === roomId)
+    try {
+      const room = SocketServer.find('room', {
+        room: roomId,
+      })
 
-    // 房间存在
-    if (room !== undefined) {
-      // 房间暂时定为 4 人间
+      // 房间存在，且暂时定为 4 人间
       if (room.connectedUsers.length > 3) {
         // 房间人数已满
         return {
@@ -332,7 +335,8 @@ export class SocketServer {
           full: false,
         }
       }
-    } else {
+    } catch (error) {
+      logger.error(`[Socket Server] ${error}`)
       return {
         roomExists: false,
       }
@@ -361,20 +365,13 @@ export class SocketServer {
   ) {
     try {
       // 查询要离开会议房间的用户
-      const user = SocketServer.connectedUsers.find(
-        (user) => user.socketId === socket.id,
-      )
+      const user = SocketServer.find('user', {
+        user: socket.id,
+      })
 
-      if (user === undefined) {
-        throw new Error(`User '${socket.id}' is not found.`)
-      }
-
-      const room = SocketServer.rooms.find((room) => room.id === user.roomId)
-
-      if (room === undefined) {
-        throw new Error(`Room '${user.roomId}' is not found.`)
-      }
-
+      const room = SocketServer.find('room', {
+        room: user.roomId,
+      })
       // 从会议房间进行删除
       room.connectedUsers = room.connectedUsers.filter(
         (user) => user.socketId !== socket.id,
@@ -479,8 +476,26 @@ export class SocketServer {
       SIO.InterServiceEvents,
       SIO.SocketData
     >,
+    sio: Server<
+      SIO.ClientToServerEvents,
+      SIO.ServerToClientEvents,
+      SIO.InterServiceEvents,
+      SIO.SocketData
+    >,
   ) {
     try {
+      // 遍历查找断连的用户是否在某个房间内
+      for (const room of SocketServer.rooms) {
+        const selectUser = room.connectedUsers.find(
+          (u) => u.socketId === socket.id,
+        )
+        if (selectUser !== undefined) {
+          SocketServer.leaveRoomHandler(socket, sio)
+        } else {
+          console.log(`User '${socket.id}' didn't exist in any room`)
+        }
+      }
+
       SocketServer.removeSocketUser(socket.id)
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)
@@ -499,15 +514,21 @@ export class SocketServer {
     try {
       const { receiverSocketId, messageContent } = data
 
-      const toReceiveUser = SocketServer.find<TUser>('user', {
+      const receiverUser = SocketServer.find('user', {
         user: receiverSocketId,
       })
 
+      const senderUser = SocketServer.find('user', {
+        user: socket.id,
+      })
+
       // 给接收方/发送方的消息
-      const message = {
+      const message: SIO.TDirectMessage = {
         id: crypto.randomUUID(),
-        receiverSocketId: toReceiveUser.socketId,
-        senderSocketId: socket.id,
+        receiverName: receiverUser.username,
+        receiverSocketId: receiverUser.socketId,
+        senderName: senderUser.username,
+        senderSocketId: senderUser.socketId,
         messageContent,
       }
 

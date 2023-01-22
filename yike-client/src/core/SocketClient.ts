@@ -172,45 +172,59 @@ export class SocketClient {
    * @description 发送私信
    * @param data
    */
-  public static handleSendDirectMessage(data: SIO.DirectMessage) {
+  public static handleSendDirectMessage(data: SIO.TDirectMessage) {
     SocketClient.socket.emit('direct-message', data)
   }
 
-  public static handleSaveDirectMessage(data: SIO.DirectMessage) {
+  public static handleSaveDirectMessage(data: SIO.TDirectMessage) {
     const { senderSocketId, receiverSocketId } = data
 
     if (senderSocketId === SocketClient.socket.id) {
-      SocketClient.appendNewDirectMessageToStore(true, data)
-    } else if (receiverSocketId === SocketClient.socket.id) {
-      SocketClient.appendNewDirectMessageToStore(false, data)
+      SocketClient.saveNewDirectMessage(true, data)
+    }
+
+    if (receiverSocketId === SocketClient.socket.id) {
+      SocketClient.saveNewDirectMessage(false, data)
     }
   }
 
-  static appendNewDirectMessageToStore(
+  static saveNewDirectMessage(
     createdByMe: boolean,
-    directMessage: SIO.DirectMessage,
+    directMessage: SIO.TDirectMessage,
   ) {
-    const { id, senderSocketId, receiverSocketId, messageContent } =
-      directMessage
+    const {
+      id,
+      senderName,
+      senderSocketId,
+      receiverName,
+      receiverSocketId,
+      messageContent,
+    } = directMessage
 
-    const directMessages = getStore().user.directMessages
-
-    for (const chatUsername in directMessages) {
+    if (receiverName === undefined || receiverSocketId === undefined) {
+      throw new Error(`Direct Message error.`)
     }
 
-    let newMessage: Omit<User.PublicMessage, 'author'>
+    const chatSectionStore = getStore().user.chatSectionStore
+
+    const [chatTargetName, ChatSectionStructure] =
+      Object.entries(chatSectionStore)
+
+    let newMessage: User.PublicChatMessage
 
     if (createdByMe) {
       newMessage = {
         id,
-        authorId: senderSocketId,
-        content: messageContent,
+        senderName: senderName,
+        senderSocketId: senderSocketId,
+        messageContent: messageContent,
       }
     } else {
       newMessage = {
         id,
-        authorId: receiverSocketId,
-        content: messageContent,
+        senderName: receiverName,
+        senderSocketId: receiverSocketId,
+        messageContent: messageContent,
       }
     }
   }

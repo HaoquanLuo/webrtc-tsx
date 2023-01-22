@@ -1,8 +1,9 @@
+import React from 'react'
 import { useMsgScrollToView } from '@/hooks/useScrollToView'
 import MessageBox from './MessageBox'
 
 interface MessageContainerProps {
-  messages: User.PublicMessage[]
+  messages: User.PublicChatMessage[]
 }
 
 const MessageContainer: React.FC<MessageContainerProps> = (props) => {
@@ -12,9 +13,9 @@ const MessageContainer: React.FC<MessageContainerProps> = (props) => {
 
   return (
     <div flex-1 flex flex-col px-1 mt="15.5" overflow-y-scroll rd-2>
-      {messages.map((msg, index) => {
+      {messages?.map((msg, index) => {
         const sameAuthor =
-          index > 0 && msg.author === messages[index - 1].author
+          index > 0 && msg.senderName === messages[index - 1].senderName
 
         return <MessageBox key={msg.id} message={{ ...msg, sameAuthor }} />
       })}
@@ -23,4 +24,4 @@ const MessageContainer: React.FC<MessageContainerProps> = (props) => {
   )
 }
 
-export default MessageContainer
+export default React.memo(MessageContainer)

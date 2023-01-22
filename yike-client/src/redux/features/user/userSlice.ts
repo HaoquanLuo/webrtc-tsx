@@ -8,8 +8,9 @@ export interface UserState {
   userInfo: User.Info
   userId: string
   userSocketId: string
-  publicMessages: User.PublicMessage[]
-  directMessages: User.DirectMessages
+  publicMessages: User.PublicChatMessage[]
+  currChatTargetId: string
+  chatSectionStore: User.ChatSectionStore
 }
 
 const initialUserState: UserState = {
@@ -21,7 +22,8 @@ const initialUserState: UserState = {
   userId: '',
   userSocketId: '',
   publicMessages: [],
-  directMessages: {},
+  currChatTargetId: '',
+  chatSectionStore: {},
 }
 
 export const userSlice = createSlice({
@@ -40,11 +42,20 @@ export const userSlice = createSlice({
     setUserSocketId: (state, action: PayloadAction<string>) => {
       state.userSocketId = action.payload
     },
-    setPublicMessages: (state, action: PayloadAction<User.PublicMessage[]>) => {
+    setPublicMessages: (
+      state,
+      action: PayloadAction<User.PublicChatMessage[]>,
+    ) => {
       state.publicMessages = action.payload
     },
-    setDirectMessages: (state, action: PayloadAction<User.DirectMessages>) => {
-      state.directMessages = action.payload
+    setChatSectionStore: (
+      state,
+      action: PayloadAction<User.ChatSectionStore>,
+    ) => {
+      state.chatSectionStore = action.payload
+    },
+    setCurrChatTargetId: (state, action: PayloadAction<string>) => {
+      state.currChatTargetId = action.payload
     },
   },
 })
@@ -55,7 +66,8 @@ export const {
   setUserId,
   setUserSocketId,
   setPublicMessages,
-  setDirectMessages,
+  setChatSectionStore,
+  setCurrChatTargetId,
 } = userSlice.actions
 
 export const selectToken = (state: StoreProps) => state.user.token
@@ -64,7 +76,9 @@ export const selectUserId = (state: StoreProps) => state.user.userId
 export const selectUserSocketId = (state: StoreProps) => state.user.userSocketId
 export const selectPublicMessages = (state: StoreProps) =>
   state.user.publicMessages
-export const selectDirectMessage = (state: StoreProps) =>
-  state.user.directMessages
+export const selectChatSectionStore = (state: StoreProps) =>
+  state.user.chatSectionStore
+export const selectCurrChatTargetId = (state: StoreProps) =>
+  state.user.currChatTargetId
 
 export default userSlice.reducer

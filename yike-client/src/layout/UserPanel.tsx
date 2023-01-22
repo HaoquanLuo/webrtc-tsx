@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
+  selectRoomId,
   selectRoomParticipants,
   selectRoomStatus,
 } from '@/redux/features/system/systemSlice'
 import IconBox from '@/components/IconBox'
 import {
+  selectCurrChatTargetId,
+  selectChatSectionStore as selectChatSectionStore,
   selectPublicMessages,
   selectUserInfo,
   selectUserSocketId,
+  setCurrChatTargetId,
+  setChatSectionStore,
 } from '@/redux/features/user/userSlice'
 import { useDebounceValue } from '@/hooks/useDebounce'
 import { notification } from 'antd'
@@ -20,20 +25,24 @@ import ParticipantContainer from '@/components/ParticipantContainer/ParticipantC
 interface Props {}
 
 const UserPanel: React.FC<Props> = (props) => {
+  const dispatch = useDispatch()
   const [api, contextHolder] = notification.useNotification()
 
+  const roomId = useSelector(selectRoomId)
   const roomParticipants = useSelector(selectRoomParticipants)
   const roomStatus = useSelector(selectRoomStatus)
   const { username } = useSelector(selectUserInfo)
   const userSocketId = useSelector(selectUserSocketId)
   const publicMessages = useSelector(selectPublicMessages)
+  const chatSectionStore = useSelector(selectChatSectionStore)
+  const currChatTargetId = useSelector(selectCurrChatTargetId)
 
   const [msgContent, setMsgContent] = useState<string>('')
-  const [currMsg, setCurrMsg] = useState<User.PublicMessage>({
+  const [currMsg, setCurrMsg] = useState<User.PublicChatMessage>({
     id: '',
-    author: username,
-    authorId: '',
-    content: '',
+    senderName: username,
+    senderSocketId: userSocketId,
+    messageContent: '',
   })
   const [noticeFlag, setNoticeFlag] = useState<string>('')
   const [togglerY, setTogglerY] = useState<string>(
@@ -41,8 +50,6 @@ const UserPanel: React.FC<Props> = (props) => {
   )
   const [startPageY, setStartPageY] = useState<number>(488)
   const [isToggling, setIsToggling] = useState<boolean>(false)
-  const [contactList, setContactList] = useState<string[]>(['聊天室', 'test0'])
-  const [currContactTarget, setCurrContactTarget] = useState<string>('聊天室')
 
   const debounceContent = useDebounceValue(msgContent)
 
@@ -93,9 +100,9 @@ const UserPanel: React.FC<Props> = (props) => {
 
     setCurrMsg({
       id: '',
-      author: username,
-      authorId: userSocketId,
-      content: '',
+      senderName: username,
+      senderSocketId: userSocketId,
+      messageContent: '',
     })
     setMsgContent('')
   }
@@ -123,13 +130,37 @@ const UserPanel: React.FC<Props> = (props) => {
     setItem('msgBoxHeight', togglerY)
   }
 
+  const handleSetCurrChatTargetId = (chatTargetId: string) => {
+    if (!(currChatTargetId === chatTargetId)) {
+      console.log('setCurrChatTarget', chatTargetId)
+      dispatch(setCurrChatTargetId(chatTargetId))
+    }
+  }
+
   useEffect(() => {
     setCurrMsg({
       ...currMsg,
       id: crypto.randomUUID(),
-      content: debounceContent,
+      senderSocketId: userSocketId,
+      messageContent: debounceContent,
     })
   }, [debounceContent])
+
+  useEffect(() => {
+    if (
+      (roomStatus === 'created' || roomStatus === 'existed') &&
+      publicMessages.length > 0
+    ) {
+      dispatch(
+        setChatSectionStore({
+          [roomId]: {
+            ...chatSectionStore[roomId],
+            chatMessages: publicMessages,
+          },
+        }),
+      )
+    }
+  }, [publicMessages])
 
   useEffect(() => {
     if (noticeFlag !== '') {
@@ -156,28 +187,28 @@ const UserPanel: React.FC<Props> = (props) => {
       '
     >
       {contextHolder}
-      {/* {roomStatus === 'existed' || roomStatus === 'created' ? ( */}
-      <>
-        <div
-          id="participants"
-          style={{
-            bottom: parseInt(MsgBoxHeight, 10) + 16,
-          }}
-          absolute
-          top-2
-          left-2
-          right-2
-          overflow-y-scroll
-          rd-2
-        >
-          <ParticipantContainer participants={roomParticipants} />
-        </div>
-        <div
-          id="toggler"
-          style={{
-            bottom: parseInt(MsgBoxHeight, 10) + 8,
-          }}
-          className={`
+      {roomStatus === 'existed' || roomStatus === 'created' ? (
+        <>
+          <div
+            id="participants"
+            style={{
+              bottom: parseInt(MsgBoxHeight, 10) + 16,
+            }}
+            absolute
+            top-2
+            left-2
+            right-2
+            overflow-y-scroll
+            rd-2
+          >
+            <ParticipantContainer participants={roomParticipants} />
+          </div>
+          <div
+            id="toggler"
+            style={{
+              bottom: parseInt(MsgBoxHeight, 10) + 8,
+            }}
+            className={`
             absolute
             left-0
             right-0
@@ -191,74 +222,80 @@ const UserPanel: React.FC<Props> = (props) => {
             place-items-center
             transition-100
           `}
-          onMouseDown={handleMouseDown}
-          hover="bg-black bg-op-20 before:bg-light after:bg-light"
-          before="content-empty w-4 h-0.2 bg-gray"
-          after="content-empty w-4 h-0.2 bg-gray"
-        >
-          {isToggling && (
-            <div
-              fixed
-              top-0
-              bottom-0
-              left-0
-              right-0
-              cursor-ns-resize
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-            ></div>
-          )}
-        </div>
-        <div
-          id="messageBox"
-          style={{
-            height: MsgBoxHeight,
-          }}
-          absolute
-          bottom-2
-          left-2
-          right-2
-          max-h-200
-          min-h-40
-          flex
-          flex-col
-          bg-slate-400
-          bg-op-20
-          rd-2
-        >
-          <div
-            absolute
-            w-full
-            flex
-            px-2
-            gap-x-2
-            items-center
-            h="15.5"
-            bg-dark
-            bg-op-40
+            onMouseDown={handleMouseDown}
+            hover="bg-black bg-op-20 before:bg-light after:bg-light"
+            before="content-empty w-4 h-0.2 bg-gray"
+            after="content-empty w-4 h-0.2 bg-gray"
           >
-            {contactList.map((contactTarget) => {
-              return (
-                <div
-                  key={contactTarget}
-                  className={`grid place-items-center rd-36 ${
-                    currContactTarget === contactTarget
-                      ? 'bg-orange ring-light-4 ring-2'
-                      : 'bg-gray'
-                  } w-12 h-12 text-xs`}
-                  onClick={() => {
-                    setCurrContactTarget(contactTarget)
-                  }}
-                >
-                  {contactTarget}
-                </div>
-              )
-            })}
+            {isToggling && (
+              <div
+                fixed
+                top-0
+                bottom-0
+                left-0
+                right-0
+                cursor-ns-resize
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+              ></div>
+            )}
           </div>
-          <MessageContainer messages={publicMessages} />
-          <div relative h-26 rd-2>
-            <textarea
-              className="
+          <div
+            id="messageBox"
+            style={{
+              height: MsgBoxHeight,
+            }}
+            absolute
+            bottom-2
+            left-2
+            right-2
+            max-h-200
+            min-h-40
+            flex
+            flex-col
+            bg-slate-400
+            bg-op-20
+            rd-2
+          >
+            <div
+              absolute
+              w-full
+              flex
+              px-2
+              gap-x-2
+              items-center
+              h="15.5"
+              bg-dark
+              bg-op-40
+              rd-t-2
+            >
+              {Object.entries(chatSectionStore).map((chatTarget) => {
+                return (
+                  <div
+                    key={chatTarget[1].chatId}
+                    className={`grid place-items-center rd-36 ${
+                      currChatTargetId === chatTarget[1].chatId
+                        ? 'bg-orange ring-light-4 ring-2'
+                        : 'bg-gray-3'
+                    } w-11 h-11 text-xs`}
+                    onClick={() =>
+                      handleSetCurrChatTargetId(chatTarget[1].chatId)
+                    }
+                  >
+                    {chatTarget[1].chatTitle}
+                  </div>
+                )
+              })}
+            </div>
+            <MessageContainer
+              messages={(() => {
+                const msgs = chatSectionStore[currChatTargetId]?.chatMessages
+                return msgs
+              })()}
+            />
+            <div relative h-26 rd-2>
+              <textarea
+                className="
                   block
                   absolute
                   bottom-0
@@ -277,20 +314,20 @@ const UserPanel: React.FC<Props> = (props) => {
                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
                   dark:focus:ring-blue-500 dark:focus:border-blue-500
                 "
-              value={msgContent}
-              onChange={handleTextAreaChange}
-              onKeyDown={handleTextAreaDown}
-              placeholder={`'Shift + Enter' 换行`}
-            />
-            <IconBox
-              className="absolute bottom-2 right-2"
-              icon={<div i-mdi-send rotate--30 />}
-              handleClick={handleSendMessage}
-            />
+                value={msgContent}
+                onChange={handleTextAreaChange}
+                onKeyDown={handleTextAreaDown}
+                placeholder={`'Shift + Enter' 换行`}
+              />
+              <IconBox
+                className="absolute bottom-2 right-2"
+                icon={<div i-mdi-send rotate--30 />}
+                handleClick={handleSendMessage}
+              />
+            </div>
           </div>
-        </div>
-      </>
-      {/* ) : null} */}
+        </>
+      ) : null}
     </div>
   )
 }
