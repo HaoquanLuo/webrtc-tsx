@@ -7,20 +7,14 @@ import logger from '@/server/logs/logger'
 type TUser = 'user'
 type TRoom = 'room'
 type FindKey = TUser | TRoom
-
 type FindOption = {
   user: string
   room: string
 }
-
 type FindMatch = {
   user: SIO.User
   room: SIO.Room
 }
-
-type Test<T> = (keyword: FindKey[], option: FindOption) => []
-
-type TestType = keyof Test<string>
 
 const user: SIO.User = {
   username: '',
@@ -33,8 +27,6 @@ const room: SIO.Room = {
   id: '',
   connectedUsers: [],
 }
-const test = () => [user, room]
-const [newUser, newRoom] = test()
 
 export class SocketServer {
   /**
@@ -503,7 +495,7 @@ export class SocketServer {
   }
 
   public static transportDirectMessageHandler(
-    data: Pick<SIO.SocketData, 'receiverSocketId' | 'messageContent'>,
+    data: SIO.TDirectMessage,
     socket: Socket<
       SIO.ClientToServerEvents,
       SIO.ServerToClientEvents,
@@ -513,6 +505,10 @@ export class SocketServer {
   ) {
     try {
       const { receiverSocketId, messageContent } = data
+
+      if (receiverSocketId === undefined) {
+        throw new Error(`[Socket Server] 'receiverSocketId' did not provided.`)
+      }
 
       const receiverUser = SocketServer.find('user', {
         user: receiverSocketId,

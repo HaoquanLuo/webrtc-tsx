@@ -56,18 +56,21 @@ const Room: React.FC = () => {
       }
 
       if (roomStatus === 'existed') {
-        dispatch(
-          setChatSectionStore({
-            [roomId]: {
-              ...chatSectionStore[roomId],
-              chatId: roomId,
-              chatTitle: '聊天室',
-              chatMessages: [],
-            },
-          }),
-        )
+        // 首次进入房间逻辑
+        if (chatSectionStore[roomId] === undefined) {
+          dispatch(
+            setChatSectionStore({
+              [roomId]: {
+                ...chatSectionStore[roomId],
+                chatId: roomId,
+                chatTitle: '聊天室',
+                chatMessages: [],
+              },
+            }),
+          )
 
-        dispatch(setCurrChatTargetId(roomId))
+          dispatch(setCurrChatTargetId(roomId))
+        }
       }
 
       return () => {
