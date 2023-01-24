@@ -1,6 +1,6 @@
 import Config from '@/config/Config'
 import { Success } from '@/core/HttpException'
-import { SocketServer } from '@/core/SocketServer'
+import { SocketEventHandler } from '@/plugin/Socket/SocketEventHandler'
 import KoaRouter from 'koa-router'
 
 const router = new KoaRouter({
@@ -9,7 +9,7 @@ const router = new KoaRouter({
 
 router.get('/room-exists/:roomId', async (ctx) => {
   const { roomId } = ctx.params
-  const roomState = await SocketServer.roomCheckHandler(roomId)
+  const roomState = await SocketEventHandler.roomCheckHandler(roomId)
 
   throw new Success(roomState)
 })

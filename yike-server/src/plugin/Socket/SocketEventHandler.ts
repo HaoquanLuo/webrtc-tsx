@@ -1,9 +1,9 @@
-import { SIO } from '../../../socket'
 import { WebRTC } from '@/common/typings/webRTC'
 import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 import logger from '@/server/logs/logger'
-import { SocketException } from './HttpException'
+import { SocketException } from '../../core/HttpException'
+import { SIO } from '@/common/typings/socket'
 
 type TUser = 'user'
 type TRoom = 'room'
@@ -17,7 +17,7 @@ type FindMatch = {
   room: SIO.Room
 }
 
-export class SocketServer {
+export class SocketEventHandler {
   /**
    * @description 服务器连接用户数
    */
@@ -47,7 +47,7 @@ export class SocketServer {
 
       switch (constants[keyword]) {
         case constants.user: {
-          const user = SocketServer.connectedUsers.find(
+          const user = SocketEventHandler.connectedUsers.find(
             (user) => user.socketId === socketId,
           )
 
@@ -58,7 +58,9 @@ export class SocketServer {
         }
 
         case constants.room: {
-          const room = SocketServer.rooms.find((room) => room.id === roomId)
+          const room = SocketEventHandler.rooms.find(
+            (room) => room.id === roomId,
+          )
 
           if (room === undefined) {
             throw new Error(`Room '${roomId}' not found in server.`)
@@ -94,7 +96,10 @@ export class SocketServer {
       audioOnly: true,
     }
 
-    SocketServer.connectedUsers = [...SocketServer.connectedUsers, newUser]
+    SocketEventHandler.connectedUsers = [
+      ...SocketEventHandler.connectedUsers,
+      newUser,
+    ]
   }
 
   /**
@@ -102,9 +107,10 @@ export class SocketServer {
    * @param newUser
    */
   public static removeSocketUser(socketId: string) {
-    SocketServer.connectedUsers = SocketServer.connectedUsers.filter(
-      (user) => user.socketId !== socketId,
-    )
+    SocketEventHandler.connectedUsers =
+      SocketEventHandler.connectedUsers.filter(
+        (user) => user.socketId !== socketId,
+      )
   }
 
   /**
@@ -135,7 +141,7 @@ export class SocketServer {
         throw new Error("'audioOnly' is not provided.")
       }
 
-      const selectUser = SocketServer.find('user', {
+      const selectUser = SocketEventHandler.find('user', {
         user: socket.id,
       })
 
@@ -154,12 +160,14 @@ export class SocketServer {
       }
 
       // 若用户存在，则将其信息变更
-      SocketServer.connectedUsers = SocketServer.connectedUsers.map((user) => {
-        if (user.socketId === socket.id) {
-          return newUser
-        }
-        return user
-      })
+      SocketEventHandler.connectedUsers = SocketEventHandler.connectedUsers.map(
+        (user) => {
+          if (user.socketId === socket.id) {
+            return newUser
+          }
+          return user
+        },
+      )
 
       // 创建新的会议房间
       const newRoom: SIO.Room = {
@@ -171,7 +179,7 @@ export class SocketServer {
 
       // 新用户加入会议房间
       socket.join(roomId)
-      SocketServer.rooms = [...SocketServer.rooms, newRoom]
+      SocketEventHandler.rooms = [...SocketEventHandler.rooms, newRoom]
 
       // 告知客户端房间已创建并将 roomId 发送给客户端
       socket.emit('room-id', {
@@ -232,7 +240,7 @@ export class SocketServer {
         `[Socket Server] User '${socket.id}' is joining the room '${roomId}'.`,
       )
 
-      const selectUser = SocketServer.find('user', {
+      const selectUser = SocketEventHandler.find('user', {
         user: socket.id,
       })
 
@@ -247,15 +255,17 @@ export class SocketServer {
       }
 
       // 若用户存在，则将其信息变更
-      SocketServer.connectedUsers = SocketServer.connectedUsers.map((user) => {
-        if (user.socketId === socket.id) {
-          return newUser
-        }
-        return user
-      })
+      SocketEventHandler.connectedUsers = SocketEventHandler.connectedUsers.map(
+        (user) => {
+          if (user.socketId === socket.id) {
+            return newUser
+          }
+          return user
+        },
+      )
 
       // 判断传递过来的 roomId 是否匹配存在
-      const selectRoom = SocketServer.find('room', { room: roomId })
+      const selectRoom = SocketEventHandler.find('room', { room: roomId })
 
       selectRoom.connectedUsers = [...selectRoom.connectedUsers, newUser]
 
@@ -294,7 +304,7 @@ export class SocketServer {
    */
   public static async roomCheckHandler(roomId: string) {
     try {
-      const room = SocketServer.rooms.find((room) => room.id === roomId)
+      const room = SocketEventHandler.rooms.find((room) => room.id === roomId)
 
       if (room === undefined) {
         throw new SocketException(`Room '${roomId}' not found in server.`)
@@ -344,11 +354,11 @@ export class SocketServer {
   ) {
     try {
       // 查询要离开会议房间的用户
-      const user = SocketServer.find('user', {
+      const user = SocketEventHandler.find('user', {
         user: socket.id,
       })
 
-      const room = SocketServer.find('room', {
+      const room = SocketEventHandler.find('room', {
         room: user.roomId,
       })
       // 从会议房间进行删除
@@ -376,7 +386,9 @@ export class SocketServer {
         logger.info(`[Socket Server] Room '${room.id}' has been destroyed.`)
 
         // 从rooms数组中删除该房间的信息
-        SocketServer.rooms = SocketServer.rooms.filter((r) => r.id !== room.id)
+        SocketEventHandler.rooms = SocketEventHandler.rooms.filter(
+          (r) => r.id !== room.id,
+        )
       }
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)
@@ -464,23 +476,28 @@ export class SocketServer {
   ) {
     try {
       // 遍历查找断连的用户是否在某个房间内
-      for (const room of SocketServer.rooms) {
+      for (const room of SocketEventHandler.rooms) {
         const selectUser = room.connectedUsers.find(
           (u) => u.socketId === socket.id,
         )
         if (selectUser !== undefined) {
-          SocketServer.leaveRoomHandler(socket, sio)
+          SocketEventHandler.leaveRoomHandler(socket, sio)
         } else {
           console.log(`User '${socket.id}' didn't exist in any room`)
         }
       }
 
-      SocketServer.removeSocketUser(socket.id)
+      SocketEventHandler.removeSocketUser(socket.id)
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)
     }
   }
 
+  /**
+   * @description 转发私聊消息
+   * @param data
+   * @param socket
+   */
   public static transportDirectMessageHandler(
     data: SIO.Message,
     socket: Socket<
@@ -501,7 +518,7 @@ export class SocketServer {
         )
       }
 
-      const receiverUser = SocketServer.connectedUsers.find(
+      const receiverUser = SocketEventHandler.connectedUsers.find(
         (user) => user.username === receiverName,
       )
 
@@ -511,11 +528,7 @@ export class SocketServer {
         )
       }
 
-      if (receiverUser.socketId !== receiverSocketId) {
-        console.log(`接收方更换了新的 socketId '${receiverUser.socketId}'`)
-      }
-
-      const senderUser = SocketServer.find('user', {
+      const senderUser = SocketEventHandler.find('user', {
         user: socket.id,
       })
 

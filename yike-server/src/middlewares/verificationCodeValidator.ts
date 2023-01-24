@@ -11,8 +11,7 @@ export default async function verificationCodeValidator(
   next: Function,
 ) {
   const { code } = ctx.request.body as any
-  console.log('code:', code, typeof code)
-  console.log('session:', ctx.session)
+
   if (ctx.session!.code !== code) {
     throw new ParameterException('验证码错误')
   } else {

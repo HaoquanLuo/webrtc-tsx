@@ -9,6 +9,9 @@ import Config from '../config/Config'
 import catchError from '../middlewares/catchError'
 import { getAllFilesExport } from '../common/utils/utils'
 import { updateRedisRole } from '../server/auth'
+import io from 'socket.io'
+import { SIO } from '@/common/typings/socket'
+import { PluginOptions, initPlugin } from '@/plugin'
 
 class Init {
   public static app: Koa
@@ -25,6 +28,7 @@ class Init {
     Init.initLoadRouters()
     Init.loadCors()
     Init.updateRedisRole()
+    Init.initPlugin()
   }
 
   // 加载 cors 模块
@@ -52,7 +56,7 @@ class Init {
 
   // 加载session
   public static loadSession() {
-    Init.app.keys = ['some secret hurr']
+    Init.app.keys = ['yike server']
     Init.app.use(
       session(
         {
@@ -72,6 +76,14 @@ class Init {
   // 更新redis里的角色数据
   public static updateRedisRole() {
     updateRedisRole()
+  }
+
+  public static initPlugin() {
+    initPlugin({
+      pluginNames: ['SocketServer'],
+      app: Init.app,
+      server: Init.server,
+    })
   }
 }
 
