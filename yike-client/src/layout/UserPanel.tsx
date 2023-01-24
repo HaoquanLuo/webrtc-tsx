@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectRoomId,
@@ -7,20 +7,23 @@ import {
 } from '@/redux/features/system/systemSlice'
 import IconBox from '@/components/IconBox'
 import {
-  selectCurrChatTargetId,
+  selectCurrChatTargetTitle as selectCurrChatTargetTitle,
   selectChatSectionStore as selectChatSectionStore,
   selectPublicMessages,
   selectUserInfo,
   selectUserSocketId,
-  setCurrChatTargetId,
+  setCurrChatTargetTitle,
   setChatSectionStore,
 } from '@/redux/features/user/userSlice'
 import { useDebounceValue } from '@/hooks/useDebounce'
 import { notification } from 'antd'
 import { WebRTCHandler } from '@/core/webRTCHandler'
-import { getItem, setItem } from '@/common/utils/storage'
 import MessageContainer from '@/components/MessageContainer/MessageContainer'
 import ParticipantContainer from '@/components/ParticipantContainer/ParticipantContainer'
+import { SocketClient } from '@/core/SocketClient'
+import { SIO } from '../../../socket'
+import { useToggler } from '@/hooks/useToggler'
+import { PublicChatTitle } from '@/common/constants/chat'
 
 interface Props {}
 
@@ -28,43 +31,27 @@ const UserPanel: React.FC<Props> = (props) => {
   const dispatch = useDispatch()
   const [api, contextHolder] = notification.useNotification()
 
-  const roomId = useSelector(selectRoomId)
   const roomParticipants = useSelector(selectRoomParticipants)
   const roomStatus = useSelector(selectRoomStatus)
   const { username } = useSelector(selectUserInfo)
   const userSocketId = useSelector(selectUserSocketId)
   const publicMessages = useSelector(selectPublicMessages)
   const chatSectionStore = useSelector(selectChatSectionStore)
-  const currChatTargetId = useSelector(selectCurrChatTargetId)
+  const currChatTargetTitle = useSelector(selectCurrChatTargetTitle)
 
   const [msgContent, setMsgContent] = useState<string>('')
-  const [currMsg, setCurrMsg] = useState<User.PublicChatMessage>({
+  const [currMsg, setCurrMsg] = useState<SIO.Message>(() => ({
     id: '',
     senderName: username,
     senderSocketId: userSocketId,
+    receiverName: '',
+    receiverSocketId: '',
     messageContent: '',
-  })
+  }))
   const [noticeFlag, setNoticeFlag] = useState<string>('')
-  const [togglerY, setTogglerY] = useState<string>(
-    (getItem('msgBoxHeight') as string) || '488',
-  )
-  const [startPageY, setStartPageY] = useState<number>(488)
-  const [isToggling, setIsToggling] = useState<boolean>(false)
 
   const debounceContent = useDebounceValue(msgContent)
-
-  const calcTogglerY = (value: string) => {
-    const numTogglerY = parseInt(value, 10)
-    if (numTogglerY > 480) {
-      return 480
-    } else if (numTogglerY < 166) {
-      return 166
-    } else {
-      return numTogglerY
-    }
-  }
-
-  const MsgBoxHeight = `${calcTogglerY(togglerY)}px`
+  const [msgBoxHeight, Toggler] = useToggler()
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMsgContent(e.target.value)
@@ -84,83 +71,117 @@ const UserPanel: React.FC<Props> = (props) => {
 
   // 发送消息事件
   const handleSendMessage = () => {
-    const allowStrReg = /^((\s*)(\S+)(\s*))$/gm
-    const allowStrFlag = allowStrReg.test(debounceContent)
+    function messageValidator(value: string) {
+      return new Promise<void>((resolve, reject) => {
+        const allowStrReg = /^((\s*)(\S+)(\s*))$/gm
+        const allowStrFlag = allowStrReg.test(value)
 
-    // 判断要发送的文本是否为空
-    if (!allowStrFlag) {
-      setNoticeFlag(crypto.randomUUID())
-      return
+        // 判断要发送的文本是否为空
+        if (!allowStrFlag) {
+          setNoticeFlag(crypto.randomUUID())
+          reject()
+        }
+
+        setNoticeFlag('')
+        resolve()
+      })
     }
 
-    setNoticeFlag('')
-    console.log('Send', currMsg)
+    function sendMessage(message: SIO.Message) {
+      console.log('Send', message)
 
-    WebRTCHandler.sendMessageUsingDataChannel(currMsg)
-
-    setCurrMsg({
-      id: '',
-      senderName: username,
-      senderSocketId: userSocketId,
-      messageContent: '',
-    })
-    setMsgContent('')
-  }
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    setIsToggling(true)
-    setStartPageY(event.pageY)
-  }
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isToggling) {
-      return
+      if (currChatTargetTitle === PublicChatTitle) {
+        WebRTCHandler.sendMessageUsingDataChannel(message)
+      } else {
+        SocketClient.handleSendDirectMessage(message)
+      }
     }
 
-    const numTogglerY = parseInt(togglerY, 10)
-    const delta = event.pageY - startPageY
-    const currTogglerY = numTogglerY - delta
-
-    setTogglerY(`${currTogglerY}`)
-    setStartPageY(event.pageY)
+    ;(async () => {
+      try {
+        await messageValidator(debounceContent)
+        sendMessage(currMsg)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setCurrMsg({
+          ...currMsg,
+          id: '',
+          messageContent: '',
+        })
+        setMsgContent('')
+      }
+    })()
   }
 
-  const handleMouseUp = () => {
-    setIsToggling(false)
-    setItem('msgBoxHeight', togglerY)
-  }
-
-  const handleSetCurrChatTargetId = (chatTargetId: string) => {
-    if (!(currChatTargetId === chatTargetId)) {
-      console.log('setCurrChatTarget', chatTargetId)
-      dispatch(setCurrChatTargetId(chatTargetId))
+  const handleSetCurrChatTargetTitle = (chatTargetTitle: string) => {
+    if (!(currChatTargetTitle === chatTargetTitle)) {
+      console.log('setCurrChatTarget', chatTargetTitle)
+      dispatch(setCurrChatTargetTitle(chatTargetTitle))
     }
   }
 
   useEffect(() => {
-    setCurrMsg({
-      ...currMsg,
-      id: crypto.randomUUID(),
-      senderSocketId: userSocketId,
-      messageContent: debounceContent,
-    })
-  }, [debounceContent])
+    if (roomStatus !== 'existed') {
+      return
+    }
+
+    if (currChatTargetTitle === '') {
+      // 初始化 currMsg
+      setCurrMsg({
+        ...currMsg,
+        senderName: username,
+        senderSocketId: userSocketId,
+      })
+
+      return
+    }
+
+    if (currChatTargetTitle === PublicChatTitle) {
+      // 发送消息到聊天室
+      setCurrMsg({
+        ...currMsg,
+        id: crypto.randomUUID(),
+        senderSocketId: userSocketId,
+        receiverName: '',
+        receiverSocketId: '',
+        messageContent: debounceContent,
+      })
+    } else {
+      // 发送消息到指定用户
+      const [chatTarget] = Object.entries(chatSectionStore).filter(
+        ([chatId]) => chatId === currChatTargetTitle,
+      )
+      const [_currChatTitle, currChatSectionStructure] = chatTarget
+
+      setCurrMsg({
+        ...currMsg,
+        id: crypto.randomUUID(),
+        senderSocketId: userSocketId,
+        receiverName: currChatSectionStructure.chatTitle,
+        receiverSocketId: currChatSectionStructure.chatId,
+        messageContent: debounceContent,
+      })
+    }
+  }, [userSocketId, roomStatus, debounceContent, currChatTargetTitle])
 
   useEffect(() => {
-    if (
-      (roomStatus === 'created' || roomStatus === 'existed') &&
-      publicMessages.length > 0
-    ) {
+    if (roomStatus !== 'existed') {
+      return
+    }
+
+    if (publicMessages.length > 0) {
       dispatch(
         setChatSectionStore({
-          [roomId]: {
-            ...chatSectionStore[roomId],
+          ...chatSectionStore,
+          [PublicChatTitle]: {
+            ...chatSectionStore[PublicChatTitle],
             chatMessages: publicMessages,
           },
         }),
       )
     }
-  }, [publicMessages])
+  }, [roomStatus, publicMessages])
 
   useEffect(() => {
     if (noticeFlag !== '') {
@@ -170,6 +191,20 @@ const UserPanel: React.FC<Props> = (props) => {
       })
     }
   }, [noticeFlag])
+
+  const participantsStyle = useMemo(
+    () => ({
+      bottom: parseInt(msgBoxHeight, 10) + 16,
+    }),
+    [msgBoxHeight],
+  )
+
+  const messageBoxStyle = useMemo(
+    () => ({
+      height: msgBoxHeight,
+    }),
+    [msgBoxHeight],
+  )
 
   return (
     <div
@@ -191,71 +226,35 @@ const UserPanel: React.FC<Props> = (props) => {
         <>
           <div
             id="participants"
-            style={{
-              bottom: parseInt(MsgBoxHeight, 10) + 16,
-            }}
-            absolute
-            top-2
-            left-2
-            right-2
-            overflow-y-scroll
-            rd-2
+            style={participantsStyle}
+            className="
+              absolute
+              top-2
+              left-2
+              right-2
+              overflow-y-scroll
+              rd-2
+            "
           >
             <ParticipantContainer participants={roomParticipants} />
           </div>
-          <div
-            id="toggler"
-            style={{
-              bottom: parseInt(MsgBoxHeight, 10) + 8,
-            }}
-            className={`
-            absolute
-            left-0
-            right-0
-            z-9
-            w-full
-            h-3
-            bg-op-20
-            cursor-ns-resize
-            py-0.5
-            grid
-            place-items-center
-            transition-100
-          `}
-            onMouseDown={handleMouseDown}
-            hover="bg-black bg-op-20 before:bg-light after:bg-light"
-            before="content-empty w-4 h-0.2 bg-gray"
-            after="content-empty w-4 h-0.2 bg-gray"
-          >
-            {isToggling && (
-              <div
-                fixed
-                top-0
-                bottom-0
-                left-0
-                right-0
-                cursor-ns-resize
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-              ></div>
-            )}
-          </div>
+          <Toggler />
           <div
             id="messageBox"
-            style={{
-              height: MsgBoxHeight,
-            }}
-            absolute
-            bottom-2
-            left-2
-            right-2
-            max-h-200
-            min-h-40
-            flex
-            flex-col
-            bg-slate-400
-            bg-op-20
-            rd-2
+            style={messageBoxStyle}
+            className="
+              absolute
+              bottom-2
+              left-2
+              right-2
+              max-h-200
+              min-h-40
+              flex
+              flex-col
+              bg-slate-400
+              bg-op-20
+              rd-2
+            "
           >
             <div
               absolute
@@ -269,29 +268,26 @@ const UserPanel: React.FC<Props> = (props) => {
               bg-op-40
               rd-t-2
             >
-              {Object.entries(chatSectionStore).map((chatTarget) => {
-                return (
-                  <div
-                    key={chatTarget[1].chatId}
-                    className={`grid place-items-center rd-36 ${
-                      currChatTargetId === chatTarget[1].chatId
-                        ? 'bg-orange ring-light-4 ring-2'
-                        : 'bg-gray-3'
-                    } w-11 h-11 text-xs`}
-                    onClick={() =>
-                      handleSetCurrChatTargetId(chatTarget[1].chatId)
-                    }
-                  >
-                    {chatTarget[1].chatTitle}
-                  </div>
-                )
-              })}
+              {Object.entries(chatSectionStore).map(
+                ([chatTitle, chatSectionStructure]) => {
+                  return (
+                    <div
+                      key={chatTitle}
+                      className={`grid place-items-center rd-36 ${
+                        currChatTargetTitle === chatTitle
+                          ? 'bg-orange ring-light-4 ring-2'
+                          : 'bg-gray-3'
+                      } w-11 h-11 text-xs cursor-pointer`}
+                      onClick={() => handleSetCurrChatTargetTitle(chatTitle)}
+                    >
+                      {chatSectionStructure.chatTitle}
+                    </div>
+                  )
+                },
+              )}
             </div>
             <MessageContainer
-              messages={(() => {
-                const msgs = chatSectionStore[currChatTargetId]?.chatMessages
-                return msgs
-              })()}
+              messages={chatSectionStore[currChatTargetTitle]?.chatMessages}
             />
             <div relative h-26 rd-2>
               <textarea

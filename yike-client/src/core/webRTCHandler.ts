@@ -5,6 +5,7 @@ import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
 import { setPublicMessages } from '@/redux/features/user/userSlice'
+import { SIO } from '../../../socket'
 
 const dispatch = store.dispatch
 
@@ -163,7 +164,6 @@ export class WebRTCHandler {
 
     // 4. 对等对象数据
     WebRTCHandler.peers[connSocketId].on('data', (data) => {
-      console.log('data: ' + data)
       const messageData = JSON.parse(data)
       WebRTCHandler.appendNewMessage(messageData)
     })
@@ -282,8 +282,10 @@ export class WebRTCHandler {
    */
   static switchVideoTracks(streamToShare: MediaStream) {
     for (const socketId in WebRTCHandler.peers) {
-      for (let index in WebRTCHandler.peers[socketId].streams[0].getTracks()) {
-        for (let index2 in streamToShare.getTracks()) {
+      for (const index in WebRTCHandler.peers[
+        socketId
+      ].streams[0].getTracks()) {
+        for (const index2 in streamToShare.getTracks()) {
           // kind 属性规定轨道的种类（eg: audio, video）
           if (
             WebRTCHandler.peers[socketId].streams[0].getTracks()[index].kind ===
@@ -304,7 +306,7 @@ export class WebRTCHandler {
    * @description 保存新消息到本地存储
    * @param message
    */
-  public static appendNewMessage(message: User.PublicChatMessage) {
+  public static appendNewMessage(message: SIO.Message) {
     // 同步到 store 进行保存
     const messages = getStore().user.publicMessages
     dispatch(setPublicMessages([...messages, message]))
@@ -314,7 +316,7 @@ export class WebRTCHandler {
    * @description 通过 data 通道发送聊天信息
    * @param message
    */
-  public static sendMessageUsingDataChannel(message: User.PublicChatMessage) {
+  public static sendMessageUsingDataChannel(message: SIO.Message) {
     // 将本地发送的聊天信息存储到 store
     WebRTCHandler.appendNewMessage(message)
 

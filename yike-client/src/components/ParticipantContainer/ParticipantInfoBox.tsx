@@ -1,10 +1,14 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { SIO } from '../../../../socket'
 import IconBox from '../IconBox'
 import {
-  selectCurrChatTargetId,
+  selectChatSectionStore,
+  selectCurrChatTargetTitle,
   selectUserInfo,
+  setChatSectionStore,
+  setCurrChatTargetTitle,
 } from '@/redux/features/user/userSlice'
+import { useCallback } from 'react'
 
 interface ParticipantInfoBoxProps {
   user: SIO.User
@@ -13,20 +17,52 @@ interface ParticipantInfoBoxProps {
 const ParticipantInfoBox: React.FC<ParticipantInfoBoxProps> = (props) => {
   const { user } = props
 
-  const { username } = useSelector(selectUserInfo)
+  const dispatch = useDispatch()
 
-  const handleSwitchChatTarget = (socketId: string) => {
-    // 先检查当前的聊天目标是否
-    const currChatTargetId = useSelector(selectCurrChatTargetId)
-    if (currChatTargetId === socketId) {
-      console.log(`Already in chatting with '${socketId}'`)
+  const { username } = useSelector(selectUserInfo)
+  const currChatTargetTitle = useSelector(selectCurrChatTargetTitle)
+  const chatSectionStore = useSelector(selectChatSectionStore)
+
+  const handleSwitchChatTarget = (user: SIO.User) => {
+    const { socketId, username } = user
+
+    function dispatchSetCurrChatTitleAction() {
+      return new Promise<string>((resolve, reject) => {
+        // 先检查当前的聊天目标是否为对方
+        if (currChatTargetTitle === username) {
+          reject(`Already chatting with '${username}'`)
+        } else {
+          dispatch(setCurrChatTargetTitle(user.username))
+          resolve(`Switch 'currChatTarget' to ${username}`)
+        }
+      })
     }
-    console.log('Chat target switch to', socketId)
+
+    try {
+      ;(async () => {
+        if (chatSectionStore[username] === undefined) {
+          dispatch(
+            setChatSectionStore({
+              ...chatSectionStore,
+              [username]: {
+                chatId: socketId,
+                chatTitle: username,
+                chatMessages: [],
+              },
+            }),
+          )
+        }
+
+        await dispatchSetCurrChatTitleAction()
+      })()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
     <div
-      key={user.socketId}
+      key={user.username}
       className="relative flex flex-col text-gray my-1 px-2 py-1 transition-100 rd-2"
       hover="bg-op-20 bg-gray rd-2"
     >
@@ -38,7 +74,7 @@ const ParticipantInfoBox: React.FC<ParticipantInfoBoxProps> = (props) => {
           top-3
           right-3
           icon={<div i-mdi-message-outline />}
-          handleClick={() => handleSwitchChatTarget(user.socketId)}
+          handleClick={() => handleSwitchChatTarget(user)}
         />
       )}
     </div>

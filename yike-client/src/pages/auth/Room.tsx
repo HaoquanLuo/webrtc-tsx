@@ -5,7 +5,7 @@ import {
   selectUserInfo,
   selectUserSocketId,
   setChatSectionStore,
-  setCurrChatTargetId,
+  setCurrChatTargetTitle,
 } from '@/redux/features/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { SIO } from '../../../../socket'
@@ -24,6 +24,7 @@ import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
 import ActionBox from '@/components/ActionContainer/ActionBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
+import { PublicChatTitle } from '@/common/constants/chat'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -57,11 +58,11 @@ const Room: React.FC = () => {
 
       if (roomStatus === 'existed') {
         // 首次进入房间逻辑
-        if (chatSectionStore[roomId] === undefined) {
+        if (chatSectionStore[PublicChatTitle] === undefined) {
           dispatch(
             setChatSectionStore({
-              [roomId]: {
-                ...chatSectionStore[roomId],
+              ...chatSectionStore,
+              [PublicChatTitle]: {
                 chatId: roomId,
                 chatTitle: '聊天室',
                 chatMessages: [],
@@ -69,7 +70,7 @@ const Room: React.FC = () => {
             }),
           )
 
-          dispatch(setCurrChatTargetId(roomId))
+          dispatch(setCurrChatTargetTitle(PublicChatTitle))
         }
       }
 

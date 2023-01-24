@@ -6,13 +6,18 @@ import {
   setRoomStatus,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
-import { setUserId, setUserSocketId } from '@/redux/features/user/userSlice'
+import {
+  setChatSectionStore,
+  setUserId,
+  setUserSocketId,
+} from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
 import { SIO } from '../../../socket'
 import { WebRTCHandler } from './webRTCHandler'
 import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
 import { getStore } from '@/common/utils/getStore'
+import { initChatSection } from '@/common/utils/initChatSection'
 
 const dispatch = store.dispatch
 
@@ -172,34 +177,52 @@ export class SocketClient {
    * @description 发送私信
    * @param data
    */
-  public static handleSendDirectMessage(data: SIO.TDirectMessage) {
+  public static handleSendDirectMessage(data: SIO.Message) {
     SocketClient.socket.emit('direct-message', data)
   }
 
-  public static handleSaveDirectMessage(data: SIO.TDirectMessage) {
-    const { senderSocketId, receiverSocketId } = data
+  public static handleSaveDirectMessage(data: SIO.Message) {
+    const { senderSocketId, senderName, receiverSocketId } = data
 
-    if (senderSocketId === SocketClient.socket.id) {
-      SocketClient.saveNewDirectMessage(true, data)
+    const userSocketId = getStore().user.userSocketId
+    const chatSectionStore = getStore().user.chatSectionStore
+
+    // 己方作为接收方时初始化与对方的消息记录
+    if (
+      userSocketId === receiverSocketId &&
+      chatSectionStore[senderName] === undefined
+    ) {
+      dispatch(
+        setChatSectionStore({
+          ...chatSectionStore,
+          [senderName]: {
+            chatId: senderSocketId,
+            chatTitle: senderName,
+            chatMessages: [],
+          },
+        }),
+      )
     }
 
+    // 己方作为发送方
+    if (senderSocketId === SocketClient.socket.id) {
+      SocketClient.saveNewDirectMessage(true, data)
+      return
+    }
+
+    // 对方作为发送方
     if (receiverSocketId === SocketClient.socket.id) {
       SocketClient.saveNewDirectMessage(false, data)
+      return
     }
   }
 
-  static saveNewDirectMessage(
+  static async saveNewDirectMessage(
     createdByMe: boolean,
-    directMessage: SIO.TDirectMessage,
+    directMessage: SIO.Message,
   ) {
-    const {
-      id,
-      senderName,
-      senderSocketId,
-      receiverName,
-      receiverSocketId,
-      messageContent,
-    } = directMessage
+    const { senderName, senderSocketId, receiverName, receiverSocketId } =
+      directMessage
 
     if (receiverName === undefined || receiverSocketId === undefined) {
       throw new Error(`Direct Message error.`)
@@ -207,25 +230,32 @@ export class SocketClient {
 
     const chatSectionStore = getStore().user.chatSectionStore
 
-    const [chatTargetName, ChatSectionStructure] =
-      Object.entries(chatSectionStore)
+    let newMessage: SIO.Message = {
+      ...directMessage,
+    }
 
-    let newMessage: User.PublicChatMessage
+    const dispatchSaveChatMessageAction = (id: string, username: string) => {
+      dispatch(
+        setChatSectionStore({
+          ...chatSectionStore,
+          [username]: {
+            chatId: id,
+            chatTitle: username,
+            chatMessages: [
+              ...chatSectionStore[username]?.chatMessages,
+              newMessage,
+            ],
+          },
+        }),
+      )
+    }
 
     if (createdByMe) {
-      newMessage = {
-        id,
-        senderName: senderName,
-        senderSocketId: senderSocketId,
-        messageContent: messageContent,
-      }
+      // 己方是消息发送者
+      dispatchSaveChatMessageAction(receiverSocketId, receiverName)
     } else {
-      newMessage = {
-        id,
-        senderName: receiverName,
-        senderSocketId: receiverSocketId,
-        messageContent: messageContent,
-      }
+      // 对方是消息发送者
+      dispatchSaveChatMessageAction(senderSocketId, senderName)
     }
   }
 }

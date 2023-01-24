@@ -21,18 +21,10 @@ declare global {
       username: string
       password: string
     }
-    type PublicChatMessage = {
-      id: string
-      senderName: string
-      senderSocketId: string
-      receiverName?: string
-      receiverSocketId?: string
-      messageContent: string
-    }
     type ChatSectionStructure = {
       chatId: string
       chatTitle: string
-      chatMessages: SIO.TDirectMessage[]
+      chatMessages: SIO.Message[]
     }
     type ChatSectionStore = {
       [userName: string]: ChatSectionStructure

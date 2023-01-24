@@ -60,7 +60,7 @@ export namespace SIO {
     connectedUsers: User[]
   }
 
-  type TDirectMessage = {
+  type Message = {
     id: string
     senderName: string
     senderSocketId: string

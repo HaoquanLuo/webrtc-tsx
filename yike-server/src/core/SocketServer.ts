@@ -3,6 +3,7 @@ import { WebRTC } from '@/common/typings/webRTC'
 import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 import logger from '@/server/logs/logger'
+import { SocketException } from './HttpException'
 
 type TUser = 'user'
 type TRoom = 'room'
@@ -14,18 +15,6 @@ type FindOption = {
 type FindMatch = {
   user: SIO.User
   room: SIO.Room
-}
-
-const user: SIO.User = {
-  username: '',
-  id: '',
-  roomId: '',
-  socketId: '',
-  audioOnly: false,
-}
-const room: SIO.Room = {
-  id: '',
-  connectedUsers: [],
 }
 
 export class SocketServer {
@@ -63,9 +52,7 @@ export class SocketServer {
           )
 
           if (user === undefined) {
-            throw new Error(
-              `[Socket Server] User '${socketId}' not found in server.`,
-            )
+            throw new Error(`User '${socketId}' not found in server.`)
           }
           return user
         }
@@ -74,9 +61,7 @@ export class SocketServer {
           const room = SocketServer.rooms.find((room) => room.id === roomId)
 
           if (room === undefined) {
-            throw new Error(
-              `[Socket Server] Room '${roomId}' not found in server.`,
-            )
+            throw new Error(`Room '${roomId}' not found in server.`)
           }
 
           return room
@@ -102,8 +87,8 @@ export class SocketServer {
    */
   public static addSocketUser(socketId: string) {
     const newUser: SIO.User = {
-      username: '',
       id: '',
+      username: '',
       roomId: '',
       socketId,
       audioOnly: true,
@@ -309,9 +294,11 @@ export class SocketServer {
    */
   public static async roomCheckHandler(roomId: string) {
     try {
-      const room = SocketServer.find('room', {
-        room: roomId,
-      })
+      const room = SocketServer.rooms.find((room) => room.id === roomId)
+
+      if (room === undefined) {
+        throw new SocketException(`Room '${roomId}' not found in server.`)
+      }
 
       // 房间存在，且暂时定为 4 人间
       if (room.connectedUsers.length > 3) {
@@ -495,7 +482,7 @@ export class SocketServer {
   }
 
   public static transportDirectMessageHandler(
-    data: SIO.TDirectMessage,
+    data: SIO.Message,
     socket: Socket<
       SIO.ClientToServerEvents,
       SIO.ServerToClientEvents,
@@ -504,23 +491,37 @@ export class SocketServer {
     >,
   ) {
     try {
-      const { receiverSocketId, messageContent } = data
+      const { receiverSocketId, receiverName, messageContent } = data
 
-      if (receiverSocketId === undefined) {
-        throw new Error(`[Socket Server] 'receiverSocketId' did not provided.`)
+      if (receiverSocketId === '' || receiverSocketId === undefined) {
+        throw new Error(
+          `[Socket Server] Value of 'receiverSocketId' is ${JSON.stringify(
+            receiverSocketId,
+          )}.`,
+        )
       }
 
-      const receiverUser = SocketServer.find('user', {
-        user: receiverSocketId,
-      })
+      const receiverUser = SocketServer.connectedUsers.find(
+        (user) => user.username === receiverName,
+      )
+
+      if (receiverUser === undefined) {
+        throw new Error(
+          `[Socket Server] User '${receiverName}' not found in connectedUsers.`,
+        )
+      }
+
+      if (receiverUser.socketId !== receiverSocketId) {
+        console.log(`接收方更换了新的 socketId '${receiverUser.socketId}'`)
+      }
 
       const senderUser = SocketServer.find('user', {
         user: socket.id,
       })
 
       // 给接收方/发送方的消息
-      const message: SIO.TDirectMessage = {
-        id: crypto.randomUUID(),
+      const message: SIO.Message = {
+        id: uuidV4(),
         receiverName: receiverUser.username,
         receiverSocketId: receiverUser.socketId,
         senderName: senderUser.username,
@@ -528,7 +529,10 @@ export class SocketServer {
         messageContent,
       }
 
-      socket.to(receiverSocketId).emit('direct-message', message)
+      // 给接收方发送消息
+      socket.to(receiverUser.socketId).emit('direct-message', message)
+
+      // 给发起方返回信息
       socket.emit('direct-message', message)
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)

@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 interface Props {
-  message: Partial<User.PublicChatMessage> & {
+  message: Partial<User.ChatMessage> & {
     sameAuthor: boolean
   }
 }

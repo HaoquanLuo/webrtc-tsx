@@ -3,7 +3,7 @@ import { useMsgScrollToView } from '@/hooks/useScrollToView'
 import MessageBox from './MessageBox'
 
 interface MessageContainerProps {
-  messages: User.PublicChatMessage[]
+  messages: User.ChatMessage[]
 }
 
 const MessageContainer: React.FC<MessageContainerProps> = (props) => {
