@@ -8,7 +8,6 @@ import {
   setCurrChatTargetTitle,
 } from '@/redux/features/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { SIO } from '../../../../socket'
 import { notification } from 'antd'
 import { SocketClient } from '@/core/SocketClient'
 import { WebRTCHandler } from '@/core/webRTCHandler'
@@ -25,6 +24,7 @@ import MediaBox from '@/components/MediaBox'
 import ActionBox from '@/components/ActionContainer/ActionBox'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { PublicChatTitle } from '@/common/constants/chat'
+import { SIO } from '@/common/typings/socket'
 
 type UserWithStream = SIO.User & Pick<WebRTC.StreamWithId, 'stream'>
 
@@ -58,11 +58,11 @@ const Room: React.FC = () => {
 
       if (roomStatus === 'existed') {
         // 首次进入房间逻辑
-        if (chatSectionStore[PublicChatTitle] === undefined) {
+        if (chatSectionStore[`${PublicChatTitle}_${roomId}`] === undefined) {
           dispatch(
             setChatSectionStore({
               ...chatSectionStore,
-              [PublicChatTitle]: {
+              [`${PublicChatTitle}_${roomId}`]: {
                 chatId: roomId,
                 chatTitle: '聊天室',
                 chatMessages: [],
@@ -70,7 +70,7 @@ const Room: React.FC = () => {
             }),
           )
 
-          dispatch(setCurrChatTargetTitle(PublicChatTitle))
+          dispatch(setCurrChatTargetTitle(`${PublicChatTitle}_${roomId}`))
         }
       }
 
@@ -141,8 +141,8 @@ const Room: React.FC = () => {
         })
       }
     }, [roomParticipants])
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    console.error(error)
   }
 
   return (

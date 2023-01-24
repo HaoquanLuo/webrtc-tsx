@@ -1,4 +1,4 @@
-import { SIO } from '../../../../socket'
+import { SIO } from '@/common/typings/socket'
 import ParticipantInfoBox from './ParticipantInfoBox'
 
 interface ParticipantContainerProps {

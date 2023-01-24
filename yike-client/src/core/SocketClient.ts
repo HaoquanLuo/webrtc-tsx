@@ -13,11 +13,11 @@ import {
 } from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
 import { Socket, io } from 'socket.io-client'
-import { SIO } from '../../../socket'
 import { WebRTCHandler } from './webRTCHandler'
 import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
 import { getStore } from '@/common/utils/getStore'
 import { initChatSection } from '@/common/utils/initChatSection'
+import { SIO } from '@/common/typings/socket'
 
 const dispatch = store.dispatch
 

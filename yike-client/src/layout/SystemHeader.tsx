@@ -15,6 +15,7 @@ import {
 } from '@/redux/features/system/systemSlice'
 import {
   selectUserInfo,
+  setCurrChatTargetTitle,
   setToken,
   setUserId,
   setUserInfo,
@@ -51,7 +52,7 @@ const SystemHeader: React.FC = () => {
       removeItem('token')
       removeItem('userInfo')
 
-      navigate('/')
+      location.reload()
     }
   }
 
@@ -59,9 +60,10 @@ const SystemHeader: React.FC = () => {
     dispatch(setRoomId(''))
     dispatch(setRoomParticipants([]))
     dispatch(setRoomStatus('destroyed'))
+    dispatch(setRoomHost(false))
     dispatch(setUserId(''))
     dispatch(setConnectWithAudioOnly(true))
-    dispatch(setRoomHost(false))
+    dispatch(setCurrChatTargetTitle(''))
 
     navigate(-1)
   }

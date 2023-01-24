@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { getToken, getUserInfo } from '@/common/utils/helpers/getTools'
 import { StoreProps } from '@/common/typings/store'
-import { SIO } from '../../../../../socket'
+import { SIO } from '@/common/typings/socket'
 
 export interface UserState {
   token: string

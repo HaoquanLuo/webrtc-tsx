@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { StreamStatus } from '@/common/typings/stream'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 
 /**
@@ -8,7 +7,8 @@ import { WebRTCHandler } from '@/core/webRTCHandler'
  */
 export const useLoadStream = () => {
   const streamRef = useRef<MediaStream | null>(null)
-  const [streamStatus, setStreamStatus] = useState<StreamStatus>('loading')
+  const [streamStatus, setStreamStatus] =
+    useState<System.StreamStatus>('loading')
 
   async function getStream() {
     try {

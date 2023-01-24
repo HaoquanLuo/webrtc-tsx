@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { StoreProps } from '@/common/typings/store'
 import { getToken } from '@/common/utils/helpers/getTools'
-import { SIO } from '../../../../../socket'
+import { SIO } from '@/common/typings/socket'
 
 export interface SystemState {
   logState: boolean

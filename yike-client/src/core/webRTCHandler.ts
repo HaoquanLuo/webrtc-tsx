@@ -4,8 +4,9 @@ import { SocketClient } from './SocketClient'
 import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
-import { setPublicMessages } from '@/redux/features/user/userSlice'
-import { SIO } from '../../../socket'
+import { setChatSectionStore } from '@/redux/features/user/userSlice'
+import { SIO } from '@/common/typings/socket'
+import { PublicChatTitle } from '@/common/constants/chat'
 
 const dispatch = store.dispatch
 
@@ -175,8 +176,8 @@ export class WebRTCHandler {
       dispatch(setWebRTCStatus('disconnected'))
     })
 
-    WebRTCHandler.peers[connSocketId].on('error', (err) => {
-      console.error(err)
+    WebRTCHandler.peers[connSocketId].on('error', (error) => {
+      console.error(error)
     })
   }
 
@@ -308,8 +309,20 @@ export class WebRTCHandler {
    */
   public static appendNewMessage(message: SIO.Message) {
     // 同步到 store 进行保存
-    const messages = getStore().user.publicMessages
-    dispatch(setPublicMessages([...messages, message]))
+    const roomId = getStore().system.roomId
+    const chatSectionStore = getStore().user.chatSectionStore
+    dispatch(
+      setChatSectionStore({
+        ...chatSectionStore,
+        [`${PublicChatTitle}_${roomId}`]: {
+          ...chatSectionStore[`${PublicChatTitle}_${roomId}`],
+          chatMessages: [
+            ...chatSectionStore[`${PublicChatTitle}_${roomId}`].chatMessages,
+            message,
+          ],
+        },
+      }),
+    )
   }
 
   /**

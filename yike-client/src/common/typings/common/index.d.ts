@@ -1,5 +1,6 @@
+import { SIO } from '../socket'
 import { AxiosResponse } from 'axios'
-import { SIO } from '../../../../../socket'
+
 declare global {
   module System {
     type RoomStatus = 'unbuild' | 'existed' | 'created' | 'destroyed'
@@ -10,6 +11,8 @@ declare global {
       | 'streaming'
       | 'connected'
       | 'disconnected'
+
+    type StreamStatus = 'loading' | 'completed'
 
     type Microphone = 'muted' | 'loud'
     type Camera = 'off' | 'on'

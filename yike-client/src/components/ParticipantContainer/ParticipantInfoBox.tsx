@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { SIO } from '../../../../socket'
 import IconBox from '../IconBox'
 import {
   selectChatSectionStore,
@@ -8,7 +7,7 @@ import {
   setChatSectionStore,
   setCurrChatTargetTitle,
 } from '@/redux/features/user/userSlice'
-import { useCallback } from 'react'
+import { SIO } from '@/common/typings/socket'
 
 interface ParticipantInfoBoxProps {
   user: SIO.User
