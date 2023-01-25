@@ -13,4 +13,4 @@ const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
   )
 }
 
-export default UserLayout
+export default React.memo(UserLayout)

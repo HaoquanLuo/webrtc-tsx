@@ -10,6 +10,7 @@ import {
   setRoomParticipants,
   setConnectWithAudioOnly,
   setRoomHost,
+  selectRoomStatus,
 } from '@/redux/features/system/systemSlice'
 import {
   selectLogState,
@@ -33,6 +34,7 @@ const SystemHeader: React.FC = () => {
   const currentPath = useSelector(selectCurrentPath)
   const { username } = useSelector(selectUserInfo)
   const roomId = useSelector(selectRoomId)
+  const roomStatus = useSelector(selectRoomStatus)
 
   const [showTips, setShowTips] = useState(false)
 
@@ -93,50 +95,44 @@ const SystemHeader: React.FC = () => {
   }
 
   return (
-    <div
-      id="system-header"
-      relative
-      flex
-      items-center
-      px-4
-      gap-2
-      bg-op-10
-      bg-gray
-      min-h="14!"
-    >
+    <div id="system-header" relative flex items-center px-6 gap-2 min-h="14!">
       <div className="left-btns" flex w-48 justify-start>
         {<BackButton />}
       </div>
-      <div className="center-btns" flex flex-1 justify-center>
-        <span mx-2 font-bold>
-          {username}
-        </span>
-        {roomId && (
-          <CopyToClipboard onCopy={handleCopyToClipboard} text={roomId}>
-            <span>{roomId}</span>
-          </CopyToClipboard>
-        )}
-        {showTips && (
-          <span absolute bottom="-4" font-bold b-2 rd-2 px-1 bg-op-40>
-            Copied!
-          </span>
-        )}
-      </div>
-      <div className="right-btns" flex w-48 justify-end>
-        {logState && (
-          <Button
-            shape="circle"
-            icon={<LogoutOutlined />}
-            onClick={() =>
-              showConfirm({
-                title: '确定要退出吗?',
-                content: '离开不会保存当前数据',
-                onOkCallback: handleLogout,
-              })
-            }
-          />
-        )}
-      </div>
+      {logState && (
+        <>
+          <div className="center-btns" flex flex-1 justify-center>
+            <span mx-2 font-bold>
+              {username}
+            </span>
+            {roomId && (
+              <CopyToClipboard onCopy={handleCopyToClipboard} text={roomId}>
+                <span>{roomId}</span>
+              </CopyToClipboard>
+            )}
+            {showTips && (
+              <span absolute bottom="-4" font-bold b-2 rd-2 px-1 bg-op-40>
+                Copied!
+              </span>
+            )}
+          </div>
+          <div className="right-btns" flex w-48 justify-end>
+            {roomStatus === 'unbuild' && (
+              <Button
+                shape="circle"
+                icon={<LogoutOutlined />}
+                onClick={() =>
+                  showConfirm({
+                    title: '确定要退出吗?',
+                    content: '离开不会保存当前数据',
+                    onOkCallback: handleLogout,
+                  })
+                }
+              />
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }

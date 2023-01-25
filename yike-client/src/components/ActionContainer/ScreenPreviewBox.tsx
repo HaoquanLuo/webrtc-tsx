@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
 
 interface ScreenPreviewBoxProps {
@@ -45,4 +45,4 @@ const ScreenPreviewBox: React.FC<ScreenPreviewBoxProps> = ({
   )
 }
 
-export default ScreenPreviewBox
+export default React.memo(ScreenPreviewBox)

@@ -1,5 +1,5 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import IconBox from '../IconBox'
 import ScreenPreviewBox from './ScreenPreviewBox'
 
@@ -66,4 +66,4 @@ const ScreenShareButton: React.FC<ScreenShareButtonProps> = () => {
   )
 }
 
-export default ScreenShareButton
+export default React.memo(ScreenShareButton)

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import IconBox from '../IconBox'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 
@@ -28,4 +28,4 @@ const CameraButton: React.FC<CameraButtonProps> = () => {
   )
 }
 
-export default CameraButton
+export default React.memo(CameraButton)

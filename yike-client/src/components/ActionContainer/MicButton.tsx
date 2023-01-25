@@ -1,5 +1,5 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import IconBox from '../IconBox'
 
 interface MicButtonProps {}
@@ -26,4 +26,4 @@ const MicButton: React.FC<MicButtonProps> = () => {
   )
 }
 
-export default MicButton
+export default React.memo(MicButton)

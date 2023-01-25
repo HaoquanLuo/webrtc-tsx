@@ -9,21 +9,29 @@ const IconBox: React.FC<Props> = (props) => {
   const { icon, handleClick, ...rest } = props
   return (
     <button
-      w-8
-      h-8
-      b-1
-      b-gray
-      b-op-40
-      bg-white
-      rd-36
-      grid
-      place-items-center
-      text-black
-      text-xl
-      cursor-pointer
-      hover:text-blue
-      hover:b-blue
-      transition-250
+      className="
+        w-8
+        h-8
+        b-1
+        b-gray
+        b-op-40
+        bg-white
+        rd-36
+        grid
+        place-items-center
+        text-black
+        text-xl
+        cursor-pointer
+        transition-250
+        hover:text-blue
+        hover:b-blue
+        dark:text-white
+        dark:bg-#232323
+        dark:b-dark
+        dark:hover:text-violet-5
+        dark:hover:b-violet-6
+        dark:rd-36
+      "
       onClick={(e) => handleClick && handleClick(e)}
       {...rest}
     >

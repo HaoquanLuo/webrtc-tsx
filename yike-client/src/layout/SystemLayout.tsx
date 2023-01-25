@@ -8,11 +8,19 @@ interface Props {
 const SystemLayout: React.FC<Props> = (props) => {
   const { children } = props
   return (
-    <div id="system-layout" flex flex-col w-full h-full relative>
+    <div
+      id="system-layout"
+      flex
+      flex-col
+      w-full
+      h-full
+      relative
+      bg-blend-soft-light
+    >
       <SystemHeader />
       {children}
     </div>
   )
 }
 
-export default SystemLayout
+export default React.memo(SystemLayout)

@@ -1,4 +1,4 @@
-import { defineConfig } from 'unocss'
+import { defineConfig, presetMini } from 'unocss'
 import presetUno from '@unocss/preset-uno'
 import presetAttributify from '@unocss/preset-attributify'
 import presetIcons from 'unocss/preset-icons'
@@ -6,8 +6,6 @@ import transformerAttributifyJsx from '@unocss/transformer-attributify-jsx'
 
 export default defineConfig({
   presets: [
-    presetUno(),
-    presetAttributify(),
     presetIcons({
       extraProperties: {
         display: 'inline-block',
@@ -15,6 +13,11 @@ export default defineConfig({
         margin: '5px',
       },
     }),
+    presetMini({
+      dark: 'class',
+    }),
+    presetUno(),
+    presetAttributify(),
   ],
   transformers: [transformerAttributifyJsx()],
   rules: [
@@ -22,7 +25,7 @@ export default defineConfig({
       /**
        * match: [ 'w-half', 'w', index: 0, input: 'w-half', groups: undefined ]
        */
-      /^(\w)-half$/,
+      /^([wh])-half$/,
       (match) => {
         switch (match[1]) {
           case 'w': {

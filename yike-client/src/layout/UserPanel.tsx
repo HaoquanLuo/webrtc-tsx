@@ -22,8 +22,9 @@ import MessageContainer from '@/components/MessageContainer/MessageContainer'
 import ParticipantContainer from '@/components/ParticipantContainer/ParticipantContainer'
 import { SocketClient } from '@/core/SocketClientEventHandler'
 import { useToggler } from '@/hooks/useToggler'
-import { PublicChatTitle } from '@/common/constants/chat'
+import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'
+import ShadowBox from '@/components/ShadowBox'
 
 type ChatHistory<T> = (nextChatList: T[], chatTarget: T) => T[]
 
@@ -235,13 +236,10 @@ const UserPanel: React.FC<Props> = (props) => {
     <div
       className='
         relative
-        sm:w-60
-        lg:w-80
+        sm:w-60 lg:w-80
         h-a
-        shrink-0
-        p-2
-        flex
-        flex-col
+        pl-3 pr-2 py-2
+        flex flex-col shrink-0
         gap-y="0.5"
         justify-between
       '
@@ -276,8 +274,11 @@ const UserPanel: React.FC<Props> = (props) => {
               min-h-40
               flex
               flex-col
-              bg-slate-400
-              bg-op-20
+              bg-gray
+              bg-op-10
+              b-gray
+              b-1
+              b-op-10
               rd-2
             "
           >
@@ -289,17 +290,17 @@ const UserPanel: React.FC<Props> = (props) => {
               gap-x-2
               items-center
               h="15.5"
-              bg-dark
-              bg-op-30
+              bg-gray
+              bg-op-10
               rd-t-2
             >
               {chatList.map(([chatTitle, chatSectionStructure]) => {
                 return (
                   <div
                     key={chatTitle}
-                    className={`grid place-items-center rd-36 ${
+                    className={`grid place-items-center rd-36 hover:bg-op-80 dark:bg-gray-7 ${
                       currChatTargetTitle === chatTitle
-                        ? 'bg-orange ring-light-4 ring-2'
+                        ? 'bg-orange ring-light-4 ring-2 dark:ring-orange dark:text-orange'
                         : 'bg-gray-3'
                     } w-11 h-11 text-xs cursor-pointer`}
                     onClick={() => handleSetCurrChatTargetTitle(chatTitle)}
@@ -316,22 +317,19 @@ const UserPanel: React.FC<Props> = (props) => {
               <textarea
                 className="
                   block
-                  absolute
-                  bottom-0
                   resize-none
+                  absolute
+                  top-0 bottom-0 left-0 right-0
                   p-2
-                  w-full
-                  h-full
-                  text-sm
-                  text-gray-900
-                  bg-gray-300
-                  bg-op-90
                   rd-2
-                  border
-                  order-gray-400
-                  focus:ring-blue-500 focus:border-blue-500
-                  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-                  dark:focus:ring-blue-500 dark:focus:border-blue-500
+                  w-full h-full
+                  text-sm text-dark
+                  bg-gray bg-op-10
+                  b-1 b-gray b-op-20
+                  focus:outline-none focus:ring-gray-400 focus:border-gray-500
+                  dark:bg-dark dark:bg-op-20 dark:border-gray-600
+                  dark:placeholder:color-gray-3 dark:text-white
+                  dark:focus:ring-gray-500 dark:focus:border-gray-500
                 "
                 value={msgContent}
                 onChange={handleTextAreaChange}
@@ -339,7 +337,9 @@ const UserPanel: React.FC<Props> = (props) => {
                 placeholder={`'Shift + Enter' 换行`}
               />
               <IconBox
-                className="absolute bottom-2 right-2"
+                absolute
+                bottom-2
+                right-2
                 icon={<div i-mdi-send rotate--30 />}
                 handleClick={handleSendMessage}
               />
@@ -351,4 +351,4 @@ const UserPanel: React.FC<Props> = (props) => {
   )
 }
 
-export default UserPanel
+export default React.memo(UserPanel)

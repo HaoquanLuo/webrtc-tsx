@@ -29,7 +29,7 @@ const MessageBox: React.FC<Props> = (props) => {
         </div>
       )}
       <div
-        className={`px-2 py-1 bg-violet rd-2 w-fit  ${
+        className={`px-2 py-1 bg-violet-6 rd-2 w-fit ${
           message.senderName === username ? 'float-right' : 'float-left'
         }`}
       >

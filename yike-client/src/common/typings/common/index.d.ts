@@ -3,14 +3,14 @@ import { AxiosResponse } from 'axios'
 
 declare global {
   module System {
-    type ThemeName = 'lightTheme' | 'darkTheme'
+    type Theme = 'light' | 'dark'
     type ThemeData = {
       colorPrimary: string
       colorTextBase: string
       colorBgBase: string
       colorBorder: string
     }
-    type ThemeSelection<T extends ThemeName> = {
+    type ThemeSelection<T extends Theme> = {
       [themeName in T]: ThemeData
     }
 
