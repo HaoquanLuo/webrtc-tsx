@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { SocketClient } from '@/core/SocketClient'
+import { SocketClient } from '@/core/SocketClientEventHandler'
 import {
   selectConnectWithAudioOnly,
   selectRoomHost,
@@ -22,6 +22,11 @@ import {
 } from '@/redux/features/user/userSlice'
 import { Button, Input, Modal, Switch, notification } from 'antd'
 
+// notification 全局配置
+notification.config({
+  duration: 2,
+})
+
 const Main: React.FC = () => {
   // 工具 hooks
   const dispatch = useDispatch()
@@ -31,7 +36,6 @@ const Main: React.FC = () => {
   // 控制弹窗显示
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [joinRoomId, setJoinRoomId] = useState('')
-  const [noticeFlag, setNoticeFlag] = useState<string>('')
 
   // store 属性
   const errorMessage = useSelector(selectErrorMessage)
@@ -51,13 +55,15 @@ const Main: React.FC = () => {
   const handleOk = () => {
     try {
       if (!roomHost && joinRoomId === '') {
-        dispatch(setErrorMessage(`没有输入房间号！`))
-        setNoticeFlag(crypto.randomUUID())
+        dispatch(
+          setErrorMessage({
+            key: `error_${Date.now()}`,
+            content: `没有输入房间号！`,
+          }),
+        )
         return
       }
 
-      setNoticeFlag('')
-      dispatch(setRoomId(joinRoomId))
       roomHost
         ? SocketClient.handleCreateRoom(username, audioOnly)
         : SocketClient.handleJoinRoom(joinRoomId, username, audioOnly)
@@ -116,13 +122,13 @@ const Main: React.FC = () => {
 
   // 监听 errorMessage
   useEffect(() => {
-    if (noticeFlag !== '') {
+    if (errorMessage.content !== '') {
       api.error({
-        message: errorMessage,
+        message: errorMessage.content,
         placement: 'top',
       })
     }
-  }, [noticeFlag])
+  }, [errorMessage])
 
   return (
     <>

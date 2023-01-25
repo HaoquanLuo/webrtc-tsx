@@ -8,7 +8,7 @@ export interface SystemState {
   logState: boolean
   currentPath: string
   connectWithAudioOnly: boolean
-  errorMessage: string
+  errorMessage: System.ErrorMessage
   roomHost: boolean
   roomStatus: System.RoomStatus
   roomId: string
@@ -20,7 +20,10 @@ const initialSystemState: SystemState = {
   logState: getToken() !== null ? true : false,
   currentPath: '/',
   connectWithAudioOnly: true,
-  errorMessage: '',
+  errorMessage: {
+    key: '',
+    content: '',
+  },
   roomHost: false,
   roomStatus: 'unbuild',
   roomId: '',
@@ -41,7 +44,7 @@ export const systemSlice = createSlice({
     setConnectWithAudioOnly: (state, action: PayloadAction<boolean>) => {
       state.connectWithAudioOnly = action.payload
     },
-    setErrorMessage: (state, action: PayloadAction<string>) => {
+    setErrorMessage: (state, action: PayloadAction<System.ErrorMessage>) => {
       state.errorMessage = action.payload
     },
     setRoomHost: (state, action: PayloadAction<boolean>) => {

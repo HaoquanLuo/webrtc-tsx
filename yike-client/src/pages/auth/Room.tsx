@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
   selectChatSectionStore,
-  selectUserId,
   selectUserInfo,
   selectUserSocketId,
   setChatSectionStore,
@@ -9,10 +8,11 @@ import {
 } from '@/redux/features/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { notification } from 'antd'
-import { SocketClient } from '@/core/SocketClient'
+import { SocketClient } from '@/core/SocketClientEventHandler'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import {
   selectConnectWithAudioOnly,
+  selectRoomHost,
   selectRoomId,
   selectRoomParticipants,
   selectRoomStatus,
@@ -33,8 +33,8 @@ const Room: React.FC = () => {
 
   const [api, contextHolder] = notification.useNotification()
 
+  const roomHost = useSelector(selectRoomHost)
   const { username } = useSelector(selectUserInfo)
-  const userId = useSelector(selectUserId)
   const userSocketId = useSelector(selectUserSocketId)
   const audioOnly = useSelector(selectConnectWithAudioOnly)
   const roomId = useSelector(selectRoomId)
@@ -90,14 +90,13 @@ const Room: React.FC = () => {
       if (streamStatus === 'completed') {
         setMyself({
           username,
-          id: userId,
           roomId,
           socketId: userSocketId,
           audioOnly,
           stream: localStream as MediaStream,
         })
       }
-    }, [userId, userSocketId, localStream])
+    }, [userSocketId, localStream])
 
     // 加载其他用户的媒体流及信息
     useEffect(() => {
@@ -134,13 +133,20 @@ const Room: React.FC = () => {
 
     // 监听用户加入、离开事件
     useEffect(() => {
-      if (roomParticipants.length > 1) {
+      if (roomHost && roomParticipants.length > 1) {
         api.info({
           message: '新用户加入',
           placement: 'top',
         })
       }
-    }, [roomParticipants])
+
+      if (!roomHost) {
+        api.success({
+          message: '欢迎加入房间',
+          placement: 'top',
+        })
+      }
+    }, [roomHost, roomParticipants])
   } catch (error) {
     console.error(error)
   }
