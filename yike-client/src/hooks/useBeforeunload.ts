@@ -1,16 +1,20 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
-const useBeforeunload = (fn: (e: Event) => void) => {
-  const cbRef = useRef(fn)
+export const useBeforeunload = (fn: (evt: BeforeUnloadEvent) => any) => {
+  const handleBeforeunload = (evt: BeforeUnloadEvent) => {
+    let returnValue: boolean = fn(evt)
+
+    if (returnValue) {
+      evt.preventDefault()
+      evt.returnValue = returnValue
+    }
+
+    return returnValue
+  }
 
   useEffect(() => {
-    const onUnload = cbRef.current
-    window.addEventListener('beforeunload', onUnload)
+    window.addEventListener('beforeunload', handleBeforeunload)
 
-    return () => {
-      window.removeEventListener('beforeunload', onUnload)
-    }
-  }, [cbRef])
+    return () => window.removeEventListener('beforeunload', handleBeforeunload)
+  }, [fn])
 }
-
-export default useBeforeunload
