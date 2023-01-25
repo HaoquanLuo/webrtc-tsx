@@ -547,6 +547,10 @@ export class SocketEventHandler {
 
       // 给发起方返回信息
       socket.emit('direct-message', message)
+
+      logger.info(
+        `[Socket Server] User '${socket.id}' sent a message to '${receiverSocketId}'.`,
+      )
     } catch (error) {
       logger.error(`[Socket Server] ${error}`)
     }

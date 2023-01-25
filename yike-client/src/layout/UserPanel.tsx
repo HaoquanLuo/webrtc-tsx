@@ -25,6 +25,8 @@ import { useToggler } from '@/hooks/useToggler'
 import { PublicChatTitle } from '@/common/constants/chat'
 import { SIO } from '@/common/typings/socket'
 
+type ChatHistory<T> = (nextChatList: T[], chatTarget: T) => T[]
+
 interface Props {}
 
 const UserPanel: React.FC<Props> = (props) => {
@@ -133,13 +135,25 @@ const UserPanel: React.FC<Props> = (props) => {
   )
 
   let chatList = useMemo(() => {
-    return Object.entries(chatSectionStore).filter((chatTarget) => {
+    const handleSelectChatHistory: ChatHistory<
+      [string, User.ChatSectionStructure]
+    > = (nextChatList, chatTarget) => {
       const [chatTitle, _chatSectionStructure] = chatTarget
       const roomFlag = chatTitle.includes(`${PublicChatTitle}`)
       const thisRoomFlag = chatTitle.includes(`${roomId}`)
 
-      return !roomFlag || (roomFlag && thisRoomFlag)
-    })
+      if (!roomFlag) {
+        nextChatList = [...nextChatList, chatTarget]
+      }
+
+      if (roomFlag && thisRoomFlag) {
+        nextChatList = [chatTarget, ...nextChatList]
+      }
+
+      return nextChatList
+    }
+
+    return Object.entries(chatSectionStore).reduce(handleSelectChatHistory, [])
   }, [Object.entries(chatSectionStore).length])
 
   useEffect(() => {
