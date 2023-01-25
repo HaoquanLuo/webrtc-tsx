@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { notification } from 'antd'
-import { loginRoutePath } from '@/common/constants/routes'
+import { LoginRoutePath } from '@/common/constants/routes'
 import { ACCESS_TOKEN } from '@/common/constants/user'
 import { setToken } from '@/redux/features/user/userSlice'
 import { getStore } from './getStore'
@@ -48,7 +48,7 @@ const errorHandler = (error: AxiosError) => {
       })
       const reload = () => {
         setTimeout(() => {
-          window.location.replace(loginRoutePath)
+          window.location.replace(LoginRoutePath)
         }, 1500)
       }
       if (token) {

@@ -1,11 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { StoreProps } from '@/common/typings/store'
-import { getToken } from '@/common/utils/helpers/getTools'
 import { SIO } from '@/common/typings/socket'
 
 export interface SystemState {
-  logState: boolean
   currentPath: string
   connectWithAudioOnly: boolean
   errorMessage: System.ErrorMessage
@@ -17,7 +15,6 @@ export interface SystemState {
 }
 
 const initialSystemState: SystemState = {
-  logState: getToken() !== null ? true : false,
   currentPath: '/',
   connectWithAudioOnly: true,
   errorMessage: {
@@ -35,9 +32,6 @@ export const systemSlice = createSlice({
   name: 'system',
   initialState: initialSystemState,
   reducers: {
-    setLogState: (state, action: PayloadAction<boolean>) => {
-      state.logState = action.payload
-    },
     setCurrentPath: (state, action: PayloadAction<string>) => {
       state.currentPath = action.payload
     },
@@ -66,7 +60,6 @@ export const systemSlice = createSlice({
 })
 
 export const {
-  setLogState,
   setCurrentPath,
   setConnectWithAudioOnly,
   setErrorMessage,
@@ -77,7 +70,6 @@ export const {
   setWebRTCStatus,
 } = systemSlice.actions
 
-export const selectLogState = (state: StoreProps) => state.system.logState
 export const selectCurrentPath = (state: StoreProps) => state.system.currentPath
 export const selectConnectWithAudioOnly = (state: StoreProps) =>
   state.system.connectWithAudioOnly

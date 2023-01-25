@@ -1,9 +1,10 @@
+import { SIO } from '@/common/typings/socket'
 import { selectUserInfo } from '@/redux/features/user/userSlice'
 import React from 'react'
 import { useSelector } from 'react-redux'
 
 interface Props {
-  message: Partial<User.ChatMessage> & {
+  message: Partial<SIO.Message> & {
     sameAuthor: boolean
   }
 }

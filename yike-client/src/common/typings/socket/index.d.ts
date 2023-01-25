@@ -17,10 +17,10 @@ export namespace SIO {
   interface ClientToServerEvents {
     // 房间相关
     'room-create': (
-      data: Pick<SIO.SocketData, 'username' | 'audioOnly'>
+      data: Pick<SIO.SocketData, 'username' | 'audioOnly'>,
     ) => void
     'room-join': (
-      data: Pick<SIO.SocketData, 'roomId' | 'username' | 'audioOnly'>
+      data: Pick<SIO.SocketData, 'roomId' | 'username' | 'audioOnly'>,
     ) => void
     'room-leave': () => void
     // webRTC 对象相关
@@ -34,7 +34,6 @@ export namespace SIO {
   interface SocketData {
     id: string
     roomId: string
-    userId: string
     username: string
     audioOnly: boolean
     connectedUsers: User[]
@@ -48,7 +47,6 @@ export namespace SIO {
 
   // Types
   type User = {
-    id: string
     username: string
     roomId: string
     socketId: string

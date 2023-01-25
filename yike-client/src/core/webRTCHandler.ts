@@ -1,12 +1,12 @@
 import SimplePeer from 'simple-peer'
 import { WebRTC } from '@/common/typings/webRTC'
-import { SocketClient } from './SocketClient'
+import { SocketClient } from './SocketClientEventHandler'
 import { getStore } from '@/common/utils/getStore'
 import { store } from '@/redux/store'
 import { setWebRTCStatus } from '@/redux/features/system/systemSlice'
 import { setChatSectionStore } from '@/redux/features/user/userSlice'
 import { SIO } from '@/common/typings/socket'
-import { PublicChatTitle } from '@/common/constants/chat'
+import { PublicChatTitle } from '@/common/constants/system'
 
 const dispatch = store.dispatch
 

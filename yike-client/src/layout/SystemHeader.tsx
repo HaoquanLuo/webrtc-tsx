@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '@/api/system/auth'
 import { showConfirm } from '@/common/utils/confirm'
 import {
-  selectLogState,
   selectCurrentPath,
-  setLogState,
   setRoomStatus,
   selectRoomId,
   setRoomId,
@@ -14,10 +12,11 @@ import {
   setRoomHost,
 } from '@/redux/features/system/systemSlice'
 import {
+  selectLogState,
   selectUserInfo,
   setCurrChatTargetTitle,
+  setLogState,
   setToken,
-  setUserId,
   setUserInfo,
 } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
@@ -61,7 +60,6 @@ const SystemHeader: React.FC = () => {
     dispatch(setRoomParticipants([]))
     dispatch(setRoomStatus('destroyed'))
     dispatch(setRoomHost(false))
-    dispatch(setUserId(''))
     dispatch(setConnectWithAudioOnly(true))
     dispatch(setCurrChatTargetTitle(''))
 

@@ -2,7 +2,7 @@ import { SIO } from '@/common/typings/socket'
 import { Server } from 'socket.io'
 import { PluginOptions } from '..'
 import logger from '@/server/logs/logger'
-import { SocketEventHandler } from '@/plugin/Socket/SocketEventHandler'
+import { SocketEventHandler } from '@/plugin/SocketServer/SocketServerEventHandler'
 
 export class SocketServer {
   constructor(options: PluginOptions) {

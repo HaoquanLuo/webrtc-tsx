@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { selectLogState } from '@/redux/features/system/systemSlice'
+import { selectLogState } from '@/redux/features/user/userSlice'
 
 const Redirect: React.FC = () => {
   const navigate = useNavigate()

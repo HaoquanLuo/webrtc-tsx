@@ -6,7 +6,7 @@ const api = {
 }
 
 /**
- * 获取图形验证码
+ * @description 获取图形验证码
  * @returns svg
  */
 export function sendCodeCaptcha() {

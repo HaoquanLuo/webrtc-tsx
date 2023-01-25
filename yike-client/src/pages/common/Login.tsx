@@ -5,10 +5,7 @@ import { login } from '@/api/system/auth'
 import { sendCodeCaptcha } from '@/api/system/common'
 import Input from '@/components/InputBox'
 import { setItem } from '@/common/utils/storage'
-import {
-  setLogState,
-  selectLogState,
-} from '@/redux/features/system/systemSlice'
+import { setLogState, selectLogState } from '@/redux/features/user/userSlice'
 import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
 
 const Login: React.FC = () => {

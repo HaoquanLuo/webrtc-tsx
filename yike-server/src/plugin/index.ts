@@ -1,6 +1,6 @@
 import Koa from 'koa'
 import http from 'http'
-import { SocketServer } from './Socket'
+import { SocketServer } from './SocketServer'
 
 type PluginName = 'SocketServer'
 

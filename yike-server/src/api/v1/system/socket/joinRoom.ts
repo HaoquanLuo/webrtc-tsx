@@ -1,6 +1,6 @@
 import Config from '@/config/Config'
 import { Success } from '@/core/HttpException'
-import { SocketEventHandler } from '@/plugin/Socket/SocketEventHandler'
+import { SocketEventHandler } from '@/plugin/SocketServer/SocketServerEventHandler'
 import KoaRouter from 'koa-router'
 
 const router = new KoaRouter({

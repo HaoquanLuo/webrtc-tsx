@@ -3,6 +3,21 @@ import { AxiosResponse } from 'axios'
 
 declare global {
   module System {
+    type ThemeName = 'lightTheme' | 'darkTheme'
+    type ThemeData = {
+      colorPrimary: string
+      colorTextBase: string
+      colorBgBase: string
+      colorBorder: string
+    }
+    type ThemeSelection<T extends ThemeName> = {
+      [themeName in T]: ThemeData
+    }
+
+    type ErrorMessage = {
+      key: string
+      content: string
+    }
     type RoomStatus = 'unbuild' | 'existed' | 'created' | 'destroyed'
 
     type WebRTCStatus =

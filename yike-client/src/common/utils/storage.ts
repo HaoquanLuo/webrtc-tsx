@@ -1,6 +1,5 @@
-// localStorage封装
 /**
- * 获取数据
+ * @description 获取数据
  * @param key
  * @param isObject 值是否是对象
  * @returns
@@ -14,7 +13,7 @@ export function getItem(
 }
 
 /**
- * 设置数据
+ * @description 设置数据
  * @param key
  * @param value
  */
@@ -29,7 +28,7 @@ export function setItem(
 }
 
 /**
- * 删除数据
+ * @description 删除数据
  * @param key
  */
 export function removeItem(key: string) {

@@ -8,7 +8,6 @@ import {
 } from '@/redux/features/system/systemSlice'
 import {
   setChatSectionStore,
-  setUserId,
   setUserSocketId,
 } from '@/redux/features/user/userSlice'
 import { store } from '@/redux/store'
@@ -16,13 +15,10 @@ import { Socket, io } from 'socket.io-client'
 import { WebRTCHandler } from './webRTCHandler'
 import { stopBothVideoAndAudio } from '@/common/utils/helpers/stopBothVideoAndAudio'
 import { getStore } from '@/common/utils/getStore'
-import { initChatSection } from '@/common/utils/initChatSection'
 import { SIO } from '@/common/typings/socket'
+import { SERVER } from '@/common/constants/socket'
 
 const dispatch = store.dispatch
-
-// 服务器地址
-const SERVER = 'http://127.0.0.1:9000'
 
 export class SocketClient {
   // socket 实例对象
@@ -46,15 +42,10 @@ export class SocketClient {
     SocketClient.socket.on('room-id', (data) => {
       const { roomId, id } = data
 
-      if (roomId === undefined) {
-        throw new Error(`Server Error: "roomId" does not exist`)
+      if (roomId === undefined || id === undefined) {
+        throw new Error(`'initSocketAndConnect' error.`)
       }
 
-      if (id === undefined) {
-        throw new Error(`Server Error: "id" does not exist`)
-      }
-
-      dispatch(setUserId(id))
       dispatch(setRoomId(roomId))
       dispatch(setRoomStatus('created'))
     })
@@ -138,13 +129,24 @@ export class SocketClient {
       const { roomExists, full } = result
 
       if (roomExists === false) {
-        dispatch(setErrorMessage(`房间不存在`))
+        dispatch(
+          setErrorMessage({
+            key: `error_${Date.now()}`,
+            content: `房间不存在`,
+          }),
+        )
         dispatch(setRoomId(''))
       } else if (full === true) {
-        dispatch(setErrorMessage(`房间人数已满`))
+        dispatch(
+          setErrorMessage({
+            key: `error_${Date.now()}`,
+            content: `房间人数已满`,
+          }),
+        )
       } else {
         SocketClient.socket.emit('room-join', emitData)
         dispatch(setRoomStatus('existed'))
+        dispatch(setRoomId(roomId))
       }
     }
   }
@@ -225,7 +227,7 @@ export class SocketClient {
       directMessage
 
     if (receiverName === undefined || receiverSocketId === undefined) {
-      throw new Error(`Direct Message error.`)
+      throw new Error(`'saveNewDirectMessage' error.`)
     }
 
     const chatSectionStore = getStore().user.chatSectionStore

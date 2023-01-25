@@ -221,18 +221,12 @@ export class SocketEventHandler {
       const { roomId, username, audioOnly } = data
 
       // username 不存在
-      if (username === undefined) {
-        throw new Error("'username' is not provided.")
-      }
-
-      // roomId 不存在
-      if (roomId === undefined) {
-        throw new Error("'roomId' is not provided.")
-      }
-
-      // audio 不存在
-      if (audioOnly === undefined) {
-        throw new Error("'audioOnly' is not provided.")
+      if (
+        roomId === undefined ||
+        username === undefined ||
+        audioOnly === undefined
+      ) {
+        throw new Error(`'joinRoomHandler' error.`)
       }
 
       // 开始加入房间操作

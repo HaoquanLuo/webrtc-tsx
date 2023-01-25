@@ -5,9 +5,9 @@ import { StoreProps } from '@/common/typings/store'
 import { SIO } from '@/common/typings/socket'
 
 export interface UserState {
+  logState: boolean
   token: string
   userInfo: User.Info
-  userId: string
   userSocketId: string
   publicMessages: SIO.Message[]
   currChatTargetTitle: string
@@ -15,12 +15,12 @@ export interface UserState {
 }
 
 const initialUserState: UserState = {
+  logState: getToken() !== null ? true : false,
   token: getToken() ?? '',
   userInfo: getUserInfo() ?? {
     username: '',
     password: '',
   },
-  userId: '',
   userSocketId: '',
   publicMessages: [],
   currChatTargetTitle: '',
@@ -31,14 +31,14 @@ export const userSlice = createSlice({
   name: 'user',
   initialState: initialUserState,
   reducers: {
+    setLogState: (state, action: PayloadAction<boolean>) => {
+      state.logState = action.payload
+    },
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload
     },
     setUserInfo: (state, action: PayloadAction<User.Info>) => {
       state.userInfo = action.payload
-    },
-    setUserId: (state, action: PayloadAction<string>) => {
-      state.userId = action.payload
     },
     setUserSocketId: (state, action: PayloadAction<string>) => {
       state.userSocketId = action.payload
@@ -59,18 +59,18 @@ export const userSlice = createSlice({
 })
 
 export const {
+  setLogState,
   setToken,
   setUserInfo,
-  setUserId,
   setUserSocketId,
   setPublicMessages,
   setChatSectionStore,
   setCurrChatTargetTitle,
 } = userSlice.actions
 
+export const selectLogState = (state: StoreProps) => state.user.logState
 export const selectToken = (state: StoreProps) => state.user.token
 export const selectUserInfo = (state: StoreProps) => state.user.userInfo
-export const selectUserId = (state: StoreProps) => state.user.userId
 export const selectUserSocketId = (state: StoreProps) => state.user.userSocketId
 export const selectPublicMessages = (state: StoreProps) =>
   state.user.publicMessages

@@ -1,9 +1,10 @@
 import React from 'react'
 import { useMsgScrollToView } from '@/hooks/useScrollToView'
 import MessageBox from './MessageBox'
+import { SIO } from '@/common/typings/socket'
 
 interface MessageContainerProps {
-  messages: User.ChatMessage[]
+  messages: SIO.Message[]
 }
 
 const MessageContainer: React.FC<MessageContainerProps> = (props) => {

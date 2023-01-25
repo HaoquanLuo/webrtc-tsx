@@ -20,7 +20,7 @@ import { notification } from 'antd'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import MessageContainer from '@/components/MessageContainer/MessageContainer'
 import ParticipantContainer from '@/components/ParticipantContainer/ParticipantContainer'
-import { SocketClient } from '@/core/SocketClient'
+import { SocketClient } from '@/core/SocketClientEventHandler'
 import { useToggler } from '@/hooks/useToggler'
 import { PublicChatTitle } from '@/common/constants/chat'
 import { SIO } from '@/common/typings/socket'
@@ -290,7 +290,7 @@ const UserPanel: React.FC<Props> = (props) => {
               items-center
               h="15.5"
               bg-dark
-              bg-op-40
+              bg-op-30
               rd-t-2
             >
               {chatList.map(([chatTitle, chatSectionStructure]) => {
