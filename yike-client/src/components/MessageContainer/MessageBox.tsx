@@ -18,10 +18,7 @@ const MessageBox: React.FC<Props> = (props) => {
     <div key={message.id} className={`my-1`}>
       {message.senderName && !message.sameAuthor && (
         <div
-          font-bold
-          text-sm
-          mx-1
-          className={`${
+          className={`font-bold text-sm mx-1 dark:text-gray-3 ${
             message.senderName === username ? 'text-right' : 'text-left'
           }`}
         >
@@ -29,7 +26,7 @@ const MessageBox: React.FC<Props> = (props) => {
         </div>
       )}
       <div
-        className={`px-2 py-1 bg-violet-6 rd-2 w-fit ${
+        className={`px-2 py-1 bg-violet-6 text-white rd-2 w-fit ${
           message.senderName === username ? 'float-right' : 'float-left'
         }`}
       >

@@ -5,7 +5,7 @@ import {
   selectRoomParticipants,
   selectRoomStatus,
 } from '@/redux/features/system/systemSlice'
-import IconBox from '@/components/IconBox'
+import IconContainer from '@/components/IconContainer'
 import {
   selectCurrChatTargetTitle as selectCurrChatTargetTitle,
   selectChatSectionStore as selectChatSectionStore,
@@ -25,6 +25,7 @@ import { useToggler } from '@/hooks/useToggler'
 import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'
 import ShadowBox from '@/components/ShadowBox'
+import IconBox from '@/components/IconContainer/IconBox'
 
 type ChatHistory<T> = (nextChatList: T[], chatTarget: T) => T[]
 
@@ -123,7 +124,7 @@ const UserPanel: React.FC<Props> = (props) => {
   }
   const participantsStyle = useMemo(
     () => ({
-      bottom: parseInt(msgBoxHeight, 10) + 16,
+      bottom: msgBoxHeight + 16,
     }),
     [msgBoxHeight],
   )
@@ -238,7 +239,7 @@ const UserPanel: React.FC<Props> = (props) => {
         relative
         sm:w-60 lg:w-80
         h-a
-        pl-3 pr-2 py-2
+        pl-3 py-2
         flex flex-col shrink-0
         gap-y="0.5"
         justify-between
@@ -298,11 +299,14 @@ const UserPanel: React.FC<Props> = (props) => {
                 return (
                   <div
                     key={chatTitle}
-                    className={`grid place-items-center rd-36 hover:bg-op-80 dark:bg-gray-7 ${
+                    className={`
+                      grid place-items-center rd-36 w-11 h-11
+                    text-white text-xs cursor-pointer ${
                       currChatTargetTitle === chatTitle
                         ? 'bg-orange ring-light-4 ring-2 dark:ring-orange dark:text-orange'
                         : 'bg-gray-3'
-                    } w-11 h-11 text-xs cursor-pointer`}
+                    } hover:bg-op-80 dark:bg-gray-7
+                    `}
                     onClick={() => handleSetCurrChatTargetTitle(chatTitle)}
                   >
                     {chatSectionStructure.chatTitle}
@@ -336,11 +340,12 @@ const UserPanel: React.FC<Props> = (props) => {
                 onKeyDown={handleTextAreaDown}
                 placeholder={`'Shift + Enter' 换行`}
               />
-              <IconBox
+              <IconContainer
                 absolute
                 bottom-2
                 right-2
-                icon={<div i-mdi-send rotate--30 />}
+                size="lg"
+                Icon={<IconBox iconName="i-mdi-send" rotate--30 />}
                 handleClick={handleSendMessage}
               />
             </div>

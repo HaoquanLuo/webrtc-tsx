@@ -1,7 +1,8 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import React, { useState } from 'react'
-import IconBox from '../IconBox'
+import IconContainer from '../IconContainer'
 import ScreenPreviewBox from './ScreenPreviewBox'
+import IconBox from '../IconContainer/IconBox'
 
 interface ScreenShareButtonProps {}
 
@@ -47,9 +48,9 @@ const ScreenShareButton: React.FC<ScreenShareButtonProps> = () => {
 
   return (
     <>
-      <IconBox
-        icon={
-          <i
+      <IconContainer
+        Icon={
+          <IconBox
             className={
               screenShareStatus === 'camera'
                 ? 'i-mdi:camera-flip-outline'

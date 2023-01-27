@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import IconBox from '../IconBox'
+import IconContainer from '../IconContainer'
 import {
   selectChatSectionStore,
   selectCurrChatTargetTitle,
@@ -8,6 +8,7 @@ import {
   setCurrChatTargetTitle,
 } from '@/redux/features/user/userSlice'
 import { SIO } from '@/common/typings/socket'
+import IconBox from '../IconContainer/IconBox'
 
 interface ParticipantInfoBoxProps {
   user: SIO.User
@@ -62,17 +63,17 @@ const ParticipantInfoBox: React.FC<ParticipantInfoBoxProps> = (props) => {
   return (
     <div
       key={user.username}
-      className="relative flex flex-col text-gray my-1 px-2 py-1 transition-100 rd-2"
+      className="relative flex flex-col text-gray-3 my-1 px-2 py-1 rd-2"
       hover="bg-op-20 bg-gray rd-2"
     >
       <div font-bold>{user.username}</div>
       <div>{user.socketId}</div>
       {username !== user.username && (
-        <IconBox
+        <IconContainer
           absolute
           top-3
           right-3
-          icon={<div i-mdi-message-outline />}
+          Icon={<IconBox iconName="i-mdi-message-outline" />}
           handleClick={() => handleSwitchChatTarget(user)}
         />
       )}

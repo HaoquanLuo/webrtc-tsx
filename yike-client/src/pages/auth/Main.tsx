@@ -20,24 +20,38 @@ import {
   selectUserInfo,
   selectUserSocketId,
 } from '@/redux/features/user/userSlice'
-import { Button, Input, Modal, Switch, notification } from 'antd'
+import { Input, Modal, Switch, notification } from 'antd'
 
 // notification 全局配置
 notification.config({
   duration: 2,
 })
 
+function calcTime(value: number) {
+  if (value > 0 && value <= 5) {
+    return '凌晨好'
+  } else if (value > 5 && value <= 9) {
+    return '早上好'
+  } else if (value >= 9 && value < 12) {
+    return '上午好'
+  } else if (value >= 12 && value < 13) {
+    return '中午好'
+  } else if (value >= 13 && value < 19) {
+    return '下午好'
+  } else if (value >= 19 && value < 24) {
+    return '晚上好'
+  }
+}
+
 const Main: React.FC = () => {
-  // 工具 hooks
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [api, contextHolder] = notification.useNotification()
 
-  // 控制弹窗显示
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [joinRoomId, setJoinRoomId] = useState('')
+  const [nowTimeStr, setNowTimeStr] = useState<string>('')
 
-  // store 属性
   const errorMessage = useSelector(selectErrorMessage)
   const { username } = useSelector(selectUserInfo)
   const userSocketId = useSelector(selectUserSocketId)
@@ -79,7 +93,6 @@ const Main: React.FC = () => {
     setIsModalOpen(false)
   }
 
-  // 按钮点击事件
   const handleCreate = () => {
     dispatch(setRoomHost(true))
     showModal()
@@ -98,7 +111,7 @@ const Main: React.FC = () => {
     dispatch(setConnectWithAudioOnly(!audioOnly))
   }
 
-  // 进入 Main 页面初始化 socket 实例
+  // 进入 Main 页面进行初始化
   useEffect(() => {
     if (userSocketId === '') {
       SocketClient.initSocketAndConnect()
@@ -130,52 +143,94 @@ const Main: React.FC = () => {
     }
   }, [errorMessage])
 
+  useEffect(() => {
+    let timer = setInterval(() => {
+      const nowTime = new Date().getHours()
+
+      setNowTimeStr(`${calcTime(nowTime) as string}，${username}!`)
+    })
+
+    return () => {
+      clearInterval(timer)
+    }
+  }, [])
+
   return (
-    <>
+    <div w-full h-full grid place-items-center>
       {contextHolder}
-      <h2>Auth Main</h2>
-      <div>
-        <Button onClick={handleCreate}>创建房间</Button>
-        <Button onClick={handleJoin}>加入房间</Button>
-      </div>
-      <Modal
-        title={roomHost ? '创建房间' : '加入房间'}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <div flex flex-col gap-y-2 p-2 font-500 text-base>
-          <div>
-            {roomHost ? (
-              <div flex text-center>
-                <i i-mdi-vector-link text-5xl mx-4></i>
-              </div>
-            ) : (
-              <div flex text-center>
-                <i i-mdi-link text-5xl mx-4></i>
-                <Input
-                  placeholder="请输入房间 id"
-                  type="text"
-                  value={joinRoomId}
-                  onChange={handleInput}
-                />
-              </div>
-            )}
+      <div flex flex-col h="80%" gap-y-16>
+        <div px-10 h-10>
+          <span text-8 font-bold vertical-baseline>
+            {nowTimeStr}
+          </span>
+        </div>
+        <div flex gap-12 text-center>
+          <div
+            className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
+            hover="~ shadow-2xl shadow-violet-6"
+            onClick={handleCreate}
+          >
+            <div
+              i-fluent:protocol-handler-24-regular
+              w-50
+              h-50
+              hover="~ text-violet-6"
+            ></div>
+            <div>创建房间</div>
           </div>
-          <div flex flex-col justify-end gap-1>
-            <div>连接选项</div>
-            <div>
-              <Switch
-                checked={audioOnly}
-                checkedChildren="仅音频"
-                unCheckedChildren="音视频"
-                onChange={handleSwitch}
-              />
-            </div>
+          <div
+            className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
+            hover="~ shadow-2xl shadow-orange-4"
+            onClick={handleJoin}
+          >
+            <div
+              i-fluent:conference-room-48-regular
+              w-50
+              h-50
+              hover="~ text-orange-4"
+            ></div>
+            <div>加入房间</div>
           </div>
         </div>
-      </Modal>
-    </>
+        <Modal
+          title={roomHost ? '创建房间' : '加入房间'}
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <div flex flex-col gap-y-2 p-2 font-500 text-base>
+            <div>
+              {roomHost ? (
+                <div flex text-center>
+                  <i i-mdi-vector-link text-5xl mx-4></i>
+                </div>
+              ) : (
+                <div flex text-center>
+                  <i i-mdi-link text-5xl mx-4></i>
+                  <Input
+                    placeholder="请输入房间 id"
+                    type="text"
+                    value={joinRoomId}
+                    onChange={handleInput}
+                  />
+                </div>
+              )}
+            </div>
+            <div flex flex-col justify-end gap-1>
+              <div>连接选项</div>
+              <div>
+                <Switch
+                  checked={audioOnly}
+                  checkedChildren="仅音频"
+                  unCheckedChildren="音视频"
+                  onChange={handleSwitch}
+                />
+              </div>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </div>
   )
 }
 

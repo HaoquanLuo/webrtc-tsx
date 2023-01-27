@@ -1,5 +1,5 @@
 import { getItem, setItem } from '@/common/utils/storage'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useMemo, useState } from 'react'
 
 export const useToggler = () => {
@@ -10,6 +10,17 @@ export const useToggler = () => {
     parseInt(getItem('msgBoxHeight') as string, 10) || 488,
   )
   const [isToggling, setIsToggling] = useState<boolean>(false)
+  const [msgBoxHeight, setMsgBoxHeight] = useState<number>(480)
+
+  const calcTogglerY = (value: number) => {
+    if (value > 488) {
+      return 488
+    } else if (value < 168) {
+      return 168
+    } else {
+      return value
+    }
+  }
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setIsToggling(true)
@@ -30,24 +41,16 @@ export const useToggler = () => {
 
   const handleMouseUp = () => {
     setIsToggling(false)
-    setItem('msgBoxHeight', togglerY)
+    setItem('msgBoxHeight', calcTogglerY(togglerY))
   }
 
-  const calcTogglerY = (value: number) => {
-    if (value > 480) {
-      return 480
-    } else if (value < 166) {
-      return 166
-    } else {
-      return value
-    }
-  }
-
-  const msgBoxHeight = `${calcTogglerY(togglerY)}px`
+  useEffect(() => {
+    setMsgBoxHeight(calcTogglerY(togglerY))
+  }, [togglerY])
 
   const togglerStyle = useMemo(
     () => ({
-      bottom: parseInt(msgBoxHeight, 10) + 8,
+      bottom: msgBoxHeight + 8,
     }),
     [msgBoxHeight],
   )
@@ -68,7 +71,6 @@ export const useToggler = () => {
         py-0.5
         grid
         place-items-center
-        transition-100
       "
       onMouseDown={handleMouseDown}
       before="content-empty w-4 h-0.2 bg-gray"

@@ -14,7 +14,6 @@ import {
 } from '@/redux/features/system/systemSlice'
 import {
   selectLogState,
-  selectUserInfo,
   setCurrChatTargetTitle,
   setLogState,
   setToken,
@@ -32,10 +31,10 @@ const SystemHeader: React.FC = () => {
 
   const logState = useSelector(selectLogState)
   const currentPath = useSelector(selectCurrentPath)
-  const { username } = useSelector(selectUserInfo)
   const roomId = useSelector(selectRoomId)
   const roomStatus = useSelector(selectRoomStatus)
 
+  const [showCopied, setShowCopied] = useState(false)
   const [showTips, setShowTips] = useState(false)
 
   async function handleLogout() {
@@ -69,10 +68,20 @@ const SystemHeader: React.FC = () => {
   }
 
   function handleCopyToClipboard() {
+    setShowCopied(true)
+    setTimeout(() => {
+      setShowCopied(false)
+    }, 1500)
+  }
+
+  function handleTipsMouseEnter() {
     setShowTips(true)
+  }
+
+  function handleTipsMouseLeave() {
     setTimeout(() => {
       setShowTips(false)
-    }, 1500)
+    }, 500)
   }
 
   /**
@@ -95,44 +104,61 @@ const SystemHeader: React.FC = () => {
   }
 
   return (
-    <div id="system-header" relative flex items-center px-6 gap-2 min-h="14!">
+    <div
+      id="system-header"
+      relative
+      flex
+      items-center
+      px-6
+      gap-2
+      min-h="14!"
+      dark="~ text-gray-3"
+    >
       <div className="left-btns" flex w-48 justify-start>
         {<BackButton />}
       </div>
-      {logState && (
-        <>
-          <div className="center-btns" flex flex-1 justify-center>
-            <span mx-2 font-bold>
-              {username}
-            </span>
-            {roomId && (
-              <CopyToClipboard onCopy={handleCopyToClipboard} text={roomId}>
-                <span>{roomId}</span>
-              </CopyToClipboard>
-            )}
-            {showTips && (
-              <span absolute bottom="-4" font-bold b-2 rd-2 px-1 bg-op-40>
-                Copied!
+      <div className="center-btns" flex flex-1 justify-center>
+        {roomId && (
+          <CopyToClipboard onCopy={handleCopyToClipboard} text={roomId}>
+            <div>
+              <span mx-2 font-bold>
+                房间号:
               </span>
-            )}
-          </div>
-          <div className="right-btns" flex w-48 justify-end>
-            {roomStatus === 'unbuild' && (
-              <Button
-                shape="circle"
-                icon={<LogoutOutlined />}
-                onClick={() =>
-                  showConfirm({
-                    title: '确定要退出吗?',
-                    content: '离开不会保存当前数据',
-                    onOkCallback: handleLogout,
-                  })
-                }
-              />
-            )}
-          </div>
-        </>
-      )}
+              <span
+                onMouseEnter={handleTipsMouseEnter}
+                onMouseLeave={handleTipsMouseLeave}
+              >
+                {roomId}
+              </span>
+            </div>
+          </CopyToClipboard>
+        )}
+        {showTips && (
+          <span absolute bottom="0" px-1 text-gray-4 text-sm>
+            点击复制
+          </span>
+        )}
+        {showCopied && (
+          <span absolute bottom="-4" font-bold b-2 rd-2 px-1 bg-gray-1 bg-op-20>
+            Copied!
+          </span>
+        )}
+      </div>
+      <div className="right-btns" flex w-48 justify-end>
+        {logState && roomStatus === 'unbuild' && (
+          <Button
+            shape="circle"
+            icon={<LogoutOutlined />}
+            onClick={() =>
+              showConfirm({
+                title: '确定要退出吗?',
+                content: '离开不会保存当前数据',
+                onOkCallback: handleLogout,
+              })
+            }
+          />
+        )}
+      </div>
     </div>
   )
 }

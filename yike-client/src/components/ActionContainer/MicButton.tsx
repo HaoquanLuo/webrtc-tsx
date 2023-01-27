@@ -1,6 +1,7 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import React, { useState } from 'react'
-import IconBox from '../IconBox'
+import IconContainer from '../IconContainer'
+import IconBox from '../IconContainer/IconBox'
 
 interface MicButtonProps {}
 
@@ -13,9 +14,9 @@ const MicButton: React.FC<MicButtonProps> = () => {
   }
 
   return (
-    <IconBox
-      icon={
-        <i
+    <IconContainer
+      Icon={
+        <IconBox
           className={
             micStatus === 'loud' ? 'i-mdi-microphone' : 'i-mdi-microphone-off'
           }

@@ -21,7 +21,7 @@ import {
 } from '@/redux/features/system/systemSlice'
 import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
-import ActionBox from '@/components/ActionContainer/ActionBox'
+import ActionBox from '@/components/ActionContainer'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'
@@ -69,9 +69,9 @@ const Room: React.FC = () => {
               },
             }),
           )
-
-          dispatch(setCurrChatTargetTitle(`${PublicChatTitle}_${roomId}`))
         }
+
+        dispatch(setCurrChatTargetTitle(`${PublicChatTitle}_${roomId}`))
       }
 
       return () => {
@@ -135,18 +135,20 @@ const Room: React.FC = () => {
     useEffect(() => {
       if (roomHost && roomParticipants.length > 1) {
         api.info({
-          message: '新用户加入',
+          message: '有新用户加入',
           placement: 'top',
         })
       }
+    }, [roomHost, roomParticipants])
 
+    useEffect(() => {
       if (!roomHost) {
         api.success({
           message: '欢迎加入房间',
           placement: 'top',
         })
       }
-    }, [roomHost, roomParticipants])
+    }, [roomHost])
   } catch (error) {
     console.error(error)
   }

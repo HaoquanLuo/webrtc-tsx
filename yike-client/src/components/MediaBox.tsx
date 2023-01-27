@@ -52,7 +52,18 @@ const MediaBox: React.FC<Props> = (props) => {
   }, [srcObject])
 
   return (
-    <div relative w-full h-full rd-2 mx-a my-0 b-gray b-1 b-op-10>
+    <div
+      relative
+      w-full
+      h-full
+      rd-2
+      mx-a
+      my-0
+      b-gray-2
+      b-1
+      b-op-10
+      dark="~ text-gray-3 b-gray-2 b-op-20"
+    >
       {audioOnly && (
         <div
           pointer-events-auto
@@ -67,10 +78,10 @@ const MediaBox: React.FC<Props> = (props) => {
           <div grid place-items-center w-full h-full text-xl>
             <div>
               <span>用户</span>
-              <span font-600 mx-1 font-italic>
+              <span font-600 mx="1.5" font-italic>
                 {userName}
               </span>
-              <span>仅以音频连接</span>
+              <span>以音频连接</span>
             </div>
           </div>
         </div>

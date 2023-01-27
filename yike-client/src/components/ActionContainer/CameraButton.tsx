@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import IconBox from '../IconBox'
+import IconContainer from '../IconContainer'
 import { WebRTCHandler } from '@/core/webRTCHandler'
+import IconBox from '../IconContainer/IconBox'
 
 interface CameraButtonProps {}
 
@@ -13,9 +14,9 @@ const CameraButton: React.FC<CameraButtonProps> = () => {
   }
 
   return (
-    <IconBox
-      icon={
-        <i
+    <IconContainer
+      Icon={
+        <IconBox
           className={
             cameraStatus === 'off'
               ? 'i-mdi:camera-off-outline'
