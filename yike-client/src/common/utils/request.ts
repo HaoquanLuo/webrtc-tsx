@@ -6,6 +6,7 @@ import { setToken } from '@/redux/features/user/userSlice'
 import { getStore } from './getStore'
 import { store } from '@/redux/store'
 import { removeItem } from './storage'
+import { setErrorMessage } from '@/redux/features/system/systemSlice'
 
 // redux
 const userState = getStore().user
@@ -36,16 +37,20 @@ const errorHandler = (error: AxiosError) => {
     const data = error.response.data as any
     const token = userState.token
     if (error.response.status === 403) {
-      notification.error({
-        message: '权限不足',
-        description: data.msg,
-      })
+      dispatch(
+        setErrorMessage({
+          content: '权限不足',
+          key: `error_${Date.now()}`,
+        }),
+      )
     }
     if (error.response.status === 401 && !data.data) {
-      notification.error({
-        message: '登录失效',
-        description: data.msg,
-      })
+      dispatch(
+        setErrorMessage({
+          content: '效限不足',
+          key: `error_${Date.now()}`,
+        }),
+      )
       const reload = () => {
         setTimeout(() => {
           window.location.replace(LoginRoutePath)
@@ -63,15 +68,17 @@ const errorHandler = (error: AxiosError) => {
 
 // 响应拦截
 axios.interceptors.response.use(
-  (response: AxiosResponse<Common.ResponseData<any>>) => {
+  (response: AxiosResponse<Common.ResponseData>) => {
     if (response?.status === 200) {
       return Promise.resolve(response)
     }
     if (response.data?.errorCode !== 10000) {
-      notification.error({
-        message: '请求失败',
-        description: response.data.msg,
-      })
+      dispatch(
+        setErrorMessage({
+          content: '请求失败',
+          key: `error_${Date.now()}`,
+        }),
+      )
       return Promise.reject(response)
     }
     return response.data.data

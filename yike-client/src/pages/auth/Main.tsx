@@ -172,7 +172,7 @@ const Main: React.FC = () => {
         <div flex gap-12 text-center>
           <div
             className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
-            hover="~ drop-shadow-[0_35px_35px_rgba(124,58,237,0.5)]"
+            hover="~ drop-shadow-[0_35px_35px_rgba(124,58,237,1)]"
             onClick={handleCreate}
           >
             <div
@@ -185,7 +185,7 @@ const Main: React.FC = () => {
           </div>
           <div
             className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
-            hover="~ shadow-2xl shadow-orange-4"
+            hover="~ drop-shadow-[0_35px_35px_rgba(251,146,60,1)]"
             onClick={handleJoin}
           >
             <div

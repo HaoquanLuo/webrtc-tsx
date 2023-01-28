@@ -4,8 +4,12 @@ import { validate } from '../server/ajv'
 
 // 请求参数类型
 type RequestDataType = 'query' | 'body'
+
 /**
- * 数据校验中间件
+ * @description 数据校验中间件
+ * @param schema
+ * @param type
+ * @returns
  */
 function validator(
   schema: string | boolean | object,

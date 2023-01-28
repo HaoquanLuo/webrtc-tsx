@@ -51,7 +51,7 @@ declare global {
 
   module Common {
     type Params = string
-    interface ResponseData<T> {
+    interface ResponseData<T = any> {
       data?: T
       msg?: string
       code?: number

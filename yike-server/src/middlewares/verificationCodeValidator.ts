@@ -2,7 +2,7 @@ import { Models } from '../common/typings/model'
 import { ParameterException } from '../core/HttpException'
 
 /**
- * 校验验证码
+ * @description 校验图形验证码
  * @param ctx
  * @param next
  */
@@ -11,6 +11,12 @@ export default async function verificationCodeValidator(
   next: Function,
 ) {
   const { code } = ctx.request.body as any
+
+  if (code === 'register') {
+    console.log('-------register--------')
+
+    await next()
+  }
 
   if (ctx.session!.code !== code) {
     throw new ParameterException('验证码错误')

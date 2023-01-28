@@ -1,5 +1,24 @@
 import request from '@/common/utils/request'
 import { AxiosResponse } from 'axios'
+interface LoginData {
+  userName: string
+  password: string
+  code: string
+}
+
+type RegisterData = {
+  userName: string
+  email: string
+  password: string
+  code: string
+}
+
+type CaptchaData = {
+  userName: string
+  email: string
+}
+
+type RoomData = { roomId: string }
 
 const Auth = '/system/auth'
 const api = {
@@ -11,18 +30,14 @@ const api = {
   roomState: `${Auth}/room-exists`,
 }
 
-interface Login {
-  userName: string
-  password: string
-  code: string
-}
-
 /**
  * @description 登录
  * @param params
  * @returns
  */
-export function login(params: Login) {
+export function login(
+  params: LoginData,
+): Promise<AxiosResponse<Common.ResponseData>> {
   return request.post(api.login, params)
 }
 
@@ -36,19 +51,18 @@ export function logout() {
 /**
  * @description 注册
  */
-export function register(params: {
-  userName: string
-  email: string
-  password: string
-  code: string
-}) {
+export function register(
+  params: RegisterData,
+): Promise<AxiosResponse<Common.ResponseData>> {
   return request.post(api.register, params)
 }
 
 /**
  * @description 获取邮箱验证码
  */
-export function getEmailCaptcha(params: { userName: string; email: string }) {
+export function getEmailCaptcha(
+  params: CaptchaData,
+): Promise<AxiosResponse<Common.ResponseData>> {
   return request.post(api.sendEmail, params)
 }
 
@@ -57,7 +71,7 @@ export function getEmailCaptcha(params: { userName: string; email: string }) {
  * @param roomId
  * @returns
  */
-export function getRoomState(params: { roomId: string }): Promise<
+export function getRoomState(params: RoomData): Promise<
   AxiosResponse<
     Common.ResponseData<{
       roomExists: boolean
