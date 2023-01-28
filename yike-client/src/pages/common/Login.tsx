@@ -90,6 +90,10 @@ const Login: React.FC = () => {
     }
   }
 
+  const handleRegister = () => {
+    navigate('register')
+  }
+
   useEffect(() => {
     if (logState) {
       setTimeout(() => {
@@ -143,6 +147,7 @@ const Login: React.FC = () => {
             />
             <InputBox
               tag={'密码'}
+              type="password"
               required={true}
               inputKey={'password'}
               inputValue={loginUser.password}
@@ -164,13 +169,29 @@ const Login: React.FC = () => {
             </div>
           </div>
         </div>
-        <div id="register-bottom" pt-2 grid place-items-center>
+        <div id="register-submit" py-2 grid place-items-center>
           <Button
             size="large"
             className="bg-blue-6 w-full hover:bg-#232323"
             onClick={handleSubmit}
           >
             登录
+          </Button>
+        </div>
+        <div id="register-bottom" grid place-items-center>
+          <a
+            className="decoration-none text-sm text-blue visited:text-blue"
+            href="#"
+          >
+            忘记密码？
+          </a>
+          <div w-full mb-4 pb-4 b-b-1 b-gray-2 b-op-20></div>
+          <Button
+            size="large"
+            className="w-40 bg-green-6 hover:bg-#232323"
+            onClick={handleRegister}
+          >
+            创建新用户
           </Button>
         </div>
       </div>

@@ -1,12 +1,13 @@
 import { getToken } from '@/common/utils/helpers/getTools'
 import SystemLayout from '@/layout/SystemLayout'
+import Login from '@/pages/common/Login'
 import {
   setCurrentPath,
   selectRoomId,
 } from '@/redux/features/system/systemSlice'
 import { lazy, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 // Vite 的懒加载需要用 import.meta.glob() 实现
 const modules = import.meta.glob<{ default: React.FC }>('../pages/**/*.tsx')
@@ -61,18 +62,5 @@ export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
 
   const userView = <>{children}</>
 
-  const guidelines = (
-    <div grid place-items-center>
-      <ul>
-        <li>
-          <Link to={'login'}>Sign In</Link>
-        </li>
-        <li>
-          <Link to={'register'}>Sign Up</Link>
-        </li>
-      </ul>
-    </div>
-  )
-
-  return <SystemLayout>{token ? userView : guidelines}</SystemLayout>
+  return <SystemLayout>{token ? userView : <Login />}</SystemLayout>
 }
