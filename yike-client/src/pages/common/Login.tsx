@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { login } from '@/api/system/auth'
 import { sendCodeCaptcha } from '@/api/system/common'
-import Input from '@/components/InputBox'
+import InputBox from '@/components/InputBox'
 import { setItem } from '@/common/utils/storage'
 import { setLogState, selectLogState } from '@/redux/features/user/userSlice'
 import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
   return (
     <>
       <h2>Sign In</h2>
-      <Input
+      <InputBox
         tag={'username'}
         inputKey={'username'}
         inputValue={user.username}
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
           handleUserChange(key, e)
         }}
       />
-      <Input
+      <InputBox
         tag={'password'}
         inputKey={'password'}
         inputValue={user.password}
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
           handleUserChange(key, e)
         }}
       />
-      <Input
+      <InputBox
         tag={'code'}
         inputKey={'code'}
         inputValue={user.code}

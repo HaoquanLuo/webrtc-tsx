@@ -1,5 +1,5 @@
 import { RouteObject } from 'react-router-dom'
-import { RouteGuard, lazyLoad } from '@/core/RouteGuard'
+import { RouteGuard, lazyLoad } from '@/hooks/useRouteGuard'
 import { constantRoutesMap } from './modules/common'
 import { authRoutesMap } from './modules/auth'
 import CommonPage from '@/pages/common/Common'

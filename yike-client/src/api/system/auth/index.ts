@@ -40,7 +40,7 @@ export function register(params: {
   userName: string
   email: string
   password: string
-  code?: string
+  code: string
 }) {
   return request.post(api.register, params)
 }

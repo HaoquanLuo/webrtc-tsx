@@ -30,15 +30,20 @@ notification.config({
 function calcTime(value: number) {
   if (value > 0 && value <= 5) {
     return '凌晨好'
-  } else if (value > 5 && value <= 9) {
+  }
+  if (value > 5 && value <= 9) {
     return '早上好'
-  } else if (value >= 9 && value < 12) {
+  }
+  if (value >= 9 && value < 12) {
     return '上午好'
-  } else if (value >= 12 && value < 13) {
+  }
+  if (value >= 12 && value < 13) {
     return '中午好'
-  } else if (value >= 13 && value < 19) {
+  }
+  if (value >= 13 && value < 19) {
     return '下午好'
-  } else if (value >= 19 && value < 24) {
+  }
+  if (value >= 19 && value < 24) {
     return '晚上好'
   }
 }
@@ -167,7 +172,7 @@ const Main: React.FC = () => {
         <div flex gap-12 text-center>
           <div
             className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
-            hover="~ shadow-2xl shadow-violet-6"
+            hover="~ drop-shadow-[0_35px_35px_rgba(124,58,237,0.5)]"
             onClick={handleCreate}
           >
             <div
