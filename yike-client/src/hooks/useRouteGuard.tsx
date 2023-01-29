@@ -1,13 +1,12 @@
-import { getToken } from '@/common/utils/helpers/getTools'
+import React, { lazy, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useLocation } from 'react-router-dom'
 import SystemLayout from '@/layout/SystemLayout'
-import Login from '@/pages/common/Login'
 import {
   setCurrentPath,
   selectRoomId,
 } from '@/redux/features/system/systemSlice'
-import { lazy, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { selectLogState } from '@/redux/features/user/userSlice'
 
 // Vite 的懒加载需要用 import.meta.glob() 实现
 const modules = import.meta.glob<{ default: React.FC }>('../pages/**/*.tsx')
@@ -20,47 +19,61 @@ export const lazyLoad = (moduleName: string) => {
   return <Module />
 }
 
-export const inAuth = new RegExp(/^\/auth(.*)/, 'gim')
-export const inRoom = new RegExp(/^\/auth\/room\/(.*)/, 'gim')
-export const inIndex = new RegExp(/^\/$/)
+const inMain = new RegExp(/^\/main/, 'gi')
+const inRoom = new RegExp(/^\/room\/(.*)/, 'gi')
+const inIndex = new RegExp(/^\/$/)
 
 /**
  * @description 路由鉴权组件
  * @param props
  * @returns
  */
-export const RouteGuard: React.FC<{ children: React.ReactElement }> = (
-  props,
-) => {
-  const { children } = props
+export const RouteGuard: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { pathname } = useLocation()
+
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const roomId = useSelector(selectRoomId)
-
-  const token = getToken()
+  const logState = useSelector(selectLogState)
 
   useEffect(() => {
-    // 未登录且在 `/auth` 路径中
-    if (!token && inAuth.test(pathname)) {
-      navigate('/login', {
-        replace: true,
-      })
+    // 未登录下的情况
+    if (!logState) {
+      if (inMain.test(pathname)) {
+        navigate('/', {
+          replace: true,
+        })
+      }
     }
 
-    if (!roomId && inRoom.test(pathname)) {
-      navigate('/', {
-        replace: true,
-      })
+    // 登录状态下的情况
+    if (logState) {
+      if (inIndex.test(pathname)) {
+        navigate('/main', {
+          replace: true,
+        })
+      }
+
+      if (!roomId && inRoom.test(pathname)) {
+        navigate('/main', {
+          replace: true,
+        })
+      }
     }
-  }, [pathname])
+  }, [pathname, logState])
 
   useEffect(() => {
     dispatch(setCurrentPath(pathname))
   }, [pathname])
 
-  const userView = <>{children}</>
+  const View: React.FC<{ view: React.ReactNode }> = ({ view }) => <>{view}</>
 
-  return <SystemLayout>{token ? userView : <Login />}</SystemLayout>
+  return (
+    <SystemLayout>
+      <View view={children} />
+    </SystemLayout>
+  )
 }

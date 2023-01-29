@@ -4,7 +4,7 @@ import UserPanel from './UserPanel'
 import { useSelector } from 'react-redux'
 import { selectRoomStatus } from '@/redux/features/system/systemSlice'
 
-const UserLayout: React.FC<{ children: React.ReactElement }> = (props) => {
+const UserLayout: React.FC<{ children: React.ReactNode }> = (props) => {
   const { children } = props
 
   const roomStatus = useSelector(selectRoomStatus)

@@ -2,7 +2,7 @@ import React from 'react'
 import SystemHeader from './SystemHeader'
 
 interface Props {
-  children: React.ReactElement
+  children: React.ReactNode
 }
 
 const SystemLayout: React.FC<Props> = (props) => {

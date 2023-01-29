@@ -24,17 +24,15 @@ const InputBox = (props: Input) => {
   const uid = crypto.randomUUID()
   return (
     <div px-1>
-      <label
-        className={`px-1 text-base ${
-          required ? "after='content-[*] text-red-6'" : ''
-        } `}
-        htmlFor={`input-${uid}`}
-      >
-        {tag}
-      </label>
+      <div inline-flex>
+        <label className="px-1 text-base" htmlFor={`input-${uid}`}>
+          {tag}
+        </label>
+        {required && <div className="text-red vertical-text-top">*</div>}
+      </div>
       <div py-1>
         <input
-          className="w-full h-a p-2 text-lg rd-2 b-gray-2 b-op-20 b-1 outline-none"
+          className="w-full h-a p-2 text-lg rd-2 b-gray-4 b-op-40 b-1 outline-none"
           id={`input-${uid}`}
           type="text"
           placeholder={placeHolder}

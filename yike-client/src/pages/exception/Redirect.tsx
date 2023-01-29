@@ -6,7 +6,7 @@ import { selectLogState } from '@/redux/features/user/userSlice'
 const Redirect: React.FC = () => {
   const navigate = useNavigate()
   const logState = useSelector(selectLogState)
-  const pathToGo = logState ? '/' : '/login'
+  const pathToGo = logState ? '/main' : '/'
 
   useEffect(() => {
     setTimeout(() => {

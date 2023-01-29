@@ -17,6 +17,7 @@ import {
   selectWebRTCStatus,
 } from '@/redux/features/system/systemSlice'
 import {
+  selectLogState,
   selectUserInfo,
   selectUserSocketId,
 } from '@/redux/features/user/userSlice'
@@ -58,6 +59,7 @@ const Main: React.FC = () => {
   const [nowTimeStr, setNowTimeStr] = useState<string>('')
 
   const errorMessage = useSelector(selectErrorMessage)
+  const logState = useSelector(selectLogState)
   const { username } = useSelector(selectUserInfo)
   const userSocketId = useSelector(selectUserSocketId)
   const audioOnly = useSelector(selectConnectWithAudioOnly)
@@ -118,23 +120,23 @@ const Main: React.FC = () => {
 
   // 进入 Main 页面进行初始化
   useEffect(() => {
-    if (userSocketId === '') {
+    if (logState && userSocketId === '') {
       SocketClient.initSocketAndConnect()
     }
 
-    if (roomStatus !== 'unbuild') {
+    if (roomStatus === 'destroyed') {
       dispatch(setRoomStatus('unbuild'))
     }
 
     if (webRTCStatus !== 'uninitialized') {
       dispatch(setWebRTCStatus('uninitialized'))
     }
-  }, [userSocketId])
+  }, [])
 
   // 监听 roomStatus 来判断是否有创建房间
   useEffect(() => {
     if (roomStatus === 'created' || roomStatus === 'existed') {
-      navigate(`/auth/room/${roomId}`)
+      navigate(`/room/${roomId}`)
     }
   }, [roomStatus, roomId])
 

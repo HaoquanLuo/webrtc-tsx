@@ -1,11 +1,20 @@
 import React from 'react'
 
-const ShadowBox: React.FC<{ children: React.ReactElement }> = (props) => {
-  const { children } = props
+interface ShadowBoxProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  open?: boolean
+}
+
+const ShadowBox: React.FC<ShadowBoxProps> = (props) => {
+  const { children, open = false, ...rest } = props
 
   return (
     <div p-2 w-full h-full flex>
-      <div relative p-2 shadow-inner shadow-md rd-2 w-full h-full>
+      <div
+        className={`relative p-2 rd-2 w-full h-full ${
+          open && 'shadow-[0_0_2px_rgba(0,0,0,0.2)]'
+        } `}
+      >
         {children}
       </div>
     </div>

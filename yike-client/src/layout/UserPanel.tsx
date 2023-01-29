@@ -24,7 +24,6 @@ import { SocketClient } from '@/core/SocketClientEventHandler'
 import { useToggler } from '@/hooks/useToggler'
 import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'
-import ShadowBox from '@/components/ShadowBox'
 import IconBox from '@/components/IconContainer/IconBox'
 
 type ChatHistory<T> = (nextChatList: T[], chatTarget: T) => T[]
@@ -55,7 +54,7 @@ const UserPanel: React.FC<Props> = (props) => {
   }))
   const [noticeFlag, setNoticeFlag] = useState<string>('')
 
-  const debounceContent = useDebounceValue(msgContent)
+  const debounceContent = useDebounceValue(msgContent, 100)
   const [msgBoxHeight, Toggler] = useToggler()
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -72,49 +71,47 @@ const UserPanel: React.FC<Props> = (props) => {
     }
   }
 
+  function messageValidator(value: string) {
+    return new Promise<string>((resolve, reject) => {
+      const allowStrReg = /^((\s*)(\S+)(\s*))$/gm
+      const allowStrFlag = allowStrReg.test(value)
+
+      // 判断要发送的文本是否为空
+      if (!allowStrFlag) {
+        setNoticeFlag(crypto.randomUUID())
+        reject('发送速度过快')
+      }
+
+      setNoticeFlag('')
+      resolve('发送成功')
+    })
+  }
+
+  function sendMessage(message: SIO.Message) {
+    if (currChatTargetTitle === `${PublicChatTitle}_${roomId}`) {
+      WebRTCHandler.sendMessageUsingDataChannel(message)
+    } else {
+      SocketClient.handleSendDirectMessage(message)
+    }
+  }
+
   // 发送消息事件
-  const handleSendMessage = () => {
-    function messageValidator(value: string) {
-      return new Promise<void>((resolve, reject) => {
-        const allowStrReg = /^((\s*)(\S+)(\s*))$/gm
-        const allowStrFlag = allowStrReg.test(value)
-
-        // 判断要发送的文本是否为空
-        if (!allowStrFlag) {
-          setNoticeFlag(crypto.randomUUID())
-          reject()
-        }
-
-        setNoticeFlag('')
-        resolve()
+  const handleSendMessage = async () => {
+    try {
+      await messageValidator(debounceContent)
+      setTimeout(() => {
+        sendMessage(currMsg)
+      }, 150)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setCurrMsg({
+        ...currMsg,
+        id: '',
+        messageContent: '',
       })
+      setMsgContent('')
     }
-
-    function sendMessage(message: SIO.Message) {
-      if (currChatTargetTitle === `${PublicChatTitle}_${roomId}`) {
-        WebRTCHandler.sendMessageUsingDataChannel(message)
-      } else {
-        SocketClient.handleSendDirectMessage(message)
-      }
-    }
-
-    ;(async () => {
-      try {
-        await messageValidator(debounceContent)
-        setTimeout(() => {
-          sendMessage(currMsg)
-        }, 150)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setCurrMsg({
-          ...currMsg,
-          id: '',
-          messageContent: '',
-        })
-        setMsgContent('')
-      }
-    })()
   }
 
   const handleSetCurrChatTargetTitle = (chatTargetTitle: string) => {

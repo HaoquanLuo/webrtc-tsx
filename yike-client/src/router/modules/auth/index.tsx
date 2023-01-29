@@ -7,15 +7,11 @@ import { lazyLoad } from '@/hooks/useRouteGuard'
  */
 export const authRoutesMap: RouteObject[] = [
   {
-    index: true,
+    path: '/main',
     element: lazyLoad(AuthPaths.Main),
   },
   {
-    path: '/auth/room/:roomId',
+    path: '/room/:roomId',
     element: lazyLoad(AuthPaths.Room),
-  },
-  {
-    path: '*',
-    element: lazyLoad(ExceptionPaths.Redirect),
   },
 ]

@@ -56,6 +56,15 @@ const SystemHeader: React.FC = () => {
     }
   }
 
+  function handleButtonClick() {
+    logState &&
+      showConfirm({
+        title: '确定要离开吗?',
+        content: '离开不会保存当前数据',
+        onOkCallback: handlePageBack,
+      })
+  }
+
   function handlePageBack() {
     dispatch(setRoomId(''))
     dispatch(setRoomParticipants([]))
@@ -88,19 +97,13 @@ const SystemHeader: React.FC = () => {
    * 根据路径判断是否显示 `返回按钮`
    */
   const BackButton = () => {
-    return currentPath !== '/' ? (
+    return currentPath === '/' || currentPath === '/main' ? null : (
       <Button
         shape="circle"
         icon={<BackwardOutlined />}
-        onClick={() =>
-          showConfirm({
-            title: '确定要离开吗?',
-            content: '离开不会保存当前数据',
-            onOkCallback: handlePageBack,
-          })
-        }
+        onClick={handleButtonClick}
       />
-    ) : null
+    )
   }
 
   return (
@@ -115,7 +118,7 @@ const SystemHeader: React.FC = () => {
       dark="~ text-gray-3"
     >
       <div className="left-btns" flex w-48 justify-start>
-        {<BackButton />}
+        <BackButton />
       </div>
       <div className="center-btns" flex flex-1 justify-center>
         {roomId && (

@@ -21,6 +21,7 @@ type CaptchaData = {
 type RoomData = { roomId: string }
 
 const Auth = '/system/auth'
+
 const api = {
   login: `${Auth}/login`,
   logout: `${Auth}/logout`,

@@ -63,7 +63,7 @@ const ParticipantInfoBox: React.FC<ParticipantInfoBoxProps> = (props) => {
   return (
     <div
       key={user.username}
-      className="relative flex flex-col text-gray-3 my-1 px-2 py-1 rd-2"
+      className="relative flex flex-col my-1 px-2 py-1 rd-2 dark:text-gray-3"
       hover="bg-op-20 bg-gray rd-2"
     >
       <div font-bold>{user.username}</div>
