@@ -2,8 +2,10 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { StoreProps } from '@/common/typings/store'
 import { SIO } from '@/common/typings/socket'
+import { getItem } from '@/common/utils/storage'
 
 export interface SystemState {
+  systemTheme: System.Theme
   currentPath: string
   connectWithAudioOnly: boolean
   errorMessage: System.ErrorMessage
@@ -15,6 +17,7 @@ export interface SystemState {
 }
 
 const initialSystemState: SystemState = {
+  systemTheme: getItem('theme') as System.Theme | 'light',
   currentPath: '/',
   connectWithAudioOnly: true,
   errorMessage: {
@@ -32,6 +35,9 @@ export const systemSlice = createSlice({
   name: 'system',
   initialState: initialSystemState,
   reducers: {
+    setSystemTheme: (state, action: PayloadAction<System.Theme>) => {
+      state.systemTheme = action.payload
+    },
     setCurrentPath: (state, action: PayloadAction<string>) => {
       state.currentPath = action.payload
     },
@@ -60,6 +66,7 @@ export const systemSlice = createSlice({
 })
 
 export const {
+  setSystemTheme,
   setCurrentPath,
   setConnectWithAudioOnly,
   setErrorMessage,
@@ -70,6 +77,7 @@ export const {
   setWebRTCStatus,
 } = systemSlice.actions
 
+export const selectSystemTheme = (state: StoreProps) => state.system.systemTheme
 export const selectCurrentPath = (state: StoreProps) => state.system.currentPath
 export const selectConnectWithAudioOnly = (state: StoreProps) =>
   state.system.connectWithAudioOnly

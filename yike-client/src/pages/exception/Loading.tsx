@@ -3,9 +3,11 @@ import React from 'react'
 const LoadingPage: React.FC = () => {
   return (
     <div
-      absolute
+      fixed
       top-0
+      bottom-0
       left-0
+      right-0
       w-full
       h-full
       grid

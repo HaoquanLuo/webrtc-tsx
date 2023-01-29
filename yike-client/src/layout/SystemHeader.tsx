@@ -11,6 +11,8 @@ import {
   setConnectWithAudioOnly,
   setRoomHost,
   selectRoomStatus,
+  selectSystemTheme,
+  setSystemTheme,
 } from '@/redux/features/system/systemSlice'
 import {
   selectLogState,
@@ -24,11 +26,30 @@ import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
 import { useNavigate } from 'react-router-dom'
 import CopyToClipboard from 'react-copy-to-clipboard'
+import IconContainer from '@/components/IconContainer'
+import { SystemThemeHandler } from '@/common/utils/theme'
+
+/**
+ * 根据路径判断是否显示 `返回按钮`
+ */
+const BackButton: React.FC<{
+  currentPath: string
+  handleButtonClick: () => void
+}> = ({ currentPath, handleButtonClick }) => {
+  return currentPath === '/' || currentPath === '/main' ? null : (
+    <Button
+      shape="circle"
+      icon={<BackwardOutlined />}
+      onClick={handleButtonClick}
+    />
+  )
+}
 
 const SystemHeader: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const systemTheme = useSelector(selectSystemTheme)
   const logState = useSelector(selectLogState)
   const currentPath = useSelector(selectCurrentPath)
   const roomId = useSelector(selectRoomId)
@@ -37,8 +58,25 @@ const SystemHeader: React.FC = () => {
   const [showCopied, setShowCopied] = useState(false)
   const [showTips, setShowTips] = useState(false)
 
+  function handlePageBack() {
+    dispatch(setRoomId(''))
+    dispatch(setRoomParticipants([]))
+    dispatch(setRoomStatus('destroyed'))
+    dispatch(setRoomHost(false))
+    dispatch(setConnectWithAudioOnly(true))
+    dispatch(setCurrChatTargetTitle(''))
+
+    navigate(-1)
+  }
+
+  function handleToggleTheme() {
+    SystemThemeHandler.toggleTheme()
+    dispatch(setSystemTheme(SystemThemeHandler.getTheme()))
+  }
+
   async function handleLogout() {
     const { data } = await logout()
+
     if (data.errorCode === 0 && data.msg === 'ok') {
       dispatch(setToken(''))
       dispatch(setLogState(false))
@@ -65,17 +103,6 @@ const SystemHeader: React.FC = () => {
       })
   }
 
-  function handlePageBack() {
-    dispatch(setRoomId(''))
-    dispatch(setRoomParticipants([]))
-    dispatch(setRoomStatus('destroyed'))
-    dispatch(setRoomHost(false))
-    dispatch(setConnectWithAudioOnly(true))
-    dispatch(setCurrChatTargetTitle(''))
-
-    navigate(-1)
-  }
-
   function handleCopyToClipboard() {
     setShowCopied(true)
     setTimeout(() => {
@@ -93,19 +120,6 @@ const SystemHeader: React.FC = () => {
     }, 500)
   }
 
-  /**
-   * 根据路径判断是否显示 `返回按钮`
-   */
-  const BackButton = () => {
-    return currentPath === '/' || currentPath === '/main' ? null : (
-      <Button
-        shape="circle"
-        icon={<BackwardOutlined />}
-        onClick={handleButtonClick}
-      />
-    )
-  }
-
   return (
     <div
       id="system-header"
@@ -118,7 +132,10 @@ const SystemHeader: React.FC = () => {
       dark="~ text-gray-3"
     >
       <div className="left-btns" flex w-48 justify-start>
-        <BackButton />
+        <BackButton
+          currentPath={currentPath}
+          handleButtonClick={handleButtonClick}
+        />
       </div>
       <div className="center-btns" flex flex-1 justify-center>
         {roomId && (
@@ -147,7 +164,19 @@ const SystemHeader: React.FC = () => {
           </span>
         )}
       </div>
-      <div className="right-btns" flex w-48 justify-end>
+      <div className="right-btns" flex gap-4 w-48 justify-end>
+        <IconContainer
+          Icon={
+            <div
+              className={`${
+                systemTheme === 'dark'
+                  ? 'i-mdi:white-balance-sunny'
+                  : 'i-fluent:weather-moon-48-regular'
+              }`}
+            />
+          }
+          handleClick={handleToggleTheme}
+        />
         {logState && roomStatus === 'unbuild' && (
           <Button
             shape="circle"

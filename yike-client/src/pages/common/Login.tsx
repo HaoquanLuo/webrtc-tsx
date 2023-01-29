@@ -13,6 +13,8 @@ import {
   selectErrorMessage,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
+import md5 from 'md5'
+import RegisterBox from './Register'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
@@ -23,10 +25,11 @@ const Login: React.FC = () => {
   const errorMessage = useSelector(selectErrorMessage)
 
   const [loginUser, setLoginUser] = useState({
-    username: 'test1',
+    username: 'ffxixslh',
     password: '123456',
     code: '',
   })
+  const [showModal, setShowModal] = useState(false)
 
   const handleUserChange = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     const nextUser = {
@@ -60,14 +63,14 @@ const Login: React.FC = () => {
         setItem('token', data.data as string)
         setItem('userInfo', {
           username: loginUser.username,
-          password: loginUser.password,
+          password: md5(loginUser.password),
         })
         dispatch(setToken(data.data))
         dispatch(setLogState(true))
         dispatch(
           setUserInfo({
             username: loginUser.username,
-            password: loginUser.password,
+            password: md5(loginUser.password),
           }),
         )
       }
@@ -78,11 +81,11 @@ const Login: React.FC = () => {
         const { data } = response
         const { msg, errorCode } = data
 
-        if (msg !== undefined && errorCode === 10000) {
+        if (msg !== undefined && errorCode !== undefined) {
           dispatch(
             setErrorMessage({
               key: `error_${Date.now()}`,
-              content: '验证码错误',
+              content: msg,
             }),
           )
         }
@@ -90,14 +93,20 @@ const Login: React.FC = () => {
     }
   }
 
-  const handleRegister = () => {
-    navigate('register')
+  const handleModalShow = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault()
+    setShowModal(true)
+  }
+
+  const handleModalShowOff = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault()
+    setShowModal(false)
   }
 
   useEffect(() => {
     if (logState) {
       setTimeout(() => {
-        navigate('/')
+        navigate('/main')
       }, 500)
     } else {
       handleCode()
@@ -114,7 +123,7 @@ const Login: React.FC = () => {
   }, [errorMessage.key])
 
   return (
-    <div w-full h-full grid place-items-center>
+    <div relative w-full h-full grid place-items-center>
       {contextHolder}
       <div
         className="
@@ -124,21 +133,23 @@ const Login: React.FC = () => {
           flex
           flex-col
           gap-y-2
-          bg-light
-          bg-op-10
+          bg-white
           rd-2
+          shadow-[0_0px_5px_rgba(0,0,0,0.5)]
+          dark:bg-dark
+          dark:bg-op-80
+          dark:shadow-[0_0px_5px_rgba(255,255,255,0.5)]
         "
       >
-        <div id="register-top" grid gap-1 b-gray-2>
+        <div id="login-top" grid gap-1 b-gray-2>
           <div text-4xl font-bold>
             登录
           </div>
         </div>
-        <div id="register-main" after="content-empty mb-2">
-          <div id="register-inputs" flex flex-col gap-2>
+        <div id="login-main" after="content-empty mb-2">
+          <div id="login-inputs" flex flex-col gap-2>
             <InputBox
               tag={'昵称'}
-              required={true}
               inputKey={'username'}
               inputValue={loginUser.username}
               changeFn={(key, e) => {
@@ -148,7 +159,6 @@ const Login: React.FC = () => {
             <InputBox
               tag={'密码'}
               type="password"
-              required={true}
               inputKey={'password'}
               inputValue={loginUser.password}
               changeFn={(key, e) => {
@@ -158,27 +168,26 @@ const Login: React.FC = () => {
             <div relative inline-flex gap-x-lg items-end>
               <InputBox
                 tag={'图形验证码'}
-                required={true}
                 inputKey={'code'}
                 inputValue={loginUser.code}
                 changeFn={(key, e) => {
                   handleUserChange(key, e)
                 }}
               />
-              <div id="captcha" className="ml-6 rd-2"></div>
+              <div id="captcha" className="ml-6 rd-2" />
             </div>
           </div>
         </div>
-        <div id="register-submit" py-2 grid place-items-center>
+        <div id="login-submit" py-2 grid place-items-center>
           <Button
             size="large"
-            className="bg-blue-6 w-full hover:bg-#232323"
+            className="bg-blue-6 w-full text-light hover:bg-#232323"
             onClick={handleSubmit}
           >
             登录
           </Button>
         </div>
-        <div id="register-bottom" grid place-items-center>
+        <div id="login-bottom" grid place-items-center>
           <a
             className="decoration-none text-sm text-blue visited:text-blue"
             href="#"
@@ -188,13 +197,28 @@ const Login: React.FC = () => {
           <div w-full mb-4 pb-4 b-b-1 b-gray-2 b-op-20></div>
           <Button
             size="large"
-            className="w-40 bg-green-6 hover:bg-#232323"
-            onClick={handleRegister}
+            className="w-40 text-light bg-green-6 hover:bg-#232323"
+            onClick={handleModalShow}
           >
             创建新用户
           </Button>
         </div>
       </div>
+      {showModal && (
+        <div
+          className="
+            fixed
+            top-0
+            bottom-0
+            left-0
+            right-0
+            bg-white
+            bg-op-60
+          "
+        >
+          <RegisterBox relative handleClick={(e) => handleModalShowOff(e)} />
+        </div>
+      )}
     </div>
   )
 }

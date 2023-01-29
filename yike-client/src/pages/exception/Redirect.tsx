@@ -15,10 +15,23 @@ const Redirect: React.FC = () => {
   }, [])
 
   return (
-    <>
-      <h1>Redirect</h1>
-      <p>Please wait a second...</p>
-    </>
+    <div
+      fixed
+      top-0
+      bottom-0
+      left-0
+      right-0
+      w-full
+      h-full
+      grid
+      place-items-center
+      text-center
+    >
+      <div>
+        <h1>Redirect</h1>
+        <p>Please wait a second...</p>
+      </div>
+    </div>
   )
 }
 

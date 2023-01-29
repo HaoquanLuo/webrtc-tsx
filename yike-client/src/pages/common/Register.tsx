@@ -18,7 +18,12 @@ import {
 } from '@/redux/features/system/systemSlice'
 import { setItem } from '@/common/utils/storage'
 
-const Register: React.FC = () => {
+interface RegisterBoxProps extends React.HTMLAttributes<HTMLDivElement> {
+  handleClick?: (event: React.MouseEvent<HTMLElement>) => void
+}
+
+const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
+  const { handleClick } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [api, contextHolder] = notification.useNotification()
@@ -141,7 +146,7 @@ const Register: React.FC = () => {
   useEffect(() => {
     if (logState) {
       setTimeout(() => {
-        navigate('/')
+        navigate('/main')
       }, 2000)
     }
   }, [logState])
@@ -166,11 +171,33 @@ const Register: React.FC = () => {
           flex
           flex-col
           gap-y-2
-          bg-light
-          bg-op-10
+          bg-white
           rd-2
+          shadow-[0_0px_5px_rgba(0,0,0,0.5)]
+          dark:bg-dark
+          dark:shadow-[0_0px_5px_rgba(255,255,255,0.5)]
         "
       >
+        <div
+          onClick={handleClick}
+          className="
+            absolute
+            grid
+            place-items-center
+            top--4
+            right--4
+            w-8
+            h-8
+            rd-100
+            b-gray-4
+            b-2
+            bg-light
+            text-light
+          "
+        >
+          <div i-mdi:window-close text-dark text-lg font-bold />
+        </div>
+
         <div id="register-top" grid gap-1 b-gray-2>
           <div text-4xl font-bold>
             注册
@@ -221,7 +248,7 @@ const Register: React.FC = () => {
                 }}
               />
               <Button
-                className="absolute bottom-2 right-5 bg-orange hover:bg-#232323"
+                className="absolute text-light bottom-2 right-5 bg-orange hover:bg-#232323"
                 size="large"
                 onClick={handleGenerateCode}
               >
@@ -245,4 +272,4 @@ const Register: React.FC = () => {
   )
 }
 
-export default Register
+export default RegisterBox
