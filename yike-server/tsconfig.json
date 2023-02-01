@@ -6,7 +6,7 @@
     "strict": true, // 严格模式
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*", "./dist/src/*"]
+      "@/*": ["./src/*", "./out/src/*"]
     },
     "allowSyntheticDefaultImports": true, // 没有默认导出时, 编译器会创建一个默认导出
     "esModuleInterop": true, // 允许export= 导出, 由import from导入
@@ -15,7 +15,9 @@
     // "sourceMap": true
   },
   "include": [
-    "src/**/*" // 需要编译的的文件和目录
+    // 需要编译的的文件和目录
+    "src/**/*",
+    ".eslintrc.js"
   ],
   "files": ["src/app.ts"]
 }

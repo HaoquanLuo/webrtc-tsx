@@ -9,9 +9,7 @@ import Config from '../config/Config'
 import catchError from '../middlewares/catchError'
 import { getAllFilesExport } from '../common/utils/utils'
 import { updateRedisRole } from '../server/auth'
-import io from 'socket.io'
-import { SIO } from '@/common/typings/socket'
-import { PluginOptions, initPlugin } from '@/plugin'
+import { initPlugin } from '../plugin'
 
 class Init {
   public static app: Koa

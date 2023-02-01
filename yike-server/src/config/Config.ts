@@ -9,7 +9,7 @@ export default class Config {
   // 接口前缀
   public static readonly API_PREFIX = '/api/'
   // 根目录
-  public static readonly BASE = isDev ? 'src' : 'dist/src'
+  public static readonly BASE = isDev ? 'src' : 'out/src'
   // redis数据库
   public static readonly REDIS_DB_NAME = REDIS_DB_NAME
   // mysql配置

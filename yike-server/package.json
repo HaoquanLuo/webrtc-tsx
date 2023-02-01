@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/app.ts --files",
     "build": "tsc",
-    "serve": "cross-env NODE_ENV=production node -r tsconfig-paths/register out/src/app.js",
+    "serve": "cross-env NODE_ENV=production node -r tsconfig-paths/register out/src/app.js --files",
     "lint": "eslint --fix src/core/SocketServer.ts"
   },
   "keywords": [],
