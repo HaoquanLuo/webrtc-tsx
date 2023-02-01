@@ -6,13 +6,13 @@
     "strict": true, // 严格模式
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*", "./dist/*"]
+      "@/*": ["./src/*", "./dist/src/*"]
     },
     "allowSyntheticDefaultImports": true, // 没有默认导出时, 编译器会创建一个默认导出
     "esModuleInterop": true, // 允许export= 导出, 由import from导入
     "forceConsistentCasingInFileNames": true, // 强制区分大小写
-    "outDir": "out", // 指定输出目录, 默认是dist文件夹
-    "sourceMap": true
+    "outDir": "out" // 指定输出目录, 默认是dist文件夹
+    // "sourceMap": true
   },
   "include": [
     "src/**/*" // 需要编译的的文件和目录
