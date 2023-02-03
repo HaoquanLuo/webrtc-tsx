@@ -13,29 +13,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
-const cors_1 = __importDefault(require("@koa/cors"));
+const koa2_cors_1 = __importDefault(require("koa2-cors"));
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const koa_session_1 = __importDefault(require("koa-session"));
-const Config_1 = __importDefault(require("../config/Config"));
-const catchError_1 = __importDefault(require("../middlewares/catchError"));
-const utils_1 = require("../common/utils/utils");
-const auth_1 = require("../server/auth");
-const plugin_1 = require("../plugin");
+const Config_1 = __importDefault(require("@/config/Config"));
+const catchError_1 = __importDefault(require("@/middlewares/catchError"));
+const utils_1 = require("@/common/utils/utils");
+const auth_1 = require("@/server/auth");
+const plugin_1 = require("@/plugin");
 class Init {
     static initCore(app, server) {
         Init.app = app;
         Init.server = server;
+        Init.loadCors();
         Init.loadBodyParser();
         Init.initCatchError();
         Init.loadSession();
         Init.initLoadRouters();
-        Init.loadCors();
         Init.updateRedisRole();
         Init.initPlugin();
     }
     // 加载 cors 模块
     static loadCors() {
-        Init.app.use((0, cors_1.default)());
+        Init.app.use((0, koa2_cors_1.default)());
     }
     // 解析body参数
     static loadBodyParser() {

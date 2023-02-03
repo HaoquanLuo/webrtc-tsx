@@ -18,9 +18,16 @@ const HttpException_1 = require("../core/HttpException");
 function verificationCodeValidator(ctx, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const { code } = ctx.request.body;
+        console.log(`code: ${code}, ctx: ${JSON.stringify(ctx)}`);
         if (code === 'register') {
             console.log('-------register--------');
             yield next();
+        }
+        if (ctx.session === null) {
+            throw new Error('session 为 null');
+        }
+        if (ctx.session.code === undefined) {
+            throw new Error('session.code 不存在');
         }
         if (ctx.session.code !== code) {
             throw new HttpException_1.ParameterException('验证码错误');

@@ -25,6 +25,7 @@ import { useToggler } from '@/hooks/useToggler'
 import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'
 import IconBox from '@/components/IconContainer/IconBox'
+import { v4 as uuidV4 } from 'uuid'
 
 type ChatHistory<T> = (nextChatList: T[], chatTarget: T) => T[]
 
@@ -78,7 +79,7 @@ const UserPanel: React.FC<Props> = (props) => {
 
       // 判断要发送的文本是否为空
       if (!allowStrFlag) {
-        setNoticeFlag(crypto.randomUUID())
+        setNoticeFlag(uuidV4())
         reject('发送速度过快')
       }
 
@@ -175,7 +176,7 @@ const UserPanel: React.FC<Props> = (props) => {
       // 发送消息到聊天室
       setCurrMsg({
         ...currMsg,
-        id: crypto.randomUUID(),
+        id: uuidV4(),
         senderSocketId: userSocketId,
         receiverName: '',
         receiverSocketId: '',
@@ -190,7 +191,7 @@ const UserPanel: React.FC<Props> = (props) => {
 
       setCurrMsg({
         ...currMsg,
-        id: crypto.randomUUID(),
+        id: uuidV4(),
         senderSocketId: userSocketId,
         receiverName: currChatSectionStructure.chatTitle,
         receiverSocketId: currChatSectionStructure.chatId,

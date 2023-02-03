@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import md5 from 'md5'
+import { v4 as uuidV4 } from 'uuid'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import InputBox from '@/components/InputBox'
@@ -133,7 +134,7 @@ const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
         if (msg !== undefined) {
           dispatch(
             setErrorMessage({
-              key: crypto.randomUUID(),
+              key: uuidV4(),
               content: msg,
             }),
           )

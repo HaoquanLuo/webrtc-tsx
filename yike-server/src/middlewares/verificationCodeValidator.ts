@@ -12,13 +12,22 @@ export default async function verificationCodeValidator(
 ) {
   const { code } = ctx.request.body as any
 
+  console.log(`code: ${code}, ctx.session: ${JSON.stringify(ctx.session)}`)
+
   if (code === 'register') {
     console.log('-------register--------')
 
     await next()
   }
 
-  if (ctx.session!.code !== code) {
+  if (ctx.session === null) {
+    throw new Error('session 为 null')
+  }
+
+  if (ctx.session.code === undefined) {
+    throw new Error('session.code 不存在')
+  }
+  if (ctx.session.code !== code) {
     throw new ParameterException('验证码错误')
   } else {
     await next()

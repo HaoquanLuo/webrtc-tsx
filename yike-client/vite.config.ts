@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -12,7 +12,19 @@ function resolve(dir: string): string {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [Unocss(), react()],
+  base: '/',
+  build: {
+    rollupOptions: {
+      output: {
+        format: 'es',
+        dir: 'out',
+        manualChunks: {
+          antd: ['antd'],
+        },
+      },
+    },
+  },
+  plugins: [Unocss(), react(), splitVendorChunkPlugin()],
   resolve: {
     alias: {
       '@': resolve('./src'),
@@ -26,7 +38,6 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:9000',
-        ws: false,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
       },

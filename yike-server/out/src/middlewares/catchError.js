@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const HttpException_1 = require("../core/HttpException");
 const logs_1 = require("../server/logs");
 function catchError(ctx, next) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield next();
@@ -24,7 +25,7 @@ function catchError(ctx, next) {
                 (0, logs_1.errorLog)(ctx, error);
                 const { method, path } = ctx;
                 ctx.body = {
-                    msg: '未知错误',
+                    msg: (_a = error.message) !== null && _a !== void 0 ? _a : '未知错误',
                     errorCode: 9999,
                     requestUrl: `${method} ${path}`,
                 };

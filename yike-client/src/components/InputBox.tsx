@@ -1,4 +1,5 @@
 import React, { ChangeEvent } from 'react'
+import { v4 as uuidV4 } from 'uuid'
 
 type InputKey = 'username' | 'password' | 'email' | 'code'
 
@@ -21,7 +22,7 @@ const InputBox = (props: Input) => {
     changeFn,
     ...rest
   } = props
-  const uid = crypto.randomUUID()
+  const uid = uuidV4()
   return (
     <div px-1>
       <div inline-flex>

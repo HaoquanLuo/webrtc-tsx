@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketException = exports.DataBaseFailed = exports.QueryFailed = exports.Forbidden = exports.AuthFailed = exports.NotFount = exports.Buffer = exports.Success = exports.ParameterException = exports.HttpException = void 0;
+exports.SocketException = exports.DataBaseFailed = exports.QueryFailed = exports.Forbidden = exports.AuthFailed = exports.NotFound = exports.Buffer = exports.Success = exports.ParameterException = exports.HttpException = void 0;
 // http异常
 class HttpException extends Error {
     constructor(data, msg = '服务器异常，请联系管理员', errorCode = 10000, code = 400) {
@@ -51,7 +51,7 @@ class Buffer extends Success {
 }
 exports.Buffer = Buffer;
 // 404
-class NotFount extends HttpException {
+class NotFound extends HttpException {
     constructor(msg, errorCode) {
         super();
         this.code = 404;
@@ -59,7 +59,7 @@ class NotFount extends HttpException {
         this.errorCode = errorCode || 10001;
     }
 }
-exports.NotFount = NotFount;
+exports.NotFound = NotFound;
 // 授权失败
 class AuthFailed extends HttpException {
     constructor(msg, errorCode) {

@@ -3,7 +3,7 @@ export class HttpException extends Error {
   public message: string
   public errorCode: number
   public code: number
-  public data: any
+  public data: unknown
   public isBuffer = false
   public responseType: string | undefined
   constructor(
@@ -68,7 +68,7 @@ export class Buffer extends Success {
   }
 }
 // 404
-export class NotFount extends HttpException {
+export class NotFound extends HttpException {
   constructor(msg: string, errorCode: number) {
     super()
     this.code = 404

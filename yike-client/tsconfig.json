@@ -10,7 +10,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*", "dist/*"]
+      "@/*": ["src/*", "out/src/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
@@ -18,7 +18,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "outDir": "out"
   },
   "include": ["src"],
   "exclude": ["node_modules"],

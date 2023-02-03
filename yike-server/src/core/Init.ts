@@ -1,15 +1,15 @@
 import path from 'path'
 import Koa from 'koa'
 import http from 'http'
-import koaCors from '@koa/cors'
+import koaCors from 'koa2-cors'
 import koaBodyParser from 'koa-bodyparser'
 import Router from 'koa-router'
 import session from 'koa-session'
-import Config from '../config/Config'
-import catchError from '../middlewares/catchError'
-import { getAllFilesExport } from '../common/utils/utils'
-import { updateRedisRole } from '../server/auth'
-import { initPlugin } from '../plugin'
+import Config from '@/config/Config'
+import catchError from '@/middlewares/catchError'
+import { getAllFilesExport } from '@/common/utils/utils'
+import { updateRedisRole } from '@/server/auth'
+import { initPlugin } from '@/plugin'
 
 class Init {
   public static app: Koa
@@ -20,11 +20,11 @@ class Init {
   ) {
     Init.app = app
     Init.server = server
+    Init.loadCors()
     Init.loadBodyParser()
     Init.initCatchError()
     Init.loadSession()
     Init.initLoadRouters()
-    Init.loadCors()
     Init.updateRedisRole()
     Init.initPlugin()
   }
@@ -61,7 +61,7 @@ class Init {
           key: 'koa:sess', //cookie key (default is koa:sess)
           maxAge: 86400000, // cookie的过期时间 maxAge in ms (default is 1 days)
           overwrite: true, //是否可以overwrite    (默认default true)
-          httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+          httpOnly: false, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
           signed: true, //签名默认true
           rolling: false, //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
           renew: false, //(boolean) renew session when session is nearly expired,

@@ -24,7 +24,8 @@
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.3",
     "simple-peer": "^9.11.1",
-    "socket.io-client": "^4.5.4"
+    "socket.io-client": "^4.5.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@iconify-json/fluent": "^1.1.17",
@@ -36,6 +37,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.0.8",
     "@types/simple-peer": "^9.11.5",
+    "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@unocss/preset-attributify": "^0.46.5",
     "@unocss/preset-icons": "^0.46.5",

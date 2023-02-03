@@ -13,7 +13,7 @@ export default async function catchError(ctx: Models.Ctx, next: Function) {
       errorLog(ctx, error)
       const { method, path } = ctx
       ctx.body = {
-        msg: '未知错误',
+        msg: error.message ?? '未知错误',
         errorCode: 9999,
         requestUrl: `${method} ${path}`,
       }
