@@ -5,7 +5,7 @@ import {
   selectRoomParticipants,
   selectRoomStatus,
 } from '@/redux/features/system/systemSlice'
-import IconContainer from '@/components/IconContainer'
+import IconContainer from '@/components/IconContainer/IconContainer'
 import {
   selectCurrChatTargetTitle as selectCurrChatTargetTitle,
   selectChatSectionStore as selectChatSectionStore,

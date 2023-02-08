@@ -51,7 +51,7 @@ const Login: React.FC = () => {
     try {
       const { data } = await login({
         userName: loginUser.username,
-        password: loginUser.password,
+        password: md5(loginUser.password),
         code: loginUser.code,
       })
 

@@ -21,7 +21,7 @@ import {
 } from '@/redux/features/system/systemSlice'
 import { WebRTC } from '@/common/typings/webRTC'
 import MediaBox from '@/components/MediaBox'
-import ActionBox from '@/components/ActionContainer'
+import ActionBox from '@/components/ActionContainer/ActionContainer'
 import { useLoadStream } from '@/hooks/useLoadStream'
 import { PublicChatTitle } from '@/common/constants/system'
 import { SIO } from '@/common/typings/socket'

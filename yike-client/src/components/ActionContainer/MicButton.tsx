@@ -1,6 +1,6 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import React, { useState } from 'react'
-import IconContainer from '../IconContainer'
+import IconContainer from '../IconContainer/IconContainer'
 import IconBox from '../IconContainer/IconBox'
 
 interface MicButtonProps {}

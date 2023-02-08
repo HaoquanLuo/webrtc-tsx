@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import IconContainer from '../IconContainer'
+import IconContainer from '../IconContainer/IconContainer'
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import IconBox from '../IconContainer/IconBox'
 

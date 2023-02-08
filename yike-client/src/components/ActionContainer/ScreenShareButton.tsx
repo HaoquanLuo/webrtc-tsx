@@ -1,6 +1,6 @@
 import { WebRTCHandler } from '@/core/webRTCHandler'
 import React, { useState } from 'react'
-import IconContainer from '../IconContainer'
+import IconContainer from '../IconContainer/IconContainer'
 import ScreenPreviewBox from './ScreenPreviewBox'
 import IconBox from '../IconContainer/IconBox'
 

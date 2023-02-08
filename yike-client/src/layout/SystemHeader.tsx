@@ -26,7 +26,7 @@ import { Button } from 'antd'
 import { removeItem } from '@/common/utils/storage'
 import { useNavigate } from 'react-router-dom'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import IconContainer from '@/components/IconContainer'
+import IconContainer from '@/components/IconContainer/IconContainer'
 import { SystemThemeHandler } from '@/common/utils/theme'
 
 /**

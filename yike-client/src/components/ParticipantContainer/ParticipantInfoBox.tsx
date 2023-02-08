@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import IconContainer from '../IconContainer'
+import IconContainer from '../IconContainer/IconContainer'
 import {
   selectChatSectionStore,
   selectCurrChatTargetTitle,

@@ -13,8 +13,10 @@ const dispatch = store.dispatch
 // axios 基础配置
 axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASE_URL
 axios.defaults.timeout = 10000
-axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
+axios.defaults.withCredentials = true
+axios.defaults.headers.common['Content-Type'] = 'application/json;charset=UTF-8'
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true
 
 // 请求拦截器
 axios.interceptors.request.use(

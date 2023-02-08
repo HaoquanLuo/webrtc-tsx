@@ -2,10 +2,10 @@ import React from 'react'
 import type { IconBoxProps, IconSize } from './IconBox'
 
 const iconSize = {
-  ['sm']: 'w-6 h-6',
-  ['md']: 'w-8 h-8',
-  ['lg']: 'w-10 h-10',
-  ['xl']: 'w-12 h-12',
+  sm: 'w-6 h-6',
+  md: 'w-8 h-8',
+  lg: 'w-10 h-10',
+  xl: 'w-12 h-12',
 }
 
 interface Props extends React.HtmlHTMLAttributes<HTMLDivElement> {
