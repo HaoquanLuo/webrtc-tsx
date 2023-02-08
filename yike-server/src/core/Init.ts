@@ -31,7 +31,14 @@ class Init {
 
   // 加载 cors 模块
   public static loadCors() {
-    Init.app.use(koaCors())
+    Init.app.use(
+      koaCors({
+        origin(ctx) {
+          return ctx.headers.origin!
+        },
+        credentials: true,
+      }),
+    )
   }
 
   // 解析body参数
@@ -58,13 +65,16 @@ class Init {
     Init.app.use(
       session(
         {
-          key: 'koa:sess', //cookie key (default is koa:sess)
-          maxAge: 86400000, // cookie的过期时间 maxAge in ms (default is 1 days)
-          overwrite: true, //是否可以overwrite    (默认default true)
-          httpOnly: false, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
-          signed: true, //签名默认true
-          rolling: false, //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
-          renew: false, //(boolean) renew session when session is nearly expired,
+          key: 'yike:sess',
+          maxAge: 86400000,
+          overwrite: true,
+          httpOnly: false,
+          signed: true,
+          renew: true,
+          // 以下配置只有在自己的域名下才有效
+          // domain: 'yike.ffxixslh.top',
+          // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          // secure: process.env.NODE_ENV === 'production',
         },
         Init.app,
       ),
