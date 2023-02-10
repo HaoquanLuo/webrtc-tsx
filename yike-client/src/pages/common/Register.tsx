@@ -182,6 +182,7 @@ const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
         <div
           onClick={handleClick}
           className="
+            cursor-pointer
             absolute
             grid
             place-items-center
