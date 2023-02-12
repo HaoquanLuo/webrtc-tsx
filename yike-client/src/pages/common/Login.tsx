@@ -10,6 +10,7 @@ import { setToken, setUserInfo } from '@/redux/features/user/userSlice'
 import { Button, notification } from 'antd'
 import { AxiosError } from 'axios'
 import {
+  selectCurrentPath,
   selectErrorMessage,
   setErrorMessage,
 } from '@/redux/features/system/systemSlice'
@@ -21,12 +22,13 @@ const Login: React.FC = () => {
   const dispatch = useDispatch()
   const [api, contextHolder] = notification.useNotification()
 
+  const currentPath = useSelector(selectCurrentPath)
   const logState = useSelector(selectLogState)
   const errorMessage = useSelector(selectErrorMessage)
 
   const [loginUser, setLoginUser] = useState({
-    username: 'ffxixslh',
-    password: '123456',
+    username: '',
+    password: '',
     code: '',
   })
   const [showModal, setShowModal] = useState(false)
@@ -108,10 +110,12 @@ const Login: React.FC = () => {
       setTimeout(() => {
         navigate('/main')
       }, 500)
-    } else {
+    }
+
+    if (!logState && currentPath === '/') {
       handleCode()
     }
-  }, [logState])
+  }, [logState, currentPath])
 
   useEffect(() => {
     if (errorMessage.content !== '') {

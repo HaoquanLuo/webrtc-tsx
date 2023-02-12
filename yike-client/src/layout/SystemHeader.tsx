@@ -20,6 +20,7 @@ import {
   setLogState,
   setToken,
   setUserInfo,
+  setUserSocketId,
 } from '@/redux/features/user/userSlice'
 import { BackwardOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
@@ -28,6 +29,7 @@ import { useNavigate } from 'react-router-dom'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import IconContainer from '@/components/IconContainer/IconContainer'
 import { SystemThemeHandler } from '@/common/utils/theme'
+import { SocketClient } from '@/core/SocketClientEventHandler'
 
 /**
  * 根据路径判断是否显示 `返回按钮`
@@ -80,17 +82,18 @@ const SystemHeader: React.FC = () => {
     if (data.errorCode === 0 && data.msg === 'ok') {
       dispatch(setToken(''))
       dispatch(setLogState(false))
+      dispatch(setUserSocketId(''))
       dispatch(
         setUserInfo({
-          username: 'default user',
-          password: 'default password',
+          username: '',
+          password: '',
         }),
       )
 
       removeItem('token')
       removeItem('userInfo')
 
-      location.reload()
+      SocketClient.disconnectSocket()
     }
   }
 

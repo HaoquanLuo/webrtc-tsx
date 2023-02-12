@@ -1,5 +1,5 @@
-import { WebRTC } from './yike-client/src/common/typings/webRTC'
-import SimplePeer from './yike-client/node_modules/@types/simple-peer'
+import { WebRTC } from '@/common/typings/webRTC'
+import SimplePeer from 'simple-peer'
 
 export namespace SIO {
   interface ServerToClientEvents {

@@ -25,7 +25,7 @@ export class SocketClient {
   static socket: Socket<SIO.ServerToClientEvents, SIO.ClientToServerEvents>
 
   /**
-   * @description 创建 Socket 实例对象
+   * @description 创建 Socket 实例对象并且连接服务器
    */
   public static initSocketAndConnect() {
     // 生成 socket 实例
@@ -88,6 +88,13 @@ export class SocketClient {
     SocketClient.socket.on('direct-message', (data) => {
       SocketClient.handleSaveDirectMessage(data)
     })
+  }
+
+  /**
+   * @description 断开 socket 连接
+   */
+  public static disconnectSocket() {
+    this.socket.disconnect()
   }
 
   /**

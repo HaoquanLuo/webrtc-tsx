@@ -33,9 +33,9 @@ const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
   const errorMessage = useSelector(selectErrorMessage)
 
   const [registerUser, setRegisterUser] = useState({
-    username: 'test1',
-    password: '123456',
-    email: 'lhq12230@163.com',
+    username: '',
+    password: '',
+    email: '',
     code: '',
   })
   const [codeEmpty, setCodeEmpty] = useState(true)

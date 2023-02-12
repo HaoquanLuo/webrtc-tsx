@@ -17,35 +17,31 @@ router.post(
   async (ctx: Models.Ctx) => {
     const { email, userName } = ctx.request.body as any
     await checkUserNameAndEmail(userName, email)
-    // let code = (Math.random() * 1000000).toFixed()
-    // if (code.length < 6) {
-    //   code += 0
-    // }
+    let code = (Math.random() * 1000000).toFixed()
+    if (code.length < 6) {
+      code += 0
+    }
 
-    /**
-     * @todo 为了方便将邮件验证码改为123456，上线前要改回去
-     */
-    const code = (123456).toFixed()
     // 在会话中添加验证码字段code
     ctx.session!.code = code
     console.log('邮件验证码:', ctx.session!.code, typeof ctx.session!.code)
     // 发送邮件
-    // await sendEmail({
-    //   to: email,
-    //   subject: '验证码',
-    //   text: '验证码',
-    //   html: `
-    //         <div >
-    //             <p>您正在注册逸课平台帐号，用户名<b>${userName}</b>，
-    //             验证邮箱为<b>${email}</b> 。
-    //             验证码为：</p>
-    //             <p style="color: green;font-weight: 600;margin: 0 6px;text-align: center; font-size: 20px">
-    //               ${code}
-    //             </p>
-    //             <p>请在注册页面填写该改验证码</p>
-    //         </div>
-    //     `,
-    // })
+    await sendEmail({
+      to: email,
+      subject: '验证码',
+      text: '验证码',
+      html: `
+            <div style="width: 100%;height: 100%;display: flex;place-items: center;">
+                <p>您正在注册逸课平台帐号，用户名<b>${userName}</b>，
+                验证邮箱为<b>${email}</b> 。
+                验证码为：</p>
+                <p style="color: green;font-weight: 600;margin: 0 6px;text-align: center; font-size: 20px">
+                  ${code}
+                </p>
+                <p>请在注册页面填写该改验证码</p>
+            </div>
+        `,
+    })
 
     throw new Success()
   },
