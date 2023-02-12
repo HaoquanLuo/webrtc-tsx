@@ -1,7 +1,7 @@
-import { Models } from '../../common/typings/model'
+import { Models } from '@/common/typings/model'
 import pool from './pool'
-import { DataBaseFailed } from '../../core/HttpException'
-import { lineToHumpObject } from '../../common/utils/utils'
+import { DataBaseFailed } from '@/core/HttpException'
+import { lineToHumpObject } from '@/common/utils/utils'
 import mysql from 'mysql'
 
 /**
@@ -66,7 +66,7 @@ export async function command(
     ).catch((error) => {
       throw new DataBaseFailed(error.msg)
     })
-  } catch {
+  } catch (error) {
     throw new DataBaseFailed()
   }
 }

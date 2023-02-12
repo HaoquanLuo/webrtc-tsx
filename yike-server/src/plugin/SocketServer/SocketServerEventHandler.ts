@@ -2,7 +2,7 @@ import { WebRTC } from '@/common/typings/webRTC'
 import { v4 as uuidV4 } from 'uuid'
 import { Server, Socket } from 'socket.io'
 import logger from '@/server/logs/logger'
-import { SocketException } from '../../core/HttpException'
+import { SocketException } from '@/core/HttpException'
 import { SIO } from '@/common/typings/socket'
 
 type TUser = 'user'

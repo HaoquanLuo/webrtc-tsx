@@ -1,4 +1,4 @@
-import Config from '../../config/Config'
+import Config from '@/config/Config'
 
 export default {
   port: Config.REDIS.PORT, // Redis port

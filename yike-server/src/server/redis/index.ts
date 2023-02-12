@@ -1,4 +1,4 @@
-import { DataBaseFailed } from '../../core/HttpException'
+import { DataBaseFailed } from '@/core/HttpException'
 import redis from './redis'
 /**
  * redis报错回调

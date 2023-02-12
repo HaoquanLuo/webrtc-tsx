@@ -1,5 +1,5 @@
 import moment from 'moment'
-import Config from '../../config/Config'
+import Config from '@/config/Config'
 
 /**
  * 格式化时间

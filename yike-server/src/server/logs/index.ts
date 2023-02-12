@@ -1,5 +1,5 @@
 import logger from './logger'
-import { Models } from '../../common/typings/model'
+import { Models } from '@/common/typings/model'
 
 /**
  * 记录信息日志

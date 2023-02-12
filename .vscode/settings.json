@@ -1,0 +1,15 @@
+{
+  "cSpell.words": [
+    "antd",
+    "Attributify",
+    "btns",
+    "dataing",
+    "reduxjs",
+    "simplepeer",
+    "Unocss",
+    "VITE",
+    "yike"
+  ],
+  "unocss.root": "yike-client",
+  "eslint.workingDirectories": ["./yike-client", "./yike-server"]
+}

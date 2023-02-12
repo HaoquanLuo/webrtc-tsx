@@ -1,5 +1,5 @@
-import { Models } from '../../common/typings/model'
-import Config from '../../config/Config'
+import { Models } from '@/common/typings/model'
+import Config from '@/config/Config'
 import { selectDb } from '../redis'
 import redis from '../redis/redis'
 
@@ -9,7 +9,10 @@ import redis from '../redis/redis'
  * @param uid
  * @returns
  */
-export async function saveToken(key: string, uid: number): Promise<Models.Result> {
+export async function saveToken(
+  key: string,
+  uid: number,
+): Promise<Models.Result> {
   return new Promise((resolve) => {
     selectDb(Config.SECURITY.TOKEN_REDIS_DB).then(() => {
       redis.setex(key, Config.SECURITY.EXPIRES_IN, uid).then((res) => {

@@ -1,4 +1,4 @@
-import Config from '../../config/Config'
+import Config from '@/config/Config'
 
 export default {
   host: Config.MYSQL.HOST,

@@ -1,4 +1,4 @@
-import { HttpException } from '../../core/HttpException'
+import { HttpException } from '@/core/HttpException'
 import transporter from './transporter'
 interface MailOptions {
   from?: string // 发件人

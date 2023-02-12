@@ -1,13 +1,13 @@
-import Config from '../../config/Config'
+import Config from '@/config/Config'
 import JWT from 'jsonwebtoken'
-import { Account } from '../../common/typings/account'
+import { Account } from '@/common/typings/account'
 import { command } from '../mysql'
-import { Menu } from '../../common/typings/menu'
-import { Models } from '../../common/typings/model'
+import { Menu } from '@/common/typings/menu'
+import { Models } from '@/common/typings/model'
 import { selectDb } from '../redis'
-import { getTreeByList } from '../../common/utils/utils'
+import { getTreeByList } from '@/common/utils/utils'
 import redis from '../redis/redis'
-import { Role } from '../../common/typings/role'
+import { Role } from '@/common/typings/role'
 
 /**
  * 构建token
@@ -27,7 +27,7 @@ export function generateToken(uid: Account.Uid, scope: Account.Scope) {
     secretKey,
     {
       expiresIn,
-    }
+    },
   )
   return token
 }
@@ -37,7 +37,9 @@ export function generateToken(uid: Account.Uid, scope: Account.Scope) {
  * @param decode
  * @returns
  */
-export function getUserPermission(decode: Account.Decode): Promise<Menu.Menu[]> {
+export function getUserPermission(
+  decode: Account.Decode,
+): Promise<Menu.Menu[]> {
   const { scope } = decode
   return new Promise(async (resolve, reject) => {
     let res: Models.Result
@@ -85,7 +87,9 @@ export function getUserPermission(decode: Account.Decode): Promise<Menu.Menu[]> 
  * @param decode
  * @returns
  */
-export function getRedisUserPermission(decode: Account.Decode): Promise<string[]> {
+export function getRedisUserPermission(
+  decode: Account.Decode,
+): Promise<string[]> {
   const { scope } = decode
   return new Promise(async (resolve) => {
     selectDb(Config.REDIS_DB_NAME.ROLE).then(() => {
@@ -117,7 +121,9 @@ export function getRedisUserPermission(decode: Account.Decode): Promise<string[]
           let permissionList: string[] = []
           const merge = (list: Models.TreeNode[]) => {
             list.forEach((item) => {
-              permissionList = [...new Set([...permissionList, ...item.permissions.split(',')])]
+              permissionList = [
+                ...new Set([...permissionList, ...item.permissions.split(',')]),
+              ]
               if (item.children) {
                 merge(item.children)
               }
@@ -186,8 +192,13 @@ export function updateRedisRole() {
           new Map([
             ['id', res.id.toString()],
             ['parentId', res.parentId.toString()],
-            ['permissions', res.menuList.map((item: { permission: string }) => item.permission).join(',')],
-          ])
+            [
+              'permissions',
+              res.menuList
+                .map((item: { permission: string }) => item.permission)
+                .join(','),
+            ],
+          ]),
         )
       }
     })
@@ -200,7 +211,10 @@ export function updateRedisRole() {
  * @param obj
  * @returns
  */
-export function updateRoles(roleId: string, obj: Map<string, string>): Promise<Models.Result> {
+export function updateRoles(
+  roleId: string,
+  obj: Map<string, string>,
+): Promise<Models.Result> {
   return new Promise((resolve) => {
     selectDb(Config.REDIS_DB_NAME.ROLE).then(async () => {
       await redis.del(roleId)
