@@ -80,4 +80,4 @@ const ActionBox = () => {
   )
 }
 
-export default React.memo(ActionBox)
+export default ActionBox

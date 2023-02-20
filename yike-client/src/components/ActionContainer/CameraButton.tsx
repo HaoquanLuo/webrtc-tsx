@@ -29,4 +29,4 @@ const CameraButton: React.FC<CameraButtonProps> = () => {
   )
 }
 
-export default React.memo(CameraButton)
+export default CameraButton

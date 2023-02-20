@@ -27,4 +27,4 @@ const MicButton: React.FC<MicButtonProps> = () => {
   )
 }
 
-export default React.memo(MicButton)
+export default MicButton

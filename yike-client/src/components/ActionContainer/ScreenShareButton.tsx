@@ -67,4 +67,4 @@ const ScreenShareButton: React.FC<ScreenShareButtonProps> = () => {
   )
 }
 
-export default React.memo(ScreenShareButton)
+export default ScreenShareButton

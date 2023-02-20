@@ -45,4 +45,4 @@ const ScreenPreviewBox: React.FC<ScreenPreviewBoxProps> = ({
   )
 }
 
-export default React.memo(ScreenPreviewBox)
+export default ScreenPreviewBox
