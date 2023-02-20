@@ -159,6 +159,7 @@ const Login: React.FC = () => {
               changeFn={(key, e) => {
                 handleUserChange(key, e)
               }}
+              data-cy="login-username"
             />
             <InputBox
               tag={'密码'}
@@ -168,6 +169,7 @@ const Login: React.FC = () => {
               changeFn={(key, e) => {
                 handleUserChange(key, e)
               }}
+              data-cy="login-password"
             />
             <div relative inline-flex gap-x-lg items-end>
               <InputBox
@@ -177,6 +179,7 @@ const Login: React.FC = () => {
                 changeFn={(key, e) => {
                   handleUserChange(key, e)
                 }}
+                data-cy="login-code"
               />
               <div id="captcha" className="ml-6 rd-2" />
             </div>

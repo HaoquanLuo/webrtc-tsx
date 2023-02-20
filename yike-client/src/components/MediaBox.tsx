@@ -95,4 +95,4 @@ const MediaBox: React.FC<Props> = (props) => {
   )
 }
 
-export default React.memo(MediaBox)
+export default MediaBox

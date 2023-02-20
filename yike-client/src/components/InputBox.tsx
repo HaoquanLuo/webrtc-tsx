@@ -8,8 +8,8 @@ interface Input extends React.HTMLAttributes<HTMLInputElement> {
   required?: boolean
   placeHolder?: string
   inputKey: InputKey
-  inputValue: any
-  changeFn: (key: string, event: ChangeEvent<HTMLInputElement>) => void
+  inputValue: string | number
+  changeFn?: (key: string, event: ChangeEvent<HTMLInputElement>) => void
 }
 
 const InputBox = (props: Input) => {
@@ -38,7 +38,7 @@ const InputBox = (props: Input) => {
           type="text"
           placeholder={placeHolder}
           value={inputValue}
-          onChange={(e) => changeFn(inputKey, e)}
+          onChange={(e) => changeFn?.(inputKey, e)}
           {...rest}
         />
       </div>

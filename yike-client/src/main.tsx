@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import App from './App'
 
 import './index.css'
-import 'uno.css'
+import 'virtual:uno.css'
 import '@unocss/reset/normalize.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
