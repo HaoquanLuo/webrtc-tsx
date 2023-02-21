@@ -17,7 +17,11 @@ router.post(
   validator(schema, 'body'),
   verificationCodeValidator,
   async (ctx: Models.Ctx) => {
-    const { password, userName, email } = ctx.request.body as any
+    const { password, userName, email } = ctx.request.body as {
+      userName: string
+      password: string
+      email: string
+    }
     const date = format(new Date())
 
     // 注册

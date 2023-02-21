@@ -10,9 +10,13 @@ export default async function verificationCodeValidator(
   ctx: Models.Ctx,
   next: Function,
 ) {
-  const { code } = ctx.request.body as any
+  const { code } = ctx.request.body as { code: string }
 
   console.log(`code: ${code}, ctx.session: ${JSON.stringify(ctx.session)}`)
+
+  if (process.env.NODE_ENV === 'development') {
+    await next()
+  }
 
   if (code === 'register') {
     console.log('-------register--------')
@@ -25,8 +29,9 @@ export default async function verificationCodeValidator(
   }
 
   if (ctx.session.code === undefined) {
-    throw new Error('session.code 不存在')
+    throw new Error('cookies 写入失败， session.code 不存在')
   }
+
   if (ctx.session.code !== code) {
     throw new ParameterException('验证码错误')
   } else {

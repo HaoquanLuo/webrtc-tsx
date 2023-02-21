@@ -17,20 +17,29 @@ router.post(
   async (ctx: Models.Ctx) => {
     const { email, userName } = ctx.request.body as any
     await checkUserNameAndEmail(userName, email)
-    let code = (Math.random() * 1000000).toFixed()
-    if (code.length < 6) {
-      code += 0
+
+    let code: string
+
+    if (process.env.NODE_ENV !== 'development') {
+      code = (Math.random() * 1000000).toFixed()
+      if (code.length < 6) {
+        code += 0
+      }
+    } else {
+      code = '123456'
     }
 
     // 在会话中添加验证码字段code
     ctx.session!.code = code
     console.log('邮件验证码:', ctx.session!.code, typeof ctx.session!.code)
-    // 发送邮件
-    await sendEmail({
-      to: email,
-      subject: '验证码',
-      text: '验证码',
-      html: `
+
+    if (process.env.NODE_ENV !== 'development')
+      // 发送邮件
+      await sendEmail({
+        to: email,
+        subject: '验证码',
+        text: '验证码',
+        html: `
             <div style="width: 100%;height: 100%;display: flex;place-items: center;">
                 <p>您正在注册逸课平台帐号，用户名<b>${userName}</b>，
                 验证邮箱为<b>${email}</b> 。
@@ -41,7 +50,7 @@ router.post(
                 <p>请在注册页面填写该改验证码</p>
             </div>
         `,
-    })
+      })
 
     throw new Success()
   },
