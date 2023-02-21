@@ -43,6 +43,7 @@ const BackButton: React.FC<{
       shape="circle"
       icon={<BackwardOutlined />}
       onClick={handleButtonClick}
+      data-cy="header-back"
     />
   )
 }
@@ -167,7 +168,7 @@ const SystemHeader: React.FC = () => {
           </span>
         )}
       </div>
-      <div className="right-btns" flex gap-4 w-48 justify-end>
+      <div className="right-btns flex gap-4 w-48 justify-end">
         <IconContainer
           Icon={
             <div
@@ -179,6 +180,7 @@ const SystemHeader: React.FC = () => {
             />
           }
           handleClick={handleToggleTheme}
+          data-cy="header-theme"
         />
         {logState && roomStatus === 'unbuild' && (
           <Button
@@ -191,6 +193,7 @@ const SystemHeader: React.FC = () => {
                 onOkCallback: handleLogout,
               })
             }
+            data-cy="header-logout"
           />
         )}
       </div>

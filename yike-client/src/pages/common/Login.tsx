@@ -190,6 +190,7 @@ const Login: React.FC = () => {
             size="large"
             className="bg-blue-6 w-full text-light hover:bg-#232323"
             onClick={handleSubmit}
+            data-cy="login-submit"
           >
             登录
           </Button>
@@ -206,6 +207,7 @@ const Login: React.FC = () => {
             size="large"
             className="w-40 text-light bg-green-6 hover:bg-#232323"
             onClick={handleModalShow}
+            data-cy="login-openModal"
           >
             创建新用户
           </Button>

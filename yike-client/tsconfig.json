@@ -20,9 +20,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "outDir": "out",
-    "types": ["vitest/globals", "cypress", "cypress/react18"]
+    "types": ["vitest", "vitest/globals", "cypress", "cypress/react18"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "tests/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "tests/**/*.ts"],
   "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

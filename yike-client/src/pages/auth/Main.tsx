@@ -9,7 +9,6 @@ import {
   selectRoomStatus,
   setConnectWithAudioOnly,
   setRoomHost,
-  setRoomId,
   selectErrorMessage,
   setErrorMessage,
   setWebRTCStatus,
@@ -176,6 +175,7 @@ const Main: React.FC = () => {
             className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
             hover="~ drop-shadow-[0_0_70px_rgba(124,58,237,1)]"
             onClick={handleCreate}
+            data-cy="room-create"
           >
             <div
               i-fluent:protocol-handler-24-regular
@@ -189,6 +189,7 @@ const Main: React.FC = () => {
             className="w-60 h-60 p-4 cursor-pointer rd-36 flex flex-col justify-start items-center"
             hover="~ drop-shadow-[0_0_70px_rgba(251,146,60,1)]"
             onClick={handleJoin}
+            data-cy="room-join"
           >
             <div
               i-fluent:conference-room-48-regular
@@ -205,7 +206,10 @@ const Main: React.FC = () => {
           onOk={handleOk}
           onCancel={handleCancel}
         >
-          <div flex flex-col gap-y-2 p-2 font-500 text-base>
+          <div
+            className="flex flex-col gap-y-2 p-2 font-500 text-base"
+            data-cy="room-modal"
+          >
             <div>
               {roomHost ? (
                 <div flex text-center>
@@ -219,6 +223,7 @@ const Main: React.FC = () => {
                     type="text"
                     value={joinRoomId}
                     onChange={handleInput}
+                    data-cy="room-id"
                   />
                 </div>
               )}
@@ -231,6 +236,7 @@ const Main: React.FC = () => {
                   checkedChildren="仅音频"
                   unCheckedChildren="音视频"
                   onChange={handleSwitch}
+                  data-cy="room-switch"
                 />
               </div>
             </div>

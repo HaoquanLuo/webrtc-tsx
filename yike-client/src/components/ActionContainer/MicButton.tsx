@@ -23,6 +23,7 @@ const MicButton: React.FC<MicButtonProps> = () => {
         />
       }
       handleClick={() => handleMicrophone()}
+      data-cy="btn-mic"
     />
   )
 }

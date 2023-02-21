@@ -25,6 +25,7 @@ const CameraButton: React.FC<CameraButtonProps> = () => {
         />
       }
       handleClick={() => handleCamera()}
+      data-cy="btn-camera"
     />
   )
 }

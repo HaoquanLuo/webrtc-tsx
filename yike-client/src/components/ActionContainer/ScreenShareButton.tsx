@@ -59,6 +59,7 @@ const ScreenShareButton: React.FC<ScreenShareButtonProps> = () => {
           />
         }
         handleClick={() => handleScreenShare()}
+        data-cy="btn-screenShare"
       />
       {screenShareStatus === 'screen' && screenStream ? (
         <ScreenPreviewBox screenStream={screenStream} />

@@ -251,13 +251,13 @@ const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
                 changeFn={(key, e) => {
                   handleUserChange(key, e)
                 }}
-                data-cy="register-email-code"
+                data-cy="register-code"
               />
               <Button
                 className="absolute text-light bottom-2 right-5 bg-orange hover:bg-#232323"
                 size="large"
                 onClick={handleGenerateCode}
-                data-cy="btn-code"
+                data-cy="register-generateCode"
               >
                 获取验证码
               </Button>
@@ -270,7 +270,7 @@ const RegisterBox: React.FC<RegisterBoxProps> = (props) => {
             size="large"
             className="w-60 bg-green-6 hover:bg-#232323"
             onClick={handleSubmit}
-            data-cy="btn-submit"
+            data-cy="register-submit"
           >
             注册
           </Button>
