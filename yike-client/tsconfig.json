@@ -20,7 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "outDir": "out",
-    "types": ["vitest", "vitest/globals", "cypress", "cypress/react18"]
+    "types": ["cypress", "cypress/react18"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "tests/**/*.ts"],
   "exclude": ["node_modules"],
