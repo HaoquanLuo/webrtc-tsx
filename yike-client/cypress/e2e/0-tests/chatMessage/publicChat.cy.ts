@@ -1,9 +1,8 @@
 /// <reference types="cypress" />
 
-describe('should create room', () => {
+describe('it should type and submit a message', () => {
   // Normal create room process
   it('should type the correct words into the fields', () => {
-    // login
     cy.visit('/')
     cy.get('[data-cy="login-username"]').type('ffxixslh')
     cy.get('[data-cy="login-password"]').type('123456')
@@ -12,23 +11,28 @@ describe('should create room', () => {
 
     cy.url().should('include', '/main')
 
-    // click join room button
-    cy.get('[data-cy="room-join"]').click()
+    cy.get('[data-cy="room-create"]').click()
     cy.get('[data-cy="room-modal"]').should('be.visible')
-
-    // click switch button
-    cy.get('[data-cy="room-switch"]').click().click()
-
-    // type room id into inputBox
-    cy.get('[data-cy="room-id"]').type('room-id')
 
     // click submit button
     cy.get('.ant-modal-footer > .ant-btn-primary:last').click()
 
+    // check in room
     cy.url().should('include', '/room')
 
-    // click back button
-    // cy.get('[data-cy="header-back"]', { timeout: 10000 }).click()
-    // cy.get('.ant-modal-confirm-btns > .ant-btn-primary:last').click()
+    cy.wait(1000)
+
+    // type in textarea
+    cy.get('[data-cy="chat-area"]').type('hello world')
+
+    cy.wait(1000)
+
+    // submit the public message
+    cy.get('[data-cy="chat-submit"]').click()
+
+    cy.wait(1000)
+
+    // check message in the messageBox
+    cy.get('[data-cy="chat-messageBox"]').contains('hello world')
   })
 })

@@ -68,15 +68,18 @@ const ParticipantInfoBox: React.FC<ParticipantInfoBoxProps> = (props) => {
     >
       <div font-bold>{user.username}</div>
       <div>{user.socketId}</div>
-      {username !== user.username && (
-        <IconContainer
-          absolute
-          top-3
-          right-3
-          Icon={<IconBox iconName="i-mdi-message-outline" />}
-          handleClick={() => handleSwitchChatTarget(user)}
-        />
-      )}
+      <div>
+        {username !== user.username && (
+          <IconContainer
+            absolute
+            top-3
+            right-3
+            Icon={<IconBox iconName="i-mdi-message-outline" />}
+            handleClick={() => handleSwitchChatTarget(user)}
+            data-cy="chat-directChat"
+          />
+        )}
+      </div>
     </div>
   )
 }

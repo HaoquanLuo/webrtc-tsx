@@ -29,7 +29,7 @@ const IconContainer: React.FC<Props> = (props) => {
         dark:hover:b-violet-6 dark:hover:text-violet-5
         ${iconSize[size]}
       `}
-      onClick={(e) => handleClick && handleClick(e)}
+      onClick={(e) => handleClick?.(e)}
       {...rest}
     >
       {typeof Icon === 'function' ? <Icon iconSize={size} /> : Icon}

@@ -74,7 +74,7 @@ const UserPanel: React.FC<Props> = (props) => {
 
   function messageValidator(value: string) {
     return new Promise<string>((resolve, reject) => {
-      const allowStrReg = /^((\s*)(\S+)(\s*))$/gm
+      const allowStrReg = /^((\s*)(.*)+(\s*))$/gm
       const allowStrFlag = allowStrReg.test(value)
 
       // 判断要发送的文本是否为空
@@ -280,6 +280,7 @@ const UserPanel: React.FC<Props> = (props) => {
               b-op-10
               rd-2
             "
+            data-cy="chat-messageBox"
           >
             <div
               absolute
@@ -306,6 +307,7 @@ const UserPanel: React.FC<Props> = (props) => {
                     } hover:bg-op-80 dark:bg-gray-7
                     `}
                     onClick={() => handleSetCurrChatTargetTitle(chatTitle)}
+                    data-cy="chat-user"
                   >
                     {chatSectionStructure.chatTitle}
                   </div>
@@ -337,6 +339,7 @@ const UserPanel: React.FC<Props> = (props) => {
                 onChange={handleTextAreaChange}
                 onKeyDown={handleTextAreaDown}
                 placeholder={`'Shift + Enter' 换行`}
+                data-cy="chat-area"
               />
               <IconContainer
                 absolute
@@ -345,6 +348,7 @@ const UserPanel: React.FC<Props> = (props) => {
                 size="lg"
                 Icon={<IconBox iconName="i-mdi-send" rotate--30 />}
                 handleClick={handleSendMessage}
+                data-cy="chat-submit"
               />
             </div>
           </div>
