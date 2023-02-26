@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   env: {
     browser: true,
     es2021: true,
@@ -13,5 +13,9 @@ module.exports = {
   rules: {
     'comma-dangle': ['error', 'always-multiline'],
     'no-console': 'error',
+    'no-unused-vars': [
+      'error',
+      { vars: 'all', args: 'after-used', ignoreRestSiblings: false },
+    ],
   },
 }
