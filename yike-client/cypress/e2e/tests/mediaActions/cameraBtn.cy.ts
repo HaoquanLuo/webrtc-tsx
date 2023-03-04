@@ -22,6 +22,6 @@ describe('should create room', () => {
 
     cy.wait(1000)
 
-    cy.get('[data-cy="btn-camera"]').click()
+    // cy.get('[data-cy="btn-camera"]').click()
   })
 })

@@ -15,7 +15,7 @@ describe('it should type and submit a message', () => {
     cy.get('[data-cy="room-modal"]').should('be.visible')
 
     // type room id into inputBox
-    cy.get('[data-cy="room-id"]').type('7a76fa05-3e27-406f-9d29-ea5463e3cb8c')
+    cy.get('[data-cy="room-id"]').type('186da3a7-7c6d-437b-b77c-c7886aaceb1c')
 
     // click submit button
     cy.get('.ant-modal-footer > .ant-btn-primary:last').click()
