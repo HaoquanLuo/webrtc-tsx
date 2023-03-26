@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe('should create room', () => {
+describe('should close screenShare', () => {
   // Normal create room process
   it('should type the correct words into the fields', () => {
     cy.visit('/')
