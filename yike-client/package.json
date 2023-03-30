@@ -7,7 +7,6 @@
     "dev": "vite --mode development",
     "build": "tsc && vite build --mode production",
     "preview": "vite preview",
-    "vitest": "vitest",
     "cypress:open": "cypress open"
   },
   "dependencies": {
