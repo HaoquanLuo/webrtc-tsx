@@ -1,5 +1,5 @@
 import React from 'react'
-import ShadowBox from '@/components/ShadowBox'
+import ShadowBox from '@/components/commonComponent/ShadowBox'
 import UserPanel from './UserPanel'
 import { useSelector } from 'react-redux'
 import { selectRoomStatus } from '@/redux/features/system/systemSlice'

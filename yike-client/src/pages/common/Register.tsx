@@ -3,7 +3,7 @@ import md5 from 'md5'
 import { v4 as uuidV4 } from 'uuid'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import InputBox from '@/components/InputBox'
+import InputBox from '@/components/commonComponent/InputBox'
 import { getEmailCaptcha, login, register } from '@/api/system/auth'
 import {
   selectLogState,
